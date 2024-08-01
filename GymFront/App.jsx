@@ -1,50 +1,37 @@
-import React from 'react';
-import {NavigationContainer} from '@react-navigation/native';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import {Text, View, Button, StyleSheet} from 'react-native';
-
-// Créez le Stack Navigator
-const Stack = createNativeStackNavigator();
-
-const HomeScreen = ({navigation}) => {
-  return (
-    <View style={styles.container}>
-      <Text>Home Screen</Text>
-      <Button
-        title="Go to Details"
-        onPress={() => navigation.navigate('Details')}
-      />
-    </View>
-  );
-};
-
-const DetailsScreen = ({navigation}) => {
-  return (
-    <View style={styles.container}>
-      <Text>Details Screen</Text>
-      <Button title="Go to Home" onPress={() => navigation.navigate('Home')} />
-    </View>
-  );
-};
+import React, {useEffect, useState} from 'react';
+import {SafeAreaView, Text, StyleSheet} from 'react-native';
+import axios from 'axios';
+import {API_URL} from '@env';
 
 const App = () => {
+  const [data, setData] = useState(null);
+
+  useEffect(() => {
+    console.log('API_URL:', API_URL);
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(`${API_URL}/test-db`);
+        setData(response.data);
+        console.log('Data fetched:', response.data);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+    fetchData();
+  }, []);
+
   return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="Home">
-        <Stack.Screen name="Home" component={HomeScreen} />
-        <Stack.Screen name="Details" component={DetailsScreen} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <SafeAreaView style={styles.container}>
+      <Text>{data ? JSON.stringify(data) : 'Loading...'}</Text>
+    </SafeAreaView>
   );
 };
 
-// Créer un objet de styles avec StyleSheet.create
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
     justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 
