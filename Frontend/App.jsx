@@ -1,7 +1,9 @@
 import React, {useEffect, useState} from 'react';
 import {SafeAreaView, Text, StyleSheet} from 'react-native';
 import axios from 'axios';
-import {API_URL} from '@env';
+// import {API_URL} from '@env';
+
+const API_URL = 'http://192.168.1.7:5000';
 
 const App = () => {
   const [data, setData] = useState(null);

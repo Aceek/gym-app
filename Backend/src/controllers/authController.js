@@ -18,7 +18,7 @@ const logout = (req, res) => {
       if (err) {
         return next(err);
       }
-      res.send('You are logged out');
+      res.send("You are logged out");
     });
   });
 };
