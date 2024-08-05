@@ -23,4 +23,15 @@ const protectedRoute = (req, res) => {
   res.send(`Hello ${req.user.displayName}`);
 };
 
-export { loginGoogle, googleCallback, logout, authFailure, protectedRoute };
+const profile = (req, res) => {
+  res.send(req.user);
+};
+
+export {
+  loginGoogle,
+  googleCallback,
+  logout,
+  authFailure,
+  protectedRoute,
+  profile,
+};

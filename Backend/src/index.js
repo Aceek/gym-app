@@ -4,6 +4,7 @@ import sessionConfig from "./config/session.js";
 import authRoutes from "./routes/authRoutes.js";
 import testDbConnection from "./services/dbService.js";
 import google_passport from "./config/google_passport.js";
+import { syncDatabase } from './models/index.js';
 
 const app = express();
 
@@ -24,4 +25,5 @@ app.get("/test-db", testDbConnection);
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
+  syncDatabase();
 });
