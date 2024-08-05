@@ -1,4 +1,4 @@
-// auth.js
+// google_passport.js
 
 import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
