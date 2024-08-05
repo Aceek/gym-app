@@ -1,7 +1,12 @@
 import React, {useEffect, useState} from 'react';
-import {SafeAreaView, Text, StyleSheet} from 'react-native';
+import {SafeAreaView, Text, StyleSheet, Button} from 'react-native';
 import axios from 'axios';
-// import {API_URL} from '@env';
+import {configureGoogleSignIn} from './src/googleSignInConfig';
+import {
+  GoogleSignin,
+  GoogleSigninButton,
+  statusCodes,
+} from '@react-native-google-signin/google-signin';
 
 const API_URL = 'http://192.168.1.7:5000';
 
@@ -10,6 +15,7 @@ const App = () => {
 
   useEffect(() => {
     console.log('API_URL:', API_URL);
+    configureGoogleSignIn();
     const fetchData = async () => {
       try {
         const response = await axios.get(`${API_URL}/test-db`);
@@ -22,9 +28,58 @@ const App = () => {
     fetchData();
   }, []);
 
+  const signIn = async () => {
+    try {
+      await GoogleSignin.hasPlayServices();
+      const userInfo = await GoogleSignin.signIn();
+      console.log('User Info:', userInfo);
+
+      // Obtenir le token d'authentification
+      const {idToken} = await GoogleSignin.getTokens();
+      console.log('ID Token:', idToken);
+
+      if (!idToken) {
+        throw new Error('Failed to retrieve idToken');
+      }
+
+      // Envoyer le token au backend
+      const response = await axios.post(`${API_URL}/auth/google`, {
+        token: idToken,
+      });
+
+      console.log('Server response:', response.data);
+    } catch (error) {
+      if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+        console.log('User cancelled the login flow');
+      } else if (error.code === statusCodes.IN_PROGRESS) {
+        console.log('Sign in is in progress already');
+      } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+        console.log('Play Services not available or outdated');
+      } else {
+        console.error('Error during sign-in:', error);
+      }
+    }
+  };
+
+  const signOut = async () => {
+    try {
+      await GoogleSignin.signOut();
+      console.log('User signed out');
+    } catch (error) {
+      console.error('Error during sign-out:', error);
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <Text>{data ? JSON.stringify(data) : 'Loading...'}</Text>
+      <GoogleSigninButton
+        style={{width: 192, height: 48}}
+        size={GoogleSigninButton.Size.Wide}
+        color={GoogleSigninButton.Color.Dark}
+        onPress={signIn}
+      />
+      <Button title="Sign Out" onPress={signOut} />
     </SafeAreaView>
   );
 };
