@@ -10,9 +10,17 @@ const googleCallback = passport.authenticate("google", {
 });
 
 const logout = (req, res) => {
-  req.logout();
-  req.session.destroy();
-  res.send("You are logged out");
+  req.logout((err) => {
+    if (err) {
+      return next(err);
+    }
+    req.session.destroy((err) => {
+      if (err) {
+        return next(err);
+      }
+      res.send('You are logged out');
+    });
+  });
 };
 
 const authFailure = (req, res) => {
