@@ -1,13 +1,48 @@
 import axios from 'axios';
 import {API_URL} from '@env';
+import {refreshTokenFunc} from './authService';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const api = axios.create({
+export const api = axios.create({
   baseURL: API_URL + '/api',
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
   },
 });
+
+api.interceptors.request.use(
+  async config => {
+    const accessToken = await AsyncStorage.getItem('access_token');
+    if (accessToken) {
+      config.headers.Authorization = `Bearer ${accessToken}`;
+    }
+    return config;
+  },
+  error => {
+    return Promise.reject(error);
+  },
+);
+
+api.interceptors.response.use(
+  response => response,
+  async error => {
+    const originalRequest = error.config;
+    if (error.response.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+      try {
+        const newAccessToken = await refreshTokenFunc();
+        axios.defaults.headers.common.Authorization = `Bearer ${newAccessToken}`;
+        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+
+        return api(originalRequest);
+      } catch (err) {
+        return Promise.reject(err);
+      }
+    }
+    return Promise.reject(error);
+  },
+);
 
 export const authenticateWithGoogle = async idToken => {
   try {
