@@ -2,6 +2,7 @@ import express from "express";
 import passport from "passport";
 import sessionConfig from "./config/session.js";
 import authRoutes from "./routes/authRoutes.js";
+import tokenRoutes from "./routes/tokenRoutes.js";
 import testDbConnection from "./services/dbService.js";
 import sequelize from "./config/sequelize.js";
 
@@ -14,7 +15,7 @@ app.use(passport.session());
 app.use(express.json());
 
 app.use("/auth", authRoutes);
-
+app.use("/token", tokenRoutes);
 app.get("/test-db", testDbConnection);
 
 const startServer = async () => {

@@ -19,7 +19,7 @@ export const authenticateGoogleUser = async (req, res) => {
       user,
     });
   } catch (error) {
-    console.error('Error during authentication:', error);
+    console.error('Error during authentication:', error); // Log the error for debugging
     res.status(500).json({ message: 'Internal Server Error' });
   }
 };
