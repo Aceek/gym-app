@@ -14,8 +14,8 @@ app.use(passport.session());
 
 app.use(express.json());
 
-app.use("/auth", authRoutes);
-app.use("/token", tokenRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/token", tokenRoutes);
 app.get("/test-db", testDbConnection);
 
 const startServer = async () => {

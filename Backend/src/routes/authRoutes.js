@@ -7,11 +7,7 @@ import googleAuthMiddleware from "../middlewares/googleAuthMiddleware.js";
 
 const router = Router();
 
-router.post(
-  "/verify-token",
-  googleAuthMiddleware,
-  authenticateGoogleUser
-);
+router.post("/google", googleAuthMiddleware, authenticateGoogleUser);
 router.get("/logout", logout);
 
 export default router;
