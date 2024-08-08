@@ -1,3 +1,4 @@
+// App.jsx
 import React, {useEffect, useState} from 'react';
 import {SafeAreaView, Text, StyleSheet, Button} from 'react-native';
 import axios from 'axios';
@@ -14,13 +15,11 @@ const App = () => {
   const [data, setData] = useState(null);
 
   useEffect(() => {
-    console.log('API_URL:', API_URL);
     configureGoogleSignIn();
     const fetchData = async () => {
       try {
         const response = await axios.get(`${API_URL}/test-db`);
         setData(response.data);
-        console.log('Data fetched:', response.data);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -31,22 +30,19 @@ const App = () => {
   const signIn = async () => {
     try {
       await GoogleSignin.hasPlayServices();
-      const userInfo = await GoogleSignin.signIn();
-      console.log('User Info:', userInfo);
+      await GoogleSignin.signIn();
 
-      // Obtenir le token d'authentification
+      // Obtain the authentication token
       const {idToken} = await GoogleSignin.getTokens();
-      console.log('ID Token:', idToken);
 
       if (!idToken) {
         throw new Error('Failed to retrieve idToken');
       }
 
-      // Envoyer le token au backend
+      // Send the token to the backend
       const response = await axios.post(`${API_URL}/auth/google`, {
         token: idToken,
       });
-
       console.log('Server response:', response.data);
     } catch (error) {
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
