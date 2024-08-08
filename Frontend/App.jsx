@@ -40,7 +40,7 @@ const App = () => {
       }
 
       // Send the token to the backend
-      const response = await axios.post(`${API_URL}/auth/google`, {
+      const response = await axios.post(`${API_URL}/auth/verify-token`, {
         token: idToken,
       });
       console.log('Server response:', response.data);
