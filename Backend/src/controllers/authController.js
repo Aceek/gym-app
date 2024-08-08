@@ -11,6 +11,7 @@ export const authenticateGoogleUser = async (req, res) => {
     const { user, created } = await userService.findOrCreateUser(googleUser);
     const accessToken = tokenService.generateAccessToken(user);
     const refreshToken = tokenService.generateRefreshToken(user);
+    console.log("accessToken\n\n", accessToken);
 
     res.status(200).json({
       message: created ? "User created" : "User logged in",

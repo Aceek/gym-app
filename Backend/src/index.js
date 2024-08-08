@@ -5,6 +5,7 @@ import authRoutes from "./routes/authRoutes.js";
 import tokenRoutes from "./routes/tokenRoutes.js";
 import testDbConnection from "./services/dbService.js";
 import sequelize from "./config/sequelize.js";
+import protectedRoutes from "./routes/protectedRoutes.js";
 
 const app = express();
 
@@ -16,6 +17,7 @@ app.use(express.json());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/token", tokenRoutes);
+app.use('/api/protected', protectedRoutes); 
 app.get("/test-db", testDbConnection);
 
 const startServer = async () => {
