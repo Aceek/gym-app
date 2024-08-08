@@ -3,8 +3,7 @@ import passport from "passport";
 import sessionConfig from "./config/session.js";
 import authRoutes from "./routes/authRoutes.js";
 import testDbConnection from "./services/dbService.js";
-import google_passport from "./config/google_passport.js";
-import { syncDatabase } from './models/index.js';
+import sequelize from "./config/sequelize.js";
 
 const app = express();
 
@@ -14,16 +13,20 @@ app.use(passport.session());
 
 app.use(express.json());
 
-app.get("/", (req, res) => {
-  res.send('<a href="auth/google">Authenticate with Google</a>');
-});
-
-app.use(authRoutes);
+app.use("/auth", authRoutes);
 
 app.get("/test-db", testDbConnection);
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-  syncDatabase();
-});
+const startServer = async () => {
+  try {
+    await sequelize.authenticate();
+    await sequelize.sync();
+    app.listen(5000, () => {
+      console.log("Server is running on port 5000");
+    });
+  } catch (error) {
+    console.error("Unable to connect to the database:", error);
+  }
+};
+
+startServer();

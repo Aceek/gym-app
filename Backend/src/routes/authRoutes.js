@@ -1,22 +1,17 @@
-import express from "express";
+import { Router } from "express";
 import {
-  loginGoogle,
-  googleAuth,
-  googleCallback,
+  authenticateGoogleUser,
   logout,
-  authFailure,
-  protectedRoute,
-  profile,
 } from "../controllers/authController.js";
-import isLoggedIn from "../middlewares/authMiddleware.js";
+import googleAuthMiddleware from "../middlewares/googleAuthMiddleware.js";
 
-const router = express.Router();
+const router = Router();
 
-router.post("/auth/google", googleAuth);
-router.get("/google/callback", googleCallback);
+router.post(
+  "/verify-token",
+  googleAuthMiddleware,
+  authenticateGoogleUser
+);
 router.get("/logout", logout);
-router.get("/auth/failure", authFailure);
-router.get("/protected", isLoggedIn, protectedRoute);
-router.get("/profile", isLoggedIn, profile);
 
 export default router;

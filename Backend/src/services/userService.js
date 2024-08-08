@@ -1,18 +1,22 @@
-import User from "../models/user.js";
+import User from '../models/userModel.js';
 
-export const findOrCreateUser = async (profile) => {
-  let user = await User.findOne({ where: { googleId: profile.id } });
-  if (!user) {
-    user = await User.create({
-      googleId: profile.id,
-      email: profile.emails[0].value,
-      displayName: profile.displayName,
-      photo: profile.photos[0].value,
+const findOrCreateUser = async (googleUser) => {
+  try {
+    const [user, created] = await User.findOrCreate({
+      where: { googleId: googleUser.id },
+      defaults: {
+        googleId: googleUser.id,
+        email: googleUser.email,
+        displayName: googleUser.displayName,
+        photo: googleUser.photo,
+      },
     });
+    return { user, created };
+  } catch (error) {
+    throw new Error('Error finding or creating user');
   }
-  return user;
 };
 
-export const findUserById = async (id) => {
-  return await User.findByPk(id);
+export default {
+  findOrCreateUser,
 };
