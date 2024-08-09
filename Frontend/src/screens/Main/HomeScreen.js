@@ -2,6 +2,7 @@ import React, {useContext, useState, useEffect} from 'react';
 import {View, Text, Button, ScrollView} from 'react-native';
 import {AuthContext} from '../../context/AuthContext';
 import * as Keychain from 'react-native-keychain';
+import {ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY} from '@env';
 
 const HomeScreen = () => {
   const {user, logout} = useContext(AuthContext);
@@ -10,9 +11,11 @@ const HomeScreen = () => {
   useEffect(() => {
     const fetchTokens = async () => {
       try {
-        const accessToken = await Keychain.getGenericPassword();
+        const accessToken = await Keychain.getGenericPassword({
+          service: ACCESS_TOKEN_KEY,
+        });
         const refreshToken = await Keychain.getGenericPassword({
-          service: 'refresh_token',
+          service: REFRESH_TOKEN_KEY,
         });
 
         setTokens({

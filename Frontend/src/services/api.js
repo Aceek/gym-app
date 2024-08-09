@@ -1,7 +1,9 @@
 import axios from 'axios';
 import {API_URL} from '@env';
 import {refreshTokenFunc} from './authService';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Keychain from 'react-native-keychain';
+
+const ACCESS_TOKEN = 'access_token';
 
 export const api = axios.create({
   baseURL: API_URL + '/api',
@@ -14,7 +16,9 @@ export const api = axios.create({
 export const setupAxiosInterceptorsJwt = () => {
   axios.interceptors.request.use(
     async config => {
-      const accessToken = await AsyncStorage.getItem('access_token');
+      const accessToken = await Keychain.getGenericPassword({
+        service: ACCESS_TOKEN,
+      });
       if (accessToken) {
         config.headers.Authorization = `Bearer ${accessToken}`;
       }

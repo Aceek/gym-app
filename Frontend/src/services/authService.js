@@ -1,9 +1,7 @@
 import * as Keychain from 'react-native-keychain';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import {authenticateWithGoogle, api} from './api';
-
-const ACCESS_TOKEN_KEY = 'access_token';
-const REFRESH_TOKEN_KEY = 'refresh_token';
+import {ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY} from '@env';
 
 export const loginWithGoogle = async () => {
   try {
@@ -71,7 +69,9 @@ export const refreshTokenFunc = async () => {
 
 export const getTokens = async () => {
   try {
-    const accessToken = await Keychain.getGenericPassword();
+    const accessToken = await Keychain.getGenericPassword({
+      service: ACCESS_TOKEN_KEY,
+    });
     const refreshToken = await Keychain.getGenericPassword({
       service: REFRESH_TOKEN_KEY,
     });

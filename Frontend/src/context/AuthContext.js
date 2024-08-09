@@ -2,10 +2,7 @@ import React, {createContext, useState, useEffect} from 'react';
 import {loginWithGoogle, googleLogout} from '../services/authService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Keychain from 'react-native-keychain';
-
-const ACCESS_TOKEN_KEY = 'access_token';
-const REFRESH_TOKEN_KEY = 'refresh_token';
-const USER_KEY = 'user';
+import {ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY, USER_KEY} from '@env';
 
 export const AuthContext = createContext();
 
