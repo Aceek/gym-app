@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
-import {authenticateWithGoogle} from './api';
+import {authenticateWithGoogle, api} from './api';
 
 const ACCESS_TOKEN_KEY = 'access_token';
 const REFRESH_TOKEN_KEY = 'refresh_token';
@@ -27,7 +27,7 @@ export const loginWithGoogle = async () => {
   }
 };
 
-export const logout = async () => {
+export const googleLogout = async () => {
   try {
     await AsyncStorage.removeItem(ACCESS_TOKEN_KEY);
     await AsyncStorage.removeItem(REFRESH_TOKEN_KEY);
@@ -35,6 +35,21 @@ export const logout = async () => {
     await GoogleSignin.signOut();
   } catch (error) {
     console.error('Error logging out:', error);
+    throw error;
+  }
+};
+
+export const refreshTokenFunc = async () => {
+  try {
+    const refreshToken = await AsyncStorage.getItem(REFRESH_TOKEN_KEY);
+    const response = await api.post('/token/refresh-token', {
+      refreshToken: refreshToken,
+    });
+    const {accessToken} = response.data;
+    await AsyncStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
+    return accessToken;
+  } catch (error) {
+    console.error('Error refreshing token:', error);
     throw error;
   }
 };

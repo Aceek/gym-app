@@ -8,7 +8,6 @@ const LoginScreen = () => {
 
   const handleGoogleSignIn = async () => {
     try {
-      await login();
     } catch (error) {
       console.error('Login failed', error);
     }

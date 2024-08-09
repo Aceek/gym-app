@@ -11,38 +11,55 @@ export const api = axios.create({
   },
 });
 
-api.interceptors.request.use(
-  async config => {
-    const accessToken = await AsyncStorage.getItem('access_token');
-    if (accessToken) {
-      config.headers.Authorization = `Bearer ${accessToken}`;
-    }
-    return config;
-  },
-  error => {
-    return Promise.reject(error);
-  },
-);
+// api.interceptors.request.use(
+//   async config => {
+//     const accessToken = await AsyncStorage.getItem('access_token');
+//     if (accessToken) {
+//       config.headers.Authorization = `Bearer ${accessToken}`;
+//     }
+//     return config;
+//   },
+//   error => {
+//     return Promise.reject(error);
+//   },
+// );
 
-api.interceptors.response.use(
-  response => response,
-  async error => {
-    const originalRequest = error.config;
-    if (error.response.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
-      try {
-        const newAccessToken = await refreshTokenFunc();
-        axios.defaults.headers.common.Authorization = `Bearer ${newAccessToken}`;
-        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-
-        return api(originalRequest);
-      } catch (err) {
-        return Promise.reject(err);
+export const setupAxiosInterceptorsJwt = () => {
+  axios.interceptors.request.use(
+    async config => {
+      const accessToken = await AsyncStorage.getItem('access_token');
+      if (accessToken) {
+        config.headers.Authorization = `Bearer ${accessToken}`;
       }
-    }
-    return Promise.reject(error);
-  },
-);
+      return config;
+    },
+    error => {
+      return Promise.reject(error);
+    },
+  );
+};
+
+export const setupAxiosInterceptors401 = logout => {
+  axios.interceptors.response.use(
+    response => response,
+    async error => {
+      const originalRequest = error.config;
+      if (error.response.status === 401 && !originalRequest._retry) {
+        originalRequest._retry = true;
+        try {
+          const newAccessToken = await refreshTokenFunc();
+          axios.defaults.headers.common.Authorization = `Bearer ${newAccessToken}`;
+          originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+          return axios(originalRequest);
+        } catch (err) {
+          logout();
+          return Promise.reject(err);
+        }
+      }
+      return Promise.reject(error);
+    },
+  );
+};
 
 export const authenticateWithGoogle = async idToken => {
   try {

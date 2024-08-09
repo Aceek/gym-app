@@ -1,8 +1,5 @@
 import React, {createContext, useState, useEffect} from 'react';
-import {
-  loginWithGoogle,
-  logout as logoutService,
-} from '../services/authService';
+import {loginWithGoogle, googleLogout} from '../services/authService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const AuthContext = createContext();
@@ -33,9 +30,10 @@ export const AuthProvider = ({children}) => {
 
   const logout = async () => {
     try {
-      await logoutService();
+      await googleLogout();
       setUser(null);
       await AsyncStorage.removeItem('user');
+      console.log('User logged out');
     } catch (error) {
       console.error('Error during logout:', error);
     }
