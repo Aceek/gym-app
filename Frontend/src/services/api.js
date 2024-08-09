@@ -11,19 +11,6 @@ export const api = axios.create({
   },
 });
 
-// api.interceptors.request.use(
-//   async config => {
-//     const accessToken = await AsyncStorage.getItem('access_token');
-//     if (accessToken) {
-//       config.headers.Authorization = `Bearer ${accessToken}`;
-//     }
-//     return config;
-//   },
-//   error => {
-//     return Promise.reject(error);
-//   },
-// );
-
 export const setupAxiosInterceptorsJwt = () => {
   axios.interceptors.request.use(
     async config => {

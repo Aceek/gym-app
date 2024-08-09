@@ -1,4 +1,4 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Keychain from 'react-native-keychain';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import {authenticateWithGoogle, api} from './api';
 
@@ -17,8 +17,13 @@ export const loginWithGoogle = async () => {
       idToken,
     );
 
-    await AsyncStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
-    await AsyncStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
+    await Keychain.setGenericPassword(ACCESS_TOKEN_KEY, accessToken, {
+      service: ACCESS_TOKEN_KEY,
+    });
+
+    await Keychain.setGenericPassword(REFRESH_TOKEN_KEY, refreshToken, {
+      service: REFRESH_TOKEN_KEY,
+    });
 
     return user;
   } catch (error) {
@@ -29,10 +34,10 @@ export const loginWithGoogle = async () => {
 
 export const googleLogout = async () => {
   try {
-    await AsyncStorage.removeItem(ACCESS_TOKEN_KEY);
-    await AsyncStorage.removeItem(REFRESH_TOKEN_KEY);
-
     await GoogleSignin.signOut();
+
+    await Keychain.resetGenericPassword({service: ACCESS_TOKEN_KEY});
+    await Keychain.resetGenericPassword({service: REFRESH_TOKEN_KEY});
   } catch (error) {
     console.error('Error logging out:', error);
     throw error;
@@ -41,12 +46,22 @@ export const googleLogout = async () => {
 
 export const refreshTokenFunc = async () => {
   try {
-    const refreshToken = await AsyncStorage.getItem(REFRESH_TOKEN_KEY);
+    const refreshToken = await Keychain.getGenericPassword({
+      service: REFRESH_TOKEN_KEY,
+    });
+    if (!refreshToken) {
+      throw new Error('No refresh token found');
+    }
+
     const response = await api.post('/token/refresh-token', {
-      refreshToken: refreshToken,
+      refreshToken: refreshToken.password,
     });
     const {accessToken} = response.data;
-    await AsyncStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
+
+    await Keychain.setGenericPassword(ACCESS_TOKEN_KEY, accessToken, {
+      service: ACCESS_TOKEN_KEY,
+    });
+
     return accessToken;
   } catch (error) {
     console.error('Error refreshing token:', error);
@@ -56,9 +71,15 @@ export const refreshTokenFunc = async () => {
 
 export const getTokens = async () => {
   try {
-    const accessToken = await AsyncStorage.getItem(ACCESS_TOKEN_KEY);
-    const refreshToken = await AsyncStorage.getItem(REFRESH_TOKEN_KEY);
-    return {accessToken, refreshToken};
+    const accessToken = await Keychain.getGenericPassword();
+    const refreshToken = await Keychain.getGenericPassword({
+      service: REFRESH_TOKEN_KEY,
+    });
+
+    return {
+      accessToken: accessToken ? accessToken.password : null,
+      refreshToken: refreshToken ? refreshToken.password : null,
+    };
   } catch (error) {
     console.error('Error getting tokens:', error);
     throw error;
