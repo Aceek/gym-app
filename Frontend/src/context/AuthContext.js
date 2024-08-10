@@ -1,8 +1,7 @@
 import React, {createContext, useState, useEffect} from 'react';
 import {loginWithGoogle, googleLogout} from '../services/authService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as Keychain from 'react-native-keychain';
-import {ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY, USER_KEY} from '@env';
+import {USER_KEY} from '@env';
 
 export const AuthContext = createContext();
 
@@ -32,7 +31,6 @@ export const AuthProvider = ({children}) => {
       const userData = await loginWithGoogle();
 
       setUser(userData);
-      await AsyncStorage.setItem(USER_KEY, JSON.stringify(userData));
     } catch (error) {
       console.error('Error during login:', error);
     }
@@ -42,12 +40,6 @@ export const AuthProvider = ({children}) => {
     try {
       await googleLogout();
       setUser(null);
-
-      await Keychain.resetGenericPassword({service: ACCESS_TOKEN_KEY});
-      await Keychain.resetGenericPassword({service: REFRESH_TOKEN_KEY});
-
-      await AsyncStorage.removeItem(USER_KEY);
-
       console.log('User logged out');
     } catch (error) {
       console.error('Error during logout:', error);

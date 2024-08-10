@@ -1,7 +1,8 @@
 import * as Keychain from 'react-native-keychain';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import {authenticateWithGoogle, api} from './api';
-import {ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY} from '@env';
+import {ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY, USER_KEY} from '@env';
+import {AsyncStorage} from 'react-native';
 
 export const loginWithGoogle = async () => {
   try {
@@ -23,6 +24,8 @@ export const loginWithGoogle = async () => {
       service: REFRESH_TOKEN_KEY,
     });
 
+    await AsyncStorage.setItem(USER_KEY, JSON.stringify(user));
+
     return user;
   } catch (error) {
     console.error('Error logging in with Google:', error);
@@ -36,6 +39,8 @@ export const googleLogout = async () => {
 
     await Keychain.resetGenericPassword({service: ACCESS_TOKEN_KEY});
     await Keychain.resetGenericPassword({service: REFRESH_TOKEN_KEY});
+
+    await AsyncStorage.removeItem(USER_KEY);
   } catch (error) {
     console.error('Error logging out:', error);
     throw error;
