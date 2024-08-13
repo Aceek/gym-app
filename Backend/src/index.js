@@ -2,10 +2,9 @@ import express from "express";
 import authRoutes from "./routes/authRoutes.js";
 import tokenRoutes from "./routes/tokenRoutes.js";
 import protectedRoutes from "./routes/protectedRoutes.js";
-import { PrismaClient } from '@prisma/client';
+import { prisma } from "./config/prismaClient.js";
 
 const app = express();
-const prisma = new PrismaClient();
 
 app.use(express.json());
 

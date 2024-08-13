@@ -1,7 +1,5 @@
-import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt";
-
-const prisma = new PrismaClient();
+import { prisma } from "../config/prismaClient.js";
 
 export const findOrCreateUser = async (googleUser) => {
   try {
