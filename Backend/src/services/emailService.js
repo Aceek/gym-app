@@ -15,7 +15,7 @@ const transporter = nodemailer.createTransport({
 export const sendConfirmationEmail = async (email, token) => {
   const confirmationLink = `${process.env.FRONTEND_URL}/confirm-email?token=${token}`;
   const mailOptions = {
-    from: process.env.SES_SMTP_USER,
+    from: process.env.SES_SMTP_VERIFIED_MAIL,
     to: email,
     subject: "Confirm your email",
     html: `<p>Please confirm your email by clicking the following link: <a href="${confirmationLink}">Confirm Email</a></p>`,
@@ -26,7 +26,7 @@ export const sendConfirmationEmail = async (email, token) => {
 export const sendResetPasswordEmail = async (email, token) => {
   const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
   const mailOptions = {
-    from: process.env.SES_SMTP_USER,
+    from: process.env.SES_SMTP_VERIFIED_MAIL,
     to: email,
     subject: "Reset your password",
     html: `<p>Click the following link to reset your password: <a href="${resetLink}">Reset Password</a></p>`,
