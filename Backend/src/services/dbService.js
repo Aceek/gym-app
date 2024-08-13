@@ -1,8 +1,10 @@
-import sequelize from '../config/sequelize.js';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 const testDbConnection = async (req, res) => {
   try {
-    const [result] = await sequelize.query("SELECT NOW()");
+    const result = await prisma.$queryRaw`SELECT NOW()`;
     res.json(result[0]);
   } catch (err) {
     console.error(err);

@@ -3,15 +3,15 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const generateAccessToken = (user) => {
+export const generateAccessToken = (user) => {
   return jwt.sign(
     { id: user.id, email: user.email },
     process.env.ACCESS_TOKEN_SECRET,
-    { expiresIn: "1m" }
+    { expiresIn: "5m" }
   );
 };
 
-const generateRefreshToken = (user) => {
+export const generateRefreshToken = (user) => {
   return jwt.sign(
     { id: user.id, email: user.email },
     process.env.REFRESH_TOKEN_SECRET,
@@ -19,12 +19,26 @@ const generateRefreshToken = (user) => {
   );
 };
 
-const verifyToken = (token, secret) => {
+export const verifyToken = (token, secret) => {
   return jwt.verify(token, secret);
+};
+
+export const generateConfirmationToken = (userId) => {
+  return jwt.sign({ id: userId }, process.env.EMAIL_CONFIRMATION_SECRET, {
+    expiresIn: "1h",
+  });
+};
+
+export const generateResetToken = (userId) => {
+  return jwt.sign({ id: userId }, process.env.RESET_PASSWORD_SECRET, {
+    expiresIn: "1h",
+  });
 };
 
 export default {
   generateAccessToken,
   generateRefreshToken,
   verifyToken,
+  generateConfirmationToken,
+  generateResetToken,
 };

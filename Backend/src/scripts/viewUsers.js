@@ -1,15 +1,16 @@
-import sequelize from '../config/sequelize.js';
-import User from '../models/user.js';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 const viewUsers = async () => {
   try {
-    await sequelize.authenticate();
-    const users = await User.findAll();
+    await prisma.$connect();
+    const users = await prisma.user.findMany();
     console.log(users);
   } catch (err) {
     console.error('Error fetching users:', err);
   } finally {
-    await sequelize.close();
+    await prisma.$disconnect();
   }
 };
 

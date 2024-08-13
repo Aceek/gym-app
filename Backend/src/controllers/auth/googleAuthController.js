@@ -1,7 +1,7 @@
 // src/controllers/authController.js
 import dotenv from "dotenv";
-import userService from "../services/userService.js";
-import tokenService from "../services/tokenService.js";
+import userService from "../../services/userService.js";
+import tokenService from "../../services/tokenService.js";
 
 dotenv.config();
 
@@ -25,7 +25,7 @@ export const authenticateGoogleUser = async (req, res) => {
   }
 };
 
-export const logout = (req, res) => {
+export const googleLogout = (req, res) => {
   req.logout();
   res.redirect("/");
 };

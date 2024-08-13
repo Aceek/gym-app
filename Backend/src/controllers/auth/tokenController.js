@@ -1,4 +1,4 @@
-import tokenService from "../services/tokenService.js";
+import tokenService from "../../services/tokenService.js";
 
 export const refreshToken = (req, res) => {
   const { refreshToken } = req.body;
