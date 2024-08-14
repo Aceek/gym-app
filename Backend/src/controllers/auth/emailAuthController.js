@@ -6,6 +6,7 @@ import {
   calculateTokenExpiry,
 } from "../../services/tokenBlacklistService.js";
 import redisService from "../../services/redisService.js";
+import prisma from "../../config/prismaClient.js";
 
 export const register = async (req, res) => {
   const { email, password, displayName } = req.body;
@@ -28,12 +29,17 @@ export const register = async (req, res) => {
 
       const confirmationToken = tokenService.generateConfirmationToken(user.id);
 
-      await userService.updateUserWithToken(user.id, confirmationToken, prisma);
+      const updatedUser = await userService.updateUserWithToken(
+        user.id,
+        confirmationToken,
+        prisma
+      );
 
-      return user;
+      return updatedUser;
     });
 
     const confirmationToken = newUser.emailConfirmationToken;
+    console.log("confirmationToken", confirmationToken);
     await emailService.sendConfirmationEmail(newUser.email, confirmationToken);
     console.log(`Confirmation email sent to: ${newUser.email}`);
 

@@ -59,9 +59,9 @@ export const verifyPassword = async (user, password) => {
   return bcrypt.compare(password, user.password);
 };
 
-export const verifyUser = async (user) => {
+export const verifyUser = async (userId) => {
   return prisma.user.update({
-    where: { id: user.id },
+    where: { id: userId },
     data: { isVerified: true },
   });
 };
