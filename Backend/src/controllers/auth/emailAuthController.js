@@ -104,6 +104,11 @@ export const confirmEmail = async (req, res) => {
       return res.status(400).json({ message: "Invalid token" });
     }
 
+    if (user.isVerified) {
+      console.warn(`Email already confirmed for user id: ${user.id}`);
+      return res.status(400).json({ message: "Email already confirmed" });
+    }
+
     if (user.emailConfirmationToken !== token) {
       console.warn(`Token mismatch for email confirmation: ${token}`);
       return res.status(400).json({ message: "Invalid token" });
@@ -225,7 +230,6 @@ export const changePassword = async (req, res) => {
     res.status(500).json({ message: "Error changing password", error });
   }
 };
-
 
 export const resendConfirmationEmail = async (req, res) => {
   try {

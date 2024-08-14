@@ -7,8 +7,8 @@ export const validateEmail = () => {
     .normalizeEmail();
 };
 
-export const validatePasswordRegister = () => {
-  return body("password")
+export const validatePasswordRegister = (passwordField = "password") => {
+  return body(passwordField)
     .isLength({ min: 6 })
     .withMessage("Password must be at least 6 characters long")
     .matches(/\d/)

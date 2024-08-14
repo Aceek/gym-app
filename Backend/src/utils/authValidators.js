@@ -21,7 +21,7 @@ export const validateLogin = [validateEmail(), validatePasswordLogin()];
 export const validateChangePassword = [
   validateToken(),
   validateRefreshToken(),
-  validatePasswordRegister(),
+  validatePasswordRegister("newPassword"),
 ];
 
 export const validateConfirmEmail = [validateToken()];
@@ -36,5 +36,5 @@ export const validateLogout = [validateRefreshToken(), validateToken()];
 
 export const validateResetPassword = [
   validateResetToken(),
-  validatePasswordRegister(),
+  validatePasswordRegister("newPassword"),
 ];
