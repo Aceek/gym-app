@@ -126,6 +126,15 @@ export const forgotPassword = async (req, res) => {
     const { email } = req.body;
     console.log(`Forgot password request received for email: ${email}`);
 
+    const rateLimitKey = `forgot_password_${email}`;
+    const limitReached = await redisService.isRateLimited(rateLimitKey, 3);
+    if (limitReached) {
+      console.warn(`Rate limit exceeded for email: ${email}`);
+      return res
+        .status(429)
+        .json({ message: "Too many requests. Please try again later." });
+    }
+
     const user = await userService.findUserByEmail(email);
     if (!user) {
       console.warn(
@@ -142,6 +151,8 @@ export const forgotPassword = async (req, res) => {
 
     await emailService.sendResetPasswordEmail(user.email, resetToken);
     console.log(`Password reset email sent to: ${user.email}`);
+
+    await redisService.incrementRateLimit(rateLimitKey);
 
     res.json({ message: "Password reset email sent" });
   } catch (error) {
@@ -215,6 +226,8 @@ export const changePassword = async (req, res) => {
   }
 };
 
+import { isRateLimited, incrementRateLimit } from "../services/redisService";
+
 export const resendConfirmationEmail = async (req, res) => {
   try {
     const { email } = req.body;
@@ -239,14 +252,15 @@ export const resendConfirmationEmail = async (req, res) => {
       return res.status(400).json({ message: "Email is already confirmed" });
     }
 
-    const isLimited = await redisService.isRateLimited(email);
+    const rateLimitKey = `resend_confirmation_${email}`;
+    const isLimited = await isRateLimited(rateLimitKey, 3);
     if (isLimited) {
       return res
         .status(429)
         .json({ message: "Too many requests. Please try again later." });
     }
 
-    await redisService.incrementRateLimit(email);
+    await incrementRateLimit(rateLimitKey);
 
     const confirmationToken = tokenService.generateConfirmationToken(user.id);
 

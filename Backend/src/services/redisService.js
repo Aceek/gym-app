@@ -19,19 +19,13 @@ export const retryConnection = async () => {
   }
 };
 
-export const isRateLimited = async (email, limit = 3) => {
-  const rateLimitKey = `resend_confirmation_${email}`;
-  const attempts = await redisClient.get(rateLimitKey);
+export const isRateLimited = async (key, limit = 3) => {
+  const attempts = await redisClient.get(key);
   return attempts && attempts >= limit;
 };
 
-export const incrementRateLimit = async (email) => {
-  const rateLimitKey = `resend_confirmation_${email}`;
-  await redisClient
-    .multi()
-    .incr(rateLimitKey)
-    .expire(rateLimitKey, 3600) // Expire en 1 heure
-    .exec();
+export const incrementRateLimit = async (key, expiration = 3600) => {
+  await redisClient.multi().incr(key).expire(key, expiration).exec();
 };
 
 export default {
