@@ -219,7 +219,6 @@ export const changePassword = async (req, res) => {
 
     await userService.resetPassword(user, newPassword);
 
-    // Invalidation des anciens tokens
     const accessTokenExpiry = calculateTokenExpiry(accessToken);
     const refreshTokenExpiry = calculateTokenExpiry(refreshToken);
 
@@ -297,10 +296,6 @@ export const logout = async (req, res) => {
       authHeader && authHeader.startsWith("Bearer ")
         ? authHeader.split(" ")[1]
         : null;
-
-    if (!verifyToken(refreshToken, process.env.REFRESH_TOKEN_SECRET)) {
-      return res.status(401).json({ message: "Invalid refresh token" });
-    }
 
     const accessTokenExpiry = calculateTokenExpiry(token);
     const refreshTokenExpiry = calculateTokenExpiry(refreshToken);
