@@ -152,7 +152,7 @@ export const forgotPassword = async (req, res) => {
 
 export const resetPassword = async (req, res) => {
   try {
-    const { token, refreshToken, newPassword } = req.body;
+    const { token, newPassword } = req.body;
     console.log(`Password reset request received with token: ${token}`);
 
     const decoded = tokenService.verifyToken(
@@ -161,18 +161,13 @@ export const resetPassword = async (req, res) => {
     );
 
     const user = await userService.findUserById(decoded.id);
-    if (!user) {
-      console.warn("User not found for password reset");
+    if (!user || user.resetToken !== token) {
+      console.warn("Invalid or expired token for password reset");
       return res.status(400).json({ message: "User not found" });
     }
 
-    const accessTokenExpiry = calculateTokenExpiry(token);
-    const refreshTokenExpiry = calculateTokenExpiry(refreshToken);
-
-    await addToBlacklist(token, accessTokenExpiry);
-    await addToBlacklist(refreshToken, refreshTokenExpiry);
-
     await userService.resetPassword(user, newPassword);
+
     console.log(`Password reset successfully for user id: ${user.id}`);
 
     res.json({
@@ -181,6 +176,42 @@ export const resetPassword = async (req, res) => {
   } catch (error) {
     console.error("Error resetting password:", error);
     res.status(500).json({ message: "Error resetting password", error });
+  }
+};
+
+export const changePassword = async (req, res) => {
+  try {
+    const { newPassword, accessToken, refreshToken } = req.body;
+    console.log(`Password change request received with access token.`);
+
+    const decoded = tokenService.verifyToken(
+      accessToken,
+      process.env.ACCESS_TOKEN_SECRET
+    );
+
+    const user = await userService.findUserById(decoded.id);
+    if (!user) {
+      console.warn("User not found for password change");
+      return res.status(400).json({ message: "User not found" });
+    }
+
+    await userService.resetPassword(user, newPassword);
+
+    // Invalidation des anciens tokens
+    const accessTokenExpiry = calculateTokenExpiry(accessToken);
+    const refreshTokenExpiry = calculateTokenExpiry(refreshToken);
+
+    await addToBlacklist(accessToken, accessTokenExpiry);
+    await addToBlacklist(refreshToken, refreshTokenExpiry);
+
+    console.log(`Password changed successfully for user id: ${user.id}`);
+
+    res.json({
+      message: "Password changed successfully. Please login again.",
+    });
+  } catch (error) {
+    console.error("Error changing password:", error);
+    res.status(500).json({ message: "Error changing password", error });
   }
 };
 

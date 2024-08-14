@@ -4,6 +4,7 @@ import * as authValidators from "../utils/authValidators.js";
 import validationMiddleware from "../middlewares/validationMiddleware.js";
 import googleAuthMiddleware from "../middlewares/googleAuthMiddleware.js";
 import { Router } from "express";
+import jwtMiddleware from "../middlewares/jwtMiddleware.js";
 
 const router = Router();
 
@@ -40,11 +41,20 @@ router.post(
   authControllers.forgotPassword
 );
 router.post(
+  "/change-password",
+  authValidators.validateChangePassword,
+  validationMiddleware,
+  jwtMiddleware,
+  authControllers.changePassword
+);
+
+router.post(
   "/reset-password",
   authValidators.validateResetPassword,
   validationMiddleware,
   authControllers.resetPassword
 );
+
 router.post(
   "/resend-confirmation-email",
   authValidators.validateResendConfirmationEmail,

@@ -54,3 +54,11 @@ export const validateRefreshToken = () => {
     .isString()
     .withMessage("Refresh token must be a valid string");
 };
+
+export const validateResetToken = () => {
+  return body('token')
+    .notEmpty()
+    .withMessage('Reset token is required')
+    .isString()
+    .withMessage('Reset token must be a valid string');
+};
