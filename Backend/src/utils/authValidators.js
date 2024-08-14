@@ -6,6 +6,7 @@ import {
   validateDisplayName,
   validatePasswordLogin,
   validateToken,
+  validateRefreshToken,
 } from "./validators.js";
 
 export const validateRegister = [
@@ -18,6 +19,7 @@ export const validateLogin = [validateEmail(), validatePasswordLogin()];
 
 export const validateResetPassword = [
   validateToken(),
+  validateRefreshToken(),
   validatePasswordRegister(),
 ];
 
@@ -28,3 +30,5 @@ export const validateForgotPassword = [validateEmail()];
 export const validateResendConfirmationEmail = [validateEmail()];
 
 export const validateGoogleAuth = [validateToken()];
+
+export const validateLogout = [validateRefreshToken(), validateToken()];

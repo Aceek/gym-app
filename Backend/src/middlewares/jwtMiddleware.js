@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
+import { isTokenBlacklisted } from "../services/tokenBlacklistService.js";
 
-const jwtMiddleware = (req, res, next) => {
+const jwtMiddleware = async (req, res, next) => {
   const authHeader = req.headers["authorization"];
   const token =
     authHeader && authHeader.startsWith("Bearer ")
@@ -14,6 +15,11 @@ const jwtMiddleware = (req, res, next) => {
   }
 
   try {
+    const isBlacklisted = await isTokenBlacklisted(token);
+    if (isBlacklisted) {
+      return res.status(401).json({ message: "Token has been revoked" });
+    }
+
     const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
     req.user = decoded;
     next();

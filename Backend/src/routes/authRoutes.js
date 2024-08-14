@@ -14,7 +14,6 @@ router.post(
   googleAuthMiddleware,
   googleAuthControllers.authenticateGoogleUser
 );
-router.get("/googleLogout", googleAuthControllers.googleLogout);
 
 router.post(
   "/register",
@@ -51,6 +50,13 @@ router.post(
   authValidators.validateResendConfirmationEmail,
   validationMiddleware,
   authControllers.resendConfirmationEmail
+);
+
+router.post(
+  "/logout",
+  authValidators.validateLogout,
+  validationMiddleware,
+  authControllers.logout
 );
 
 export default router;

@@ -1,24 +1,39 @@
 import tokenService from "../../services/tokenService.js";
 import emailService from "../../services/emailService.js";
 import userService from "../../services/userService.js";
+import {
+  addToBlacklist,
+  calculateTokenExpiry,
+} from "../../services/tokenBlacklistService.js";
+import redisService from "../../services/redisService.js";
 
 export const register = async (req, res) => {
+  const { email, password, displayName } = req.body;
+  console.log(`Register request received for email: ${email}`);
+
+  const existingUser = await userService.findUserByEmail(email);
+  if (existingUser) {
+    console.warn(`Attempt to register with an existing email: ${email}`);
+    return res.status(400).json({ message: "Email already in use" });
+  }
+
   try {
-    const { email, password, displayName } = req.body;
-    console.log(`Register request received for email: ${email}`);
+    const newUser = await prisma.$transaction(async (prisma) => {
+      const user = await userService.createUser(
+        email,
+        password,
+        displayName,
+        prisma
+      );
 
-    const existingUser = await userService.findUserByEmail(email);
-    if (existingUser) {
-      console.warn(`Attempt to register with an existing email: ${email}`);
-      return res.status(400).json({ message: "Email already in use" });
-    }
+      const confirmationToken = tokenService.generateConfirmationToken(user.id);
 
-    const newUser = await userService.createUser(email, password, displayName);
-    console.log(`New user created with id: ${newUser.id}`);
+      await userService.updateUserWithToken(user.id, confirmationToken, prisma);
 
-    const confirmationToken = tokenService.generateConfirmationToken(
-      newUser.id
-    );
+      return user;
+    });
+
+    const confirmationToken = newUser.emailConfirmationToken;
     await emailService.sendConfirmationEmail(newUser.email, confirmationToken);
     console.log(`Confirmation email sent to: ${newUser.email}`);
 
@@ -83,9 +98,16 @@ export const confirmEmail = async (req, res) => {
       return res.status(400).json({ message: "Invalid token" });
     }
 
-    await userService.verifyUser(user);
-    console.log(`Email confirmed for user id: ${user.id}`);
+    if (user.emailConfirmationToken !== token) {
+      console.warn(`Token mismatch for email confirmation: ${token}`);
+      return res.status(400).json({ message: "Invalid token" });
+    }
 
+    await userService.verifyUser(user.id);
+
+    await userService.clearEmailConfirmationToken(user.id);
+
+    console.log(`Email confirmed for user id: ${user.id}`);
     res.json({ message: "Email confirmed successfully. You can now login." });
   } catch (error) {
     console.error("Error confirming email:", error);
@@ -109,7 +131,6 @@ export const forgotPassword = async (req, res) => {
     }
 
     const resetToken = tokenService.generateResetToken(user.id);
-    // await userService.setResetTokenAndExpiration(user, resetToken);
     await userService.setResetToken(user, resetToken);
     console.log(`Password reset token generated for user id: ${user.id}`);
 
@@ -125,7 +146,7 @@ export const forgotPassword = async (req, res) => {
 
 export const resetPassword = async (req, res) => {
   try {
-    const { token, newPassword } = req.body;
+    const { token, refreshToken, newPassword } = req.body;
     console.log(`Password reset request received with token: ${token}`);
 
     const decoded = tokenService.verifyToken(
@@ -135,18 +156,21 @@ export const resetPassword = async (req, res) => {
 
     const user = await userService.findUserById(decoded.id);
     if (!user) {
-      // console.warn(`Invalid or expired token for password reset: ${token}`);
-      // return res.status(400).json({ message: "Invalid or expired token" });
       console.warn("User not found for password reset");
       return res.status(400).json({ message: "User not found" });
     }
+
+    const accessTokenExpiry = calculateTokenExpiry(token);
+    const refreshTokenExpiry = calculateTokenExpiry(refreshToken);
+
+    await addToBlacklist(token, accessTokenExpiry);
+    await addToBlacklist(refreshToken, refreshTokenExpiry);
 
     await userService.resetPassword(user, newPassword);
     console.log(`Password reset successfully for user id: ${user.id}`);
 
     res.json({
-      message:
-        "Password reset successfully. You can now login with your new password.",
+      message: "Password reset successfully. Please login again.",
     });
   } catch (error) {
     console.error("Error resetting password:", error);
@@ -178,7 +202,19 @@ export const resendConfirmationEmail = async (req, res) => {
       return res.status(400).json({ message: "Email is already confirmed" });
     }
 
+    const isLimited = await redisService.isRateLimited(email);
+    if (isLimited) {
+      return res
+        .status(429)
+        .json({ message: "Too many requests. Please try again later." });
+    }
+
+    await redisService.incrementRateLimit(email);
+
     const confirmationToken = tokenService.generateConfirmationToken(user.id);
+
+    await userService.updateUserWithToken(user.id, confirmationToken);
+
     await emailService.sendConfirmationEmail(user.email, confirmationToken);
     console.log(`Confirmation email re-sent to: ${user.email}`);
 
@@ -190,5 +226,22 @@ export const resendConfirmationEmail = async (req, res) => {
     res
       .status(500)
       .json({ message: "Error resending confirmation email", error });
+  }
+};
+
+export const logout = async (req, res) => {
+  try {
+    const { token, refreshToken } = req.body;
+
+    const accessTokenExpiry = calculateTokenExpiry(token);
+    const refreshTokenExpiry = calculateTokenExpiry(refreshToken);
+
+    await addToBlacklist(token, accessTokenExpiry);
+    await addToBlacklist(refreshToken, refreshTokenExpiry);
+
+    res.status(200).json({ message: "Logged out successfully" });
+  } catch (error) {
+    console.error("Error during logout:", error);
+    res.status(500).json({ message: "Error during logout", error });
   }
 };

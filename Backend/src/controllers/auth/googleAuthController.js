@@ -24,8 +24,3 @@ export const authenticateGoogleUser = async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
-
-export const googleLogout = (req, res) => {
-  req.logout();
-  res.redirect("/");
-};

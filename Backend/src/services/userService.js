@@ -20,15 +20,27 @@ export const findOrCreateUser = async (googleUser) => {
   }
 };
 
-export const createUser = async (email, password, displayName) => {
-  const hashedPassword = await bcrypt.hash(password, 10);
-  return prisma.user.create({
-    data: {
-      email,
-      password: hashedPassword,
-      displayName,
-    },
-  });
+export const createUser = async (
+  email,
+  password,
+  displayName,
+  prismaClient = prisma
+) => {
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const user = await prismaClient.user.create({
+      data: {
+        email,
+        password: hashedPassword,
+        displayName,
+      },
+    });
+    console.log(`User created with id: ${user.id}`);
+    return user;
+  } catch (error) {
+    console.error("Error creating user:", error);
+    throw new Error("Failed to create user");
+  }
 };
 
 export const findUserByEmail = async (email) => {
@@ -85,6 +97,46 @@ export const resetPassword = async (user, newPassword) => {
   });
 };
 
+export const updateUserWithToken = async (
+  userId,
+  confirmationToken,
+  prismaClient = prisma
+) => {
+  try {
+    const updatedUser = await prismaClient.user.update({
+      where: { id: userId },
+      data: {
+        emailConfirmationToken: confirmationToken,
+      },
+    });
+    console.log(
+      `User with id: ${userId} updated with email confirmation token.`
+    );
+    return updatedUser;
+  } catch (error) {
+    console.error(`Error updating user with email confirmation token:`, error);
+    throw new Error("Failed to update user with email confirmation token");
+  }
+};
+
+export const clearEmailConfirmationToken = async (userId) => {
+  try {
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        emailConfirmationToken: null,
+      },
+    });
+    console.log(`Email confirmation token cleared for user id: ${userId}`);
+  } catch (error) {
+    console.error(
+      `Error clearing email confirmation token for user id: ${userId}`,
+      error
+    );
+    throw new Error("Failed to clear email confirmation token");
+  }
+};
+
 export default {
   findOrCreateUser,
   createUser,
@@ -96,4 +148,6 @@ export default {
   // isResetTokenValid,
   resetPassword,
   setResetToken,
+  updateUserWithToken,
+  clearEmailConfirmationToken,
 };
