@@ -1,37 +1,56 @@
-import { Router } from "express";
-import {
-  authenticateGoogleUser,
-  googleLogout,
-} from "../controllers/auth/googleAuthController.js";
-import googleAuthMiddleware from "../middlewares/googleAuthMiddleware.js";
-import {
-  register,
-  login,
-  confirmEmail,
-  forgotPassword,
-  resetPassword,
-} from "../controllers/auth/emailAuthController.js";
-import {
-  validateRegister,
-  validateLogin,
-  validateResetPassword,
-} from "../utils/validators.js";
+import * as authControllers from "../controllers/auth/emailAuthController.js";
+import * as googleAuthControllers from "../controllers/auth/googleAuthController.js";
+import * as authValidators from "../utils/authValidators.js";
 import validationMiddleware from "../middlewares/validationMiddleware.js";
+import googleAuthMiddleware from "../middlewares/googleAuthMiddleware.js";
+import { Router } from "express";
 
 const router = Router();
 
-router.post("/google", googleAuthMiddleware, authenticateGoogleUser);
-router.get("/googleLogout", googleLogout);
+router.post(
+  "/google",
+  authValidators.validateGoogleAuth,
+  validationMiddleware,
+  googleAuthMiddleware,
+  googleAuthControllers.authenticateGoogleUser
+);
+router.get("/googleLogout", googleAuthControllers.googleLogout);
 
-router.post("/register", validateRegister, validationMiddleware, register);
-router.post("/login", validateLogin, validationMiddleware, login);
-router.get("/confirm-email", confirmEmail);
-router.post("/forgot-password", forgotPassword);
+router.post(
+  "/register",
+  authValidators.validateRegister,
+  validationMiddleware,
+  authControllers.register
+);
+router.post(
+  "/login",
+  authValidators.validateLogin,
+  validationMiddleware,
+  authControllers.login
+);
+router.get(
+  "/confirm-email",
+  authValidators.validateConfirmEmail,
+  validationMiddleware,
+  authControllers.confirmEmail
+);
+router.post(
+  "/forgot-password",
+  authValidators.validateForgotPassword,
+  validationMiddleware,
+  authControllers.forgotPassword
+);
 router.post(
   "/reset-password",
-  validateResetPassword,
+  authValidators.validateResetPassword,
   validationMiddleware,
-  resetPassword
+  authControllers.resetPassword
+);
+router.post(
+  "/resend-confirmation-email",
+  authValidators.validateResendConfirmationEmail,
+  validationMiddleware,
+  authControllers.resendConfirmationEmail
 );
 
 export default router;
