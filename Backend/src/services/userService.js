@@ -54,17 +54,24 @@ export const verifyUser = async (user) => {
   });
 };
 
-export const setResetTokenAndExpiration = async (user, token) => {
-  const expiration = new Date();
-  expiration.setHours(expiration.getHours() + 1);
+// export const setResetTokenAndExpiration = async (user, token) => {
+//   const expiration = new Date();
+//   expiration.setHours(expiration.getHours() + 1);
+//   return prisma.user.update({
+//     where: { id: user.id },
+//     data: { resetToken: token, resetTokenExpiration: expiration },
+//   });
+// };
+
+// export const isResetTokenValid = (user) => {
+//   return user.resetTokenExpiration > new Date();
+// };
+
+export const setResetToken = async (user, token) => {
   return prisma.user.update({
     where: { id: user.id },
-    data: { resetToken: token, resetTokenExpiration: expiration },
+    data: { resetToken: token },
   });
-};
-
-export const isResetTokenValid = (user) => {
-  return user.resetTokenExpiration > new Date();
 };
 
 export const resetPassword = async (user, newPassword) => {
@@ -74,7 +81,6 @@ export const resetPassword = async (user, newPassword) => {
     data: {
       password: hashedPassword,
       resetToken: null,
-      resetTokenExpiration: null,
     },
   });
 };
@@ -86,7 +92,8 @@ export default {
   verifyPassword,
   findUserById,
   verifyUser,
-  setResetTokenAndExpiration,
-  isResetTokenValid,
+  // setResetTokenAndExpiration,
+  // isResetTokenValid,
   resetPassword,
+  setResetToken,
 };

@@ -14,7 +14,6 @@ model User {
   password           String?
   isVerified         Boolean  @default(false)
   resetToken         String?
-  resetTokenExpiration DateTime?
   displayName        String?
   photo              String?
   createdAt          DateTime @default(now())

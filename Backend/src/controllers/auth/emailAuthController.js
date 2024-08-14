@@ -109,7 +109,8 @@ export const forgotPassword = async (req, res) => {
     }
 
     const resetToken = tokenService.generateResetToken(user.id);
-    await userService.setResetTokenAndExpiration(user, resetToken);
+    // await userService.setResetTokenAndExpiration(user, resetToken);
+    await userService.setResetToken(user, resetToken);
     console.log(`Password reset token generated for user id: ${user.id}`);
 
     await emailService.sendResetPasswordEmail(user.email, resetToken);
@@ -133,9 +134,11 @@ export const resetPassword = async (req, res) => {
     );
 
     const user = await userService.findUserById(decoded.id);
-    if (!user || !userService.isResetTokenValid(user)) {
-      console.warn(`Invalid or expired token for password reset: ${token}`);
-      return res.status(400).json({ message: "Invalid or expired token" });
+    if (!user) {
+      // console.warn(`Invalid or expired token for password reset: ${token}`);
+      // return res.status(400).json({ message: "Invalid or expired token" });
+      console.warn("User not found for password reset");
+      return res.status(400).json({ message: "User not found" });
     }
 
     await userService.resetPassword(user, newPassword);
@@ -148,5 +151,44 @@ export const resetPassword = async (req, res) => {
   } catch (error) {
     console.error("Error resetting password:", error);
     res.status(500).json({ message: "Error resetting password", error });
+  }
+};
+
+export const resendConfirmationEmail = async (req, res) => {
+  try {
+    const { email } = req.body;
+    console.log(
+      `Resend confirmation email request received for email: ${email}`
+    );
+
+    const user = await userService.findUserByEmail(email);
+    if (!user) {
+      console.warn(
+        `Attempt to resend confirmation email to a non-existent email: ${email}`
+      );
+      return res
+        .status(400)
+        .json({ message: "No account with that email found" });
+    }
+
+    if (user.isVerified) {
+      console.warn(
+        `Attempt to resend confirmation email to an already verified email: ${email}`
+      );
+      return res.status(400).json({ message: "Email is already confirmed" });
+    }
+
+    const confirmationToken = tokenService.generateConfirmationToken(user.id);
+    await emailService.sendConfirmationEmail(user.email, confirmationToken);
+    console.log(`Confirmation email re-sent to: ${user.email}`);
+
+    res.json({
+      message: "Confirmation email resent. Please check your inbox.",
+    });
+  } catch (error) {
+    console.error("Error resending confirmation email:", error);
+    res
+      .status(500)
+      .json({ message: "Error resending confirmation email", error });
   }
 };
