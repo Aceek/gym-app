@@ -18,7 +18,8 @@ export const sendConfirmationEmail = async (email, token) => {
     from: process.env.SES_SMTP_VERIFIED_MAIL,
     to: email,
     subject: "Confirm your email",
-    html: `<p>Please confirm your email by clicking the following link: <a href="${confirmationLink}">Confirm Email</a></p>`,
+    html: `<p>Please confirm your email by clicking the following link: <a href="${confirmationLink}">Confirm Email</a>
+    your token is ${token}</p>`,
   };
   await transporter.sendMail(mailOptions);
 };
@@ -29,7 +30,8 @@ export const sendResetPasswordEmail = async (email, token) => {
     from: process.env.SES_SMTP_VERIFIED_MAIL,
     to: email,
     subject: "Reset your password",
-    html: `<p>Click the following link to reset your password: <a href="${resetLink}">Reset Password</a></p>`,
+    html: `<p>Click the following link to reset your password: <a href="${resetLink}">Reset Password</a>
+     your token is ${token}</p>`,
   };
   await transporter.sendMail(mailOptions);
 };
