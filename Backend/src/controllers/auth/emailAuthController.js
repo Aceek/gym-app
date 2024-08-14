@@ -226,7 +226,6 @@ export const changePassword = async (req, res) => {
   }
 };
 
-import { isRateLimited, incrementRateLimit } from "../services/redisService";
 
 export const resendConfirmationEmail = async (req, res) => {
   try {
