@@ -7,6 +7,7 @@ import {
 } from "../../services/tokenBlacklistService.js";
 import redisService from "../../services/redisService.js";
 import prisma from "../../config/prismaClient.js";
+import { verifyToken } from "../../services/tokenService.js";
 
 export const register = async (req, res) => {
   const { email, password, displayName } = req.body;
@@ -177,9 +178,14 @@ export const resetPassword = async (req, res) => {
     );
 
     const user = await userService.findUserById(decoded.id);
-    if (!user || user.resetToken !== token) {
-      console.warn("Invalid or expired token for password reset");
+    if (!user) {
+      console.warn("User not found for password reset");
       return res.status(400).json({ message: "User not found" });
+    }
+
+    if (user.resetPasswordToken !== token) {
+      console.warn("Invalid or expired token for password reset");
+      return res.status(400).json({ message: "Invalid or expired token" });
     }
 
     await userService.resetPassword(user, newPassword);
@@ -285,7 +291,16 @@ export const resendConfirmationEmail = async (req, res) => {
 
 export const logout = async (req, res) => {
   try {
-    const { token, refreshToken } = req.body;
+    const { refreshToken } = req.body;
+    const authHeader = req.headers["authorization"];
+    const token =
+      authHeader && authHeader.startsWith("Bearer ")
+        ? authHeader.split(" ")[1]
+        : null;
+
+    if (!verifyToken(refreshToken, process.env.REFRESH_TOKEN_SECRET)) {
+      return res.status(401).json({ message: "Invalid refresh token" });
+    }
 
     const accessTokenExpiry = calculateTokenExpiry(token);
     const refreshTokenExpiry = calculateTokenExpiry(refreshToken);

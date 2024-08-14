@@ -1,5 +1,3 @@
-import { body } from "express-validator";
-
 import {
   validateEmail,
   validatePasswordRegister,
@@ -19,7 +17,6 @@ export const validateRegister = [
 export const validateLogin = [validateEmail(), validatePasswordLogin()];
 
 export const validateChangePassword = [
-  validateToken(),
   validateRefreshToken(),
   validatePasswordRegister("newPassword"),
 ];
@@ -30,9 +27,9 @@ export const validateForgotPassword = [validateEmail()];
 
 export const validateResendConfirmationEmail = [validateEmail()];
 
-export const validateGoogleAuth = [validateToken()];
+export const validateGoogleAuth = [validateToken("token", "body")];
 
-export const validateLogout = [validateRefreshToken(), validateToken()];
+export const validateLogout = [validateRefreshToken()];
 
 export const validateResetPassword = [
   validateResetToken(),

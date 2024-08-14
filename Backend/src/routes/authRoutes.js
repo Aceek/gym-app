@@ -66,6 +66,7 @@ router.post(
   "/logout",
   authValidators.validateLogout,
   validationMiddleware,
+  jwtMiddleware,
   authControllers.logout
 );
 

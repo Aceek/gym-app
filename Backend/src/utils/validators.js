@@ -39,13 +39,13 @@ export const validateDisplayName = () => {
     .escape();
 };
 
-export const validateToken = () => {
-  return query("token")
+export const validateToken = (tokenName = 'token', location = 'query') => {
+  return location === 'query' ? query(tokenName) : body(tokenName)
     .notEmpty()
     .withMessage("Token is required")
     .isString()
     .withMessage("Token must be a valid string");
-};
+}
 
 export const validateRefreshToken = () => {
   return body("refreshToken")
