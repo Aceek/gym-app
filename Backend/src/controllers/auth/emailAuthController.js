@@ -183,7 +183,7 @@ export const resetPassword = async (req, res) => {
       return res.status(400).json({ message: "User not found" });
     }
 
-    if (user.resetPasswordToken !== token) {
+    if (user.resetToken !== token) {
       console.warn("Invalid or expired token for password reset");
       return res.status(400).json({ message: "Invalid or expired token" });
     }
@@ -203,8 +203,14 @@ export const resetPassword = async (req, res) => {
 
 export const changePassword = async (req, res) => {
   try {
-    const { newPassword, accessToken, refreshToken } = req.body;
+    const { newPassword, refreshToken } = req.body;
     console.log(`Password change request received with access token.`);
+
+    const authHeader = req.headers["authorization"];
+    const accessToken =
+      authHeader && authHeader.startsWith("Bearer ")
+        ? authHeader.split(" ")[1]
+        : null;
 
     const decoded = tokenService.verifyToken(
       accessToken,
@@ -219,8 +225,8 @@ export const changePassword = async (req, res) => {
 
     await userService.resetPassword(user, newPassword);
 
-    const accessTokenExpiry = calculateTokenExpiry(accessToken);
     const refreshTokenExpiry = calculateTokenExpiry(refreshToken);
+    const accessTokenExpiry = calculateTokenExpiry(accessToken);
 
     await addToBlacklist(accessToken, accessTokenExpiry);
     await addToBlacklist(refreshToken, refreshTokenExpiry);

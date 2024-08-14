@@ -17,7 +17,8 @@ export const validateRegister = [
 export const validateLogin = [validateEmail(), validatePasswordLogin()];
 
 export const validateChangePassword = [
-  validateRefreshToken(),
+  // validateRefreshToken(),
+  validateToken("refreshToken", "body"),
   validatePasswordRegister("newPassword"),
 ];
 
