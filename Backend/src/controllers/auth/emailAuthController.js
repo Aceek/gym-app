@@ -64,17 +64,17 @@ export const login = async (req, res) => {
       return res.status(400).json({ message: "Invalid email or password" });
     }
 
-    const isPasswordValid = await userService.verifyPassword(user, password);
-    if (!isPasswordValid) {
-      console.warn(`Login failed, invalid password for email: ${email}`);
-      return res.status(400).json({ message: "Invalid email or password" });
-    }
-
     if (!user.isVerified) {
       console.warn(`Login attempt with unverified email: ${email}`);
       return res
         .status(400)
         .json({ message: "Please confirm your email to login" });
+    }
+
+    const isPasswordValid = await userService.verifyPassword(user, password);
+    if (!isPasswordValid) {
+      console.warn(`Login failed, invalid password for email: ${email}`);
+      return res.status(400).json({ message: "Invalid email or password" });
     }
 
     const accessToken = tokenService.generateAccessToken(user);

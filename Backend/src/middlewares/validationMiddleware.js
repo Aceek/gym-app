@@ -6,7 +6,10 @@ export default (req, res, next) => {
     return res.status(400).json({
       status: "error",
       message: "Validation failed",
-      errors: errors.array().map(error => error.msg),
+      errors: errors.array().map((error) => ({
+        field: error.path,
+        message: error.msg,
+      })),
     });
   }
   next();
