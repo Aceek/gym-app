@@ -7,7 +7,6 @@ import {
 } from "../../services/tokenBlacklistService.js";
 import redisService from "../../services/redisService.js";
 import prisma from "../../config/prismaClient.js";
-import { verifyToken } from "../../services/tokenService.js";
 
 export const register = async (req, res) => {
   const { email, password, displayName } = req.body;
@@ -267,14 +266,14 @@ export const resendConfirmationEmail = async (req, res) => {
     }
 
     const rateLimitKey = `resend_confirmation_${email}`;
-    const isLimited = await isRateLimited(rateLimitKey, 3);
+    const isLimited = await redisService.isRateLimited(rateLimitKey, 3);
     if (isLimited) {
       return res
         .status(429)
         .json({ message: "Too many requests. Please try again later." });
     }
 
-    await incrementRateLimit(rateLimitKey);
+    await redisService.incrementRateLimit(rateLimitKey);
 
     const confirmationToken = tokenService.generateConfirmationToken(user.id);
 

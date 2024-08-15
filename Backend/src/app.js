@@ -12,7 +12,6 @@ app.use("/api/auth", authRoutes);
 app.use("/api/token", tokenRoutes);
 app.use("/api/protected", protectedRoutes);
 
-// Test de connexion à la base de données
 app.get("/test-db", async (req, res) => {
   try {
     await prisma.$connect();
@@ -22,15 +21,4 @@ app.get("/test-db", async (req, res) => {
   }
 });
 
-const startServer = async () => {
-  try {
-    await prisma.$connect();
-    app.listen(5000, () => {
-      console.log("Server is running on port 5000");
-    });
-  } catch (error) {
-    console.error("Unable to connect to the database:", error);
-  }
-};
-
-startServer();
+export default app;

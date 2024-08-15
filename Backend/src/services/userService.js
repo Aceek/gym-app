@@ -26,6 +26,7 @@ export const createUser = async (
   displayName,
   prismaClient = prisma
 ) => {
+  console.log('Create user has been called with email:', email);
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = await prismaClient.user.create({
