@@ -80,8 +80,8 @@ export const confirmEmail = async (req, res) => {
 };
 
 export const forgotPassword = async (req, res) => {
+  const { email } = req.body;
   try {
-    const { email } = req.body;
     console.log(`Forgot password request received for email: ${email}`);
 
     const rateLimitKey = `forgot_password_${email}`;
