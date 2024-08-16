@@ -1,9 +1,6 @@
 import axios from 'axios';
 import {API_URL} from '@env';
-import {refreshTokenFunc} from './authService';
-import * as Keychain from 'react-native-keychain';
-
-const ACCESS_TOKEN = 'access_token';
+import setupAxiosInterceptors from './axiosInterceptors';
 
 export const api = axios.create({
   baseURL: API_URL + '/api',
@@ -13,47 +10,13 @@ export const api = axios.create({
   },
 });
 
-export const setupAxiosInterceptorsJwt = () => {
-  axios.interceptors.request.use(
-    async config => {
-      const accessToken = await Keychain.getGenericPassword({
-        service: ACCESS_TOKEN,
-      });
-      if (accessToken) {
-        config.headers.Authorization = `Bearer ${accessToken}`;
-      }
-      return config;
-    },
-    error => {
-      return Promise.reject(error);
-    },
-  );
-};
-
-export const setupAxiosInterceptors401 = logout => {
-  axios.interceptors.response.use(
-    response => response,
-    async error => {
-      const originalRequest = error.config;
-      if (error.response.status === 401 && !originalRequest._retry) {
-        originalRequest._retry = true;
-        try {
-          const newAccessToken = await refreshTokenFunc();
-          axios.defaults.headers.common.Authorization = `Bearer ${newAccessToken}`;
-          originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-          return axios(originalRequest);
-        } catch (err) {
-          logout();
-          return Promise.reject(err);
-        }
-      }
-      return Promise.reject(error);
-    },
-  );
+export const initializeAxiosInterceptors = logout => {
+  setupAxiosInterceptors(logout);
 };
 
 export const authenticateWithGoogle = async idToken => {
   try {
+    console.log('Authenticating with Google');
     const response = await api.post('/auth/google', {token: idToken});
     return response.data;
   } catch (error) {

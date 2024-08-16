@@ -1,5 +1,9 @@
 import React, {createContext, useState, useEffect} from 'react';
-import {loginWithGoogle, googleLogout} from '../services/authService';
+import {
+  loginWithGoogle,
+  googleLogout,
+  registerUser,
+} from '../services/authService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {USER_KEY} from '@env';
 
@@ -46,8 +50,18 @@ export const AuthProvider = ({children}) => {
     }
   };
 
+  const register = async (email, password, displayName) => {
+    try {
+      const userData = await registerUser(email, password, displayName);
+      setUser(userData);
+    } catch (error) {
+      console.error('Error during registration:', error);
+      throw error;
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{user, isLoading, login, logout}}>
+    <AuthContext.Provider value={{user, isLoading, login, logout, register}}>
       {children}
     </AuthContext.Provider>
   );

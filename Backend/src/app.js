@@ -12,6 +12,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/token", tokenRoutes);
 app.use("/api/protected", protectedRoutes);
 
+// simple test route
 app.get("/test-db", async (req, res) => {
   try {
     await prisma.$connect();
@@ -19,6 +20,11 @@ app.get("/test-db", async (req, res) => {
   } catch (error) {
     res.status(500).send("Database connection failed!");
   }
+});
+
+app.get("/api/health", (req, res) => {
+  console.log("Health check");
+  res.send("Hello World!");
 });
 
 export default app;

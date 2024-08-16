@@ -4,20 +4,16 @@ import AppNavigator from './src/navigation/AppNavigator';
 import {configureGoogleSignIn} from './src/config/configureGoogleSignIn';
 import {navigationRef} from './src/navigation/RootNavigation';
 import {NavigationContainer} from '@react-navigation/native';
-import {
-  setupAxiosInterceptors401,
-  setupAxiosInterceptorsJwt,
-} from './src/services/api';
 import {useContext} from 'react';
 import {AuthContext} from './src/context/AuthContext';
+import {initializeAxiosInterceptors} from './src/services/api';
 
 const AppContent = () => {
   const {logout} = useContext(AuthContext);
 
   useEffect(() => {
     configureGoogleSignIn();
-    setupAxiosInterceptors401(logout);
-    setupAxiosInterceptorsJwt();
+    initializeAxiosInterceptors(logout);
   }, [logout]);
 
   return (
