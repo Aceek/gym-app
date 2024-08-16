@@ -1,5 +1,6 @@
 import bcrypt from "bcrypt";
 import { prisma } from "../config/prismaClient.js";
+import tokenService from "./tokenService.js";
 
 export const findOrCreateUser = async (googleUser) => {
   try {
@@ -26,7 +27,7 @@ export const createUser = async (
   displayName,
   prismaClient = prisma
 ) => {
-  console.log('Create user has been called with email:', email);
+  console.log("Create user has been called with email:", email);
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = await prismaClient.user.create({
@@ -66,19 +67,6 @@ export const verifyUser = async (userId) => {
     data: { isVerified: true },
   });
 };
-
-// export const setResetTokenAndExpiration = async (user, token) => {
-//   const expiration = new Date();
-//   expiration.setHours(expiration.getHours() + 1);
-//   return prisma.user.update({
-//     where: { id: user.id },
-//     data: { resetToken: token, resetTokenExpiration: expiration },
-//   });
-// };
-
-// export const isResetTokenValid = (user) => {
-//   return user.resetTokenExpiration > new Date();
-// };
 
 export const setResetToken = async (user, token) => {
   return prisma.user.update({
@@ -138,6 +126,68 @@ export const clearEmailConfirmationToken = async (userId) => {
   }
 };
 
+export const registerUserTransaction = async (email, password, displayName) => {
+  return prisma.$transaction(async (prisma) => {
+    const user = await createUser(email, password, displayName, prisma);
+
+    const confirmationToken = tokenService.generateConfirmationToken(user.id);
+
+    const updatedUser = await updateUserWithToken(
+      user.id,
+      confirmationToken,
+      prisma
+    );
+
+    return updatedUser;
+  });
+};
+
+export const validateUserForLogin = async (email, password) => {
+  const user = await findUserByEmail(email);
+  if (!user) {
+    const error = new Error("Invalid email or password");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  if (!user.isVerified) {
+    const error = new Error("Please confirm your email to login");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  const isPasswordValid = await verifyPassword(user, password);
+  if (!isPasswordValid) {
+    const error = new Error("Invalid email or password");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  return user;
+};
+
+export const validateUserForConfirmation = async (userId, token) => {
+  const user = await findUserById(userId);
+  if (!user) {
+    throw new Error("Invalid token");
+  }
+
+  if (user.isVerified) {
+    throw new Error("Email already confirmed");
+  }
+
+  if (user.emailConfirmationToken !== token) {
+    throw new Error("Invalid token");
+  }
+
+  return user;
+};
+
+export const confirmUserEmail = async (userId) => {
+  await verifyUser(userId);
+  await clearEmailConfirmationToken(userId);
+};
+
 export default {
   findOrCreateUser,
   createUser,
@@ -145,10 +195,12 @@ export default {
   verifyPassword,
   findUserById,
   verifyUser,
-  // setResetTokenAndExpiration,
-  // isResetTokenValid,
   resetPassword,
   setResetToken,
   updateUserWithToken,
   clearEmailConfirmationToken,
+  registerUserTransaction,
+  validateUserForLogin,
+  validateUserForConfirmation,
+  confirmUserEmail,
 };

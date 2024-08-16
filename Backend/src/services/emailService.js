@@ -36,7 +36,13 @@ export const sendResetPasswordEmail = async (email, token) => {
   await transporter.sendMail(mailOptions);
 };
 
+export const sendConfirmationEmailToUser = async (email, token) => {
+  console.log(`Confirmation email sent to: ${email}`);
+  await sendConfirmationEmail(email, token);
+};
+
 export default {
   sendConfirmationEmail,
   sendResetPasswordEmail,
+  sendConfirmationEmailToUser,
 };

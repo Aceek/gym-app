@@ -6,27 +6,42 @@ import {
   calculateTokenExpiry,
 } from "../../services/tokenBlacklistService.js";
 import redisService from "../../services/redisService.js";
+import prisma from "../../config/prismaClient.js";
 
 export const register = async (req, res) => {
   const { email, password, displayName } = req.body;
   console.log(`Register request received for email: ${email}`);
 
-  try {
-    const existingUser = await userService.findUserByEmail(email);
-    if (existingUser) {
-      console.warn(`Attempt to register with an existing email: ${email}`);
-      return res.status(400).json({ message: "Email already in use" });
-    }
+  const existingUser = await userService.findUserByEmail(email);
+  if (existingUser) {
+    console.warn(`Attempt to register with an existing email: ${email}`);
+    return res.status(400).json({ message: "Email already in use" });
+  }
 
-    const newUser = await userService.registerUserTransaction(
-      email,
-      password,
-      displayName
-    );
-    await emailService.sendConfirmationEmailToUser(
-      newUser.email,
-      newUser.emailConfirmationToken
-    );
+  try {
+    const newUser = await prisma.$transaction(async (prisma) => {
+      const user = await userService.createUser(
+        email,
+        password,
+        displayName,
+        prisma
+      );
+
+      const confirmationToken = tokenService.generateConfirmationToken(user.id);
+
+      const updatedUser = await userService.updateUserWithToken(
+        user.id,
+        confirmationToken,
+        prisma
+      );
+
+      return updatedUser;
+    });
+
+    const confirmationToken = newUser.emailConfirmationToken;
+    console.log("confirmationToken", confirmationToken);
+    await emailService.sendConfirmationEmail(newUser.email, confirmationToken);
+    console.log(`Confirmation email sent to: ${newUser.email}`);
 
     res.status(201).json({
       message:
@@ -43,17 +58,33 @@ export const login = async (req, res) => {
     const { email, password } = req.body;
     console.log(`Login request received for email: ${email}`);
 
-    const user = await userService.validateUserForLogin(email, password);
+    const user = await userService.findUserByEmail(email);
+    if (!user) {
+      console.warn(`Login failed, user not found for email: ${email}`);
+      return res.status(400).json({ message: "Invalid email or password" });
+    }
 
-    const { accessToken, refreshToken } =
-      tokenService.generateTokensForUser(user);
+    if (!user.isVerified) {
+      console.warn(`Login attempt with unverified email: ${email}`);
+      return res
+        .status(400)
+        .json({ message: "Please confirm your email to login" });
+    }
+
+    const isPasswordValid = await userService.verifyPassword(user, password);
+    if (!isPasswordValid) {
+      console.warn(`Login failed, invalid password for email: ${email}`);
+      return res.status(400).json({ message: "Invalid email or password" });
+    }
+
+    const accessToken = tokenService.generateAccessToken(user);
+    const refreshToken = tokenService.generateRefreshToken(user);
     console.log(`Tokens generated for user id: ${user.id}`);
 
-    res.status(200).json({ accessToken, refreshToken, user });
+    res.json({ accessToken, refreshToken, user });
   } catch (error) {
-    const statusCode = error.statusCode || 500;
-    console.error("Error logging in:", error.message);
-    res.status(statusCode).json({ message: error.message });
+    console.error("Error logging in:", error);
+    res.status(500).json({ message: "Error logging in", error });
   }
 };
 
@@ -67,18 +98,31 @@ export const confirmEmail = async (req, res) => {
       process.env.EMAIL_CONFIRMATION_SECRET
     );
 
-    const user = await userService.validateUserForConfirmation(
-      decoded.id,
-      token
-    );
+    const user = await userService.findUserById(decoded.id);
+    if (!user) {
+      console.warn(`Invalid token for email confirmation: ${token}`);
+      return res.status(400).json({ message: "Invalid token" });
+    }
 
-    await userService.confirmUserEmail(user.id);
+    if (user.isVerified) {
+      console.warn(`Email already confirmed for user id: ${user.id}`);
+      return res.status(400).json({ message: "Email already confirmed" });
+    }
+
+    if (user.emailConfirmationToken !== token) {
+      console.warn(`Token mismatch for email confirmation: ${token}`);
+      return res.status(400).json({ message: "Invalid token" });
+    }
+
+    await userService.verifyUser(user.id);
+
+    await userService.clearEmailConfirmationToken(user.id);
 
     console.log(`Email confirmed for user id: ${user.id}`);
     res.json({ message: "Email confirmed successfully. You can now login." });
   } catch (error) {
-    console.error("Error confirming email:", error.message);
-    res.status(400).json({ message: error.message });
+    console.error("Error confirming email:", error);
+    res.status(500).json({ message: "Error confirming email", error });
   }
 };
 

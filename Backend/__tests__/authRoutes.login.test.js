@@ -2,6 +2,7 @@ import request from "supertest";
 import app from "../src/app.js";
 import * as userService from "../src/services/userService.js";
 import * as tokenService from "../src/services/tokenService.js";
+import redisClient from "../src/config/redisClient.js";
 
 // Mock global du module userService et tokenService
 jest.mock("../src/services/userService");
@@ -12,8 +13,17 @@ describe("POST /login", () => {
     jest.clearAllMocks(); // Réinitialise les mocks après chaque test
   });
 
+  afterAll(async () => {
+    jest.resetAllMocks(); // Réinitialise les mocks après tous les tests
+    await redisClient.quit();
+  });
+
   it("should return 400 if email does not exist", async () => {
-    userService.findUserByEmail.mockResolvedValue(null);
+    userService.validateUserForLogin.mockImplementation(() => {
+      const error = new Error("Invalid email or password");
+      error.statusCode = 400;
+      throw error;
+    });
 
     const res = await request(app).post("/api/auth/login").send({
       email: "nonexistent@test.com",
@@ -25,9 +35,11 @@ describe("POST /login", () => {
   });
 
   it("should return 400 if password is incorrect", async () => {
-    const user = { id: 1, email: "test@test.com", isVerified: true };
-    userService.findUserByEmail.mockResolvedValue(user);
-    userService.verifyPassword.mockResolvedValue(false);
+    userService.validateUserForLogin.mockImplementation(() => {
+      const error = new Error("Invalid email or password");
+      error.statusCode = 400;
+      throw error;
+    });
 
     const res = await request(app).post("/api/auth/login").send({
       email: "test@test.com",
@@ -39,13 +51,11 @@ describe("POST /login", () => {
   });
 
   it("should return 400 if email is not verified", async () => {
-    const user = {
-      id: 1,
-      email: "test@test.com",
-      password: "Password123!",
-      isVerified: false,
-    };
-    userService.findUserByEmail.mockResolvedValue(user);
+    userService.validateUserForLogin.mockImplementation(() => {
+      const error = new Error("Please confirm your email to login");
+      error.statusCode = 400;
+      throw error;
+    });
 
     const res = await request(app).post("/api/auth/login").send({
       email: "test@test.com",
@@ -58,10 +68,11 @@ describe("POST /login", () => {
 
   it("should return tokens and user info if login is successful", async () => {
     const user = { id: 1, email: "test@test.com", isVerified: true };
-    userService.findUserByEmail.mockResolvedValue(user);
-    userService.verifyPassword.mockResolvedValue(true);
-    tokenService.generateAccessToken.mockReturnValue("accessToken");
-    tokenService.generateRefreshToken.mockReturnValue("refreshToken");
+    userService.validateUserForLogin.mockResolvedValue(user);
+    tokenService.generateTokensForUser.mockReturnValue({
+      accessToken: "accessToken",
+      refreshToken: "refreshToken",
+    });
 
     const res = await request(app).post("/api/auth/login").send({
       email: "test@test.com",
@@ -77,7 +88,7 @@ describe("POST /login", () => {
   });
 
   it("should return 500 if there is an unexpected error", async () => {
-    userService.findUserByEmail.mockImplementation(() => {
+    userService.validateUserForLogin.mockImplementation(() => {
       throw new Error("Unexpected Error");
     });
 
@@ -87,6 +98,6 @@ describe("POST /login", () => {
     });
 
     expect(res.statusCode).toEqual(500);
-    expect(res.body.message).toEqual("Error logging in");
+    expect(res.body.message).toEqual("Unexpected Error");
   });
 });

@@ -35,10 +35,20 @@ export const generateResetToken = (userId) => {
   });
 };
 
+export const generateTokensForUser = (user) => {
+  const accessToken = generateAccessToken(user);
+  const refreshToken = generateRefreshToken(user);
+  return { accessToken, refreshToken };
+};
+
+
+
+
 export default {
   generateAccessToken,
   generateRefreshToken,
   verifyToken,
   generateConfirmationToken,
   generateResetToken,
+  generateTokensForUser,
 };

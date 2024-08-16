@@ -1,0 +1,124 @@
+
+> backend@1.0.0 test
+> jest --onlyFailures
+
+  console.log
+    Login request received for email: nonexistent@test.com
+
+      at log (src/controllers/auth/emailAuthController.js:117:13)
+
+[31m  console.error
+    Error logging in: Cannot read properties of undefined (reading 'accessToken')
+
+      126 |   } catch (error) {
+      127 |     const statusCode = error.statusCode || 500;
+    > 128 |     console.error("Error logging in:", error.message);
+          |             ^
+      129 |     res.status(statusCode).json({ message: error.message });
+      130 |   }
+      131 | };
+
+      at error (src/controllers/auth/emailAuthController.js:128:13)
+      at call (src/controllers/auth/emailAuthController.js:2:1)
+      at Generator.tryCatch (src/controllers/auth/emailAuthController.js:2:1)
+      at Generator._invoke [as next] (src/controllers/auth/emailAuthController.js:2:1)
+      at asyncGeneratorStep (src/controllers/auth/emailAuthController.js:2:1)
+      at asyncGeneratorStep (src/controllers/auth/emailAuthController.js:2:1)
+[39m
+  console.log
+    Connected to Redis
+
+      at log (src/config/redisClient.js:19:13)
+
+  console.log
+    Login request received for email: test@test.com
+
+      at log (src/controllers/auth/emailAuthController.js:117:13)
+
+[31m  console.error
+    Error logging in: Cannot read properties of undefined (reading 'accessToken')
+
+      126 |   } catch (error) {
+      127 |     const statusCode = error.statusCode || 500;
+    > 128 |     console.error("Error logging in:", error.message);
+          |             ^
+      129 |     res.status(statusCode).json({ message: error.message });
+      130 |   }
+      131 | };
+
+      at error (src/controllers/auth/emailAuthController.js:128:13)
+      at call (src/controllers/auth/emailAuthController.js:2:1)
+      at Generator.tryCatch (src/controllers/auth/emailAuthController.js:2:1)
+      at Generator._invoke [as next] (src/controllers/auth/emailAuthController.js:2:1)
+      at asyncGeneratorStep (src/controllers/auth/emailAuthController.js:2:1)
+      at asyncGeneratorStep (src/controllers/auth/emailAuthController.js:2:1)
+[39m
+  console.log
+    Login request received for email: test@test.com
+
+      at log (src/controllers/auth/emailAuthController.js:117:13)
+
+[31m  console.error
+    Error logging in: Cannot read properties of undefined (reading 'accessToken')
+
+      126 |   } catch (error) {
+      127 |     const statusCode = error.statusCode || 500;
+    > 128 |     console.error("Error logging in:", error.message);
+          |             ^
+      129 |     res.status(statusCode).json({ message: error.message });
+      130 |   }
+      131 | };
+
+      at error (src/controllers/auth/emailAuthController.js:128:13)
+      at call (src/controllers/auth/emailAuthController.js:2:1)
+      at Generator.tryCatch (src/controllers/auth/emailAuthController.js:2:1)
+      at Generator._invoke [as next] (src/controllers/auth/emailAuthController.js:2:1)
+      at asyncGeneratorStep (src/controllers/auth/emailAuthController.js:2:1)
+      at asyncGeneratorStep (src/controllers/auth/emailAuthController.js:2:1)
+[39m
+  console.log
+    Login request received for email: test@test.com
+
+      at log (src/controllers/auth/emailAuthController.js:117:13)
+
+[31m  console.error
+    Error logging in: Cannot read properties of undefined (reading 'accessToken')
+
+      126 |   } catch (error) {
+      127 |     const statusCode = error.statusCode || 500;
+    > 128 |     console.error("Error logging in:", error.message);
+          |             ^
+      129 |     res.status(statusCode).json({ message: error.message });
+      130 |   }
+      131 | };
+
+      at error (src/controllers/auth/emailAuthController.js:128:13)
+      at call (src/controllers/auth/emailAuthController.js:2:1)
+      at Generator.tryCatch (src/controllers/auth/emailAuthController.js:2:1)
+      at Generator._invoke [as next] (src/controllers/auth/emailAuthController.js:2:1)
+      at asyncGeneratorStep (src/controllers/auth/emailAuthController.js:2:1)
+      at asyncGeneratorStep (src/controllers/auth/emailAuthController.js:2:1)
+[39m
+  console.log
+    Login request received for email: test@test.com
+
+      at log (src/controllers/auth/emailAuthController.js:117:13)
+
+[31m  console.error
+    Error logging in: Cannot read properties of undefined (reading 'accessToken')
+
+      126 |   } catch (error) {
+      127 |     const statusCode = error.statusCode || 500;
+    > 128 |     console.error("Error logging in:", error.message);
+          |             ^
+      129 |     res.status(statusCode).json({ message: error.message });
+      130 |   }
+      131 | };
+
+      at error (src/controllers/auth/emailAuthController.js:128:13)
+      at call (src/controllers/auth/emailAuthController.js:2:1)
+      at Generator.tryCatch (src/controllers/auth/emailAuthController.js:2:1)
+      at Generator._invoke [as next] (src/controllers/auth/emailAuthController.js:2:1)
+      at asyncGeneratorStep (src/controllers/auth/emailAuthController.js:2:1)
+      at asyncGeneratorStep (src/controllers/auth/emailAuthController.js:2:1)
+[39m
