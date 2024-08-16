@@ -19,17 +19,17 @@ export const retryConnection = async () => {
   }
 };
 
-export const isRateLimited = async (key, limit = 3) => {
-  const attempts = await redisClient.get(key);
-  return attempts && attempts >= limit;
-};
+// export const isRateLimited = async (key, limit = 3) => {
+//   const attempts = await redisClient.get(key);
+//   return attempts && attempts >= limit;
+// };
 
-export const incrementRateLimit = async (key, expiration = 3600) => {
-  await redisClient.multi().incr(key).expire(key, expiration).exec();
-};
+// export const incrementRateLimit = async (key, expiration = 3600) => {
+//   await redisClient.multi().incr(key).expire(key, expiration).exec();
+// };
 
 export default {
   retryConnection,
-  isRateLimited,
-  incrementRateLimit,
+  // isRateLimited,
+  // incrementRateLimit,
 };

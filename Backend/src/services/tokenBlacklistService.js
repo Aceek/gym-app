@@ -32,3 +32,20 @@ export const isTokenBlacklisted = async (token) => {
     throw new Error("Failed to check token in Redis");
   }
 };
+
+
+export const blacklistTokens = async (accessToken, refreshToken) => {
+  const refreshTokenExpiry = calculateTokenExpiry(refreshToken);
+  const accessTokenExpiry = calculateTokenExpiry(accessToken);
+
+  await addToBlacklist(accessToken, accessTokenExpiry);
+  await addToBlacklist(refreshToken, refreshTokenExpiry);
+};
+
+
+export default {
+  addToBlacklist,
+  calculateTokenExpiry,
+  isTokenBlacklisted,
+  blacklistTokens,
+};

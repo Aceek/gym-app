@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import { prisma } from "../config/prismaClient.js";
 import tokenService from "./tokenService.js";
+import emailService from "./emailService.js";
 
 export const findOrCreateUser = async (googleUser) => {
   try {
@@ -188,6 +189,30 @@ export const confirmUserEmail = async (userId) => {
   await clearEmailConfirmationToken(userId);
 };
 
+export const handlePasswordResetRequest = async (email) => {
+  const user = await findUserByEmail(email);
+  if (!user) {
+    throw new Error("No account with that email found");
+  }
+
+  const resetToken = tokenService.generateResetToken(user.id);
+  await setResetToken(user, resetToken);
+  await emailService.sendResetPasswordEmail(user.email, resetToken);
+
+  return user;
+};
+
+export const findUserByToken = async (token, secret) => {
+  const decoded = tokenService.verifyToken(token, secret);
+  const user = await findUserById(decoded.id);
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  return user;
+};
+
 export default {
   findOrCreateUser,
   createUser,
@@ -203,4 +228,6 @@ export default {
   validateUserForLogin,
   validateUserForConfirmation,
   confirmUserEmail,
+  handlePasswordResetRequest,
+  findUserByToken,
 };

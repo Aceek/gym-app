@@ -1,11 +1,8 @@
 import tokenService from "../../services/tokenService.js";
 import emailService from "../../services/emailService.js";
 import userService from "../../services/userService.js";
-import {
-  addToBlacklist,
-  calculateTokenExpiry,
-} from "../../services/tokenBlacklistService.js";
-import redisService from "../../services/redisService.js";
+import tokenBlacklistService from "../../services/tokenBlacklistService.js";
+import rateLimitService from "../../services/rateLimitService.js";
 
 export const register = async (req, res) => {
   const { email, password, displayName } = req.body;
@@ -88,37 +85,27 @@ export const forgotPassword = async (req, res) => {
     console.log(`Forgot password request received for email: ${email}`);
 
     const rateLimitKey = `forgot_password_${email}`;
-    const limitReached = await redisService.isRateLimited(rateLimitKey, 3);
-    if (limitReached) {
-      console.warn(`Rate limit exceeded for email: ${email}`);
-      return res
-        .status(429)
-        .json({ message: "Too many requests. Please try again later." });
-    }
+    await rateLimitService.checkAndIncrementRateLimit(rateLimitKey, 3);
 
-    const user = await userService.findUserByEmail(email);
-    if (!user) {
-      console.warn(
-        `Forgot password failed, no account found for email: ${email}`
-      );
-      return res
-        .status(400)
-        .json({ message: "No account with that email found" });
-    }
-
-    const resetToken = tokenService.generateResetToken(user.id);
-    await userService.setResetToken(user, resetToken);
-    console.log(`Password reset token generated for user id: ${user.id}`);
-
-    await emailService.sendResetPasswordEmail(user.email, resetToken);
+    const user = await userService.handlePasswordResetRequest(email);
     console.log(`Password reset email sent to: ${user.email}`);
-
-    await redisService.incrementRateLimit(rateLimitKey);
 
     res.json({ message: "Password reset email sent" });
   } catch (error) {
-    console.error("Error sending reset email:", error);
-    res.status(500).json({ message: "Error sending reset email", error });
+    if (error.message === "Rate limit exceeded") {
+      console.warn(`Rate limit exceeded for email: ${email}`);
+      res
+        .status(429)
+        .json({ message: "Too many requests. Please try again later." });
+    } else if (error.message === "No account with that email found") {
+      console.warn(
+        `Forgot password failed, no account found for email: ${email}`
+      );
+      res.status(400).json({ message: error.message });
+    } else {
+      console.error("Error sending reset email:", error);
+      res.status(500).json({ message: "Error sending reset email", error });
+    }
   }
 };
 
@@ -167,24 +154,14 @@ export const changePassword = async (req, res) => {
         ? authHeader.split(" ")[1]
         : null;
 
-    const decoded = tokenService.verifyToken(
+    const user = await userService.findUserByToken(
       accessToken,
       process.env.ACCESS_TOKEN_SECRET
     );
 
-    const user = await userService.findUserById(decoded.id);
-    if (!user) {
-      console.warn("User not found for password change");
-      return res.status(400).json({ message: "User not found" });
-    }
-
     await userService.resetPassword(user, newPassword);
 
-    const refreshTokenExpiry = calculateTokenExpiry(refreshToken);
-    const accessTokenExpiry = calculateTokenExpiry(accessToken);
-
-    await addToBlacklist(accessToken, accessTokenExpiry);
-    await addToBlacklist(refreshToken, refreshTokenExpiry);
+    await tokenBlacklistService.blacklistTokens(accessToken, refreshToken);
 
     console.log(`Password changed successfully for user id: ${user.id}`);
 
@@ -192,6 +169,11 @@ export const changePassword = async (req, res) => {
       message: "Password changed successfully. Please login again.",
     });
   } catch (error) {
+    if (error.message === "User not found") {
+      console.warn(error.message);
+      return res.status(400).json({ message: error.message });
+    }
+
     console.error("Error changing password:", error);
     res.status(500).json({ message: "Error changing password", error });
   }
@@ -222,17 +204,9 @@ export const resendConfirmationEmail = async (req, res) => {
     }
 
     const rateLimitKey = `resend_confirmation_${email}`;
-    const isLimited = await redisService.isRateLimited(rateLimitKey, 3);
-    if (isLimited) {
-      return res
-        .status(429)
-        .json({ message: "Too many requests. Please try again later." });
-    }
-
-    await redisService.incrementRateLimit(rateLimitKey);
+    await rateLimitService.checkAndIncrementRateLimit(rateLimitKey, 3);
 
     const confirmationToken = tokenService.generateConfirmationToken(user.id);
-
     await userService.updateUserWithToken(user.id, confirmationToken);
 
     await emailService.sendConfirmationEmail(user.email, confirmationToken);
@@ -242,6 +216,13 @@ export const resendConfirmationEmail = async (req, res) => {
       message: "Confirmation email resent. Please check your inbox.",
     });
   } catch (error) {
+    if (error.message === "Rate limit exceeded") {
+      console.warn(`Rate limit exceeded for email: ${email}`);
+      return res
+        .status(429)
+        .json({ message: "Too many requests. Please try again later." });
+    }
+
     console.error("Error resending confirmation email:", error);
     res
       .status(500)
@@ -258,11 +239,11 @@ export const logout = async (req, res) => {
         ? authHeader.split(" ")[1]
         : null;
 
-    const accessTokenExpiry = calculateTokenExpiry(token);
-    const refreshTokenExpiry = calculateTokenExpiry(refreshToken);
+    if (!token || !refreshToken) {
+      return res.status(400).json({ message: "Missing tokens" });
+    }
 
-    await addToBlacklist(token, accessTokenExpiry);
-    await addToBlacklist(refreshToken, refreshTokenExpiry);
+    await tokenBlacklistService.blacklistTokens(token, refreshToken);
 
     res.status(200).json({ message: "Logged out successfully" });
   } catch (error) {
