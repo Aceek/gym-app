@@ -34,6 +34,10 @@ export const validatePasswordLogin = () => {
 export const validateDisplayName = () => {
   return body("displayName")
     .notEmpty()
+    .isString()
+    .withMessage("Display name must be a valid string")
+    .isLength({ min: 4 })
+    .withMessage("Display name must be at least 4 characters long")
     .withMessage("Display name is required")
     .trim()
     .escape();
