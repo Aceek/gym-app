@@ -61,8 +61,6 @@ export const login = async (req, res) => {
   }
 };
 
-
-
 export const confirmEmail = async (req, res) => {
   try {
     const { token } = req.query;
@@ -187,8 +185,8 @@ export const changePassword = async (req, res) => {
 };
 
 export const resendConfirmationEmail = async (req, res) => {
+  const { email } = req.body;
   try {
-    const { email } = req.body;
     console.log(
       `Resend confirmation email request received for email: ${email}`
     );
@@ -214,7 +212,10 @@ export const resendConfirmationEmail = async (req, res) => {
     const confirmationToken = tokenService.generateConfirmationToken(user.id);
     await userService.updateUserWithToken(user.id, confirmationToken);
 
-    await emailService.sendConfirmationEmail(user.email, confirmationToken);
+    await emailService.sendConfirmationEmailToUser(
+      user.email,
+      confirmationToken
+    );
     console.log(`Confirmation email re-sent to: ${user.email}`);
 
     const message = "Confirmation email resent. Please check your inbox.";
