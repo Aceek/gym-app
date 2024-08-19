@@ -87,25 +87,47 @@ export const resetPassword = async (user, newPassword) => {
   });
 };
 
-export const updateUserWithToken = async (
+// export const updateUserWithToken = async (
+//   userId,
+//   confirmationToken,
+//   prismaClient = prisma
+// ) => {
+//   try {
+//     const updatedUser = await prismaClient.user.update({
+//       where: { id: userId },
+//       data: {
+//         emailConfirmationToken: confirmationToken,
+//       },
+//     });
+//     console.log(
+//       `User with id: ${userId} updated with email confirmation token.`
+//     );
+//     return updatedUser;
+//   } catch (error) {
+//     console.error(`Error updating user with email confirmation token:`, error);
+//     throw new Error("Failed to update user with email confirmation token");
+//   }
+// };
+
+export const updateUserWithConfirmationCode = async (
   userId,
-  confirmationToken,
+  confirmationCode,
   prismaClient = prisma
 ) => {
   try {
     const updatedUser = await prismaClient.user.update({
       where: { id: userId },
       data: {
-        emailConfirmationToken: confirmationToken,
+        emailConfirmationCode: confirmationCode,
       },
     });
     console.log(
-      `User with id: ${userId} updated with email confirmation token.`
+      `User with id: ${userId} updated with email confirmation code.`
     );
     return updatedUser;
   } catch (error) {
-    console.error(`Error updating user with email confirmation token:`, error);
-    throw new Error("Failed to update user with email confirmation token");
+    console.error(`Error updating user with email confirmation code:`, error);
+    throw new Error("Failed to update user with email confirmation code");
   }
 };
 
@@ -131,11 +153,17 @@ export const registerUserTransaction = async (email, password, displayName) => {
   return prisma.$transaction(async (prisma) => {
     const user = await createUser(email, password, displayName, prisma);
 
-    const confirmationToken = tokenService.generateConfirmationToken(user.id);
+    // const confirmationToken = tokenService.generateConfirmationToken(user.id);
+    const confirmationCode = tokenService.generateConfirmationCode();
 
-    const updatedUser = await updateUserWithToken(
+    // const updatedUser = await updateUserWithToken(
+    //   user.id,
+    //   confirmationToken,
+    //   prisma
+    // );
+    const updatedUser = await updateUserWithConfirmationCode(
       user.id,
-      confirmationToken,
+      confirmationCode,
       prisma
     );
 
@@ -222,7 +250,8 @@ export default {
   verifyUser,
   resetPassword,
   setResetToken,
-  updateUserWithToken,
+  // updateUserWithToken,
+  updateUserWithConfirmationCode,
   clearEmailConfirmationToken,
   registerUserTransaction,
   validateUserForLogin,

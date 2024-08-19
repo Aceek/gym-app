@@ -26,7 +26,7 @@ export const register = async (req, res) => {
     );
     await emailService.sendConfirmationEmailToUser(
       newUser.email,
-      newUser.emailConfirmationToken
+      newUser.emailConfirmationCode
     );
 
     return sendSuccessResponse(
@@ -209,12 +209,14 @@ export const resendConfirmationEmail = async (req, res) => {
     const rateLimitKey = `resend_confirmation_${email}`;
     await rateLimitService.checkAndIncrementRateLimit(rateLimitKey, 3);
 
-    const confirmationToken = tokenService.generateConfirmationToken(user.id);
-    await userService.updateUserWithToken(user.id, confirmationToken);
+    // const confirmationToken = tokenService.generateConfirmationToken(user.id);
+    const confirmationCode = tokenService.generateConfirmationCode();
+    // await userService.updateUserWithToken(user.id, confirmationToken);
+    await userService.updateUserWithConfirmationCode(user.id, confirmationCode);
 
     await emailService.sendConfirmationEmailToUser(
       user.email,
-      confirmationToken
+      confirmationCode
     );
     console.log(`Confirmation email re-sent to: ${user.email}`);
 

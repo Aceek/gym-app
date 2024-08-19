@@ -12,14 +12,24 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-export const sendConfirmationEmail = async (email, token) => {
-  const confirmationLink = `${process.env.FRONTEND_URL}/confirm-email?token=${token}`;
+// export const sendConfirmationEmailToUser = async (email, token) => {
+//   const confirmationLink = `${process.env.FRONTEND_URL}/confirm-email?token=${token}`;
+//   const mailOptions = {
+//     from: process.env.SES_SMTP_VERIFIED_MAIL,
+//     to: email,
+//     subject: "Confirm your email",
+//     html: `<p>Please confirm your email by clicking the following link: <a href="${confirmationLink}">Confirm Email</a>
+//     your token is ${token}</p>`,
+//   };
+//   await transporter.sendMail(mailOptions);
+// };
+
+export const sendConfirmationEmailToUser = async (email, confirmationCode) => {
   const mailOptions = {
     from: process.env.SES_SMTP_VERIFIED_MAIL,
     to: email,
     subject: "Confirm your email",
-    html: `<p>Please confirm your email by clicking the following link: <a href="${confirmationLink}">Confirm Email</a>
-    your token is ${token}</p>`,
+    html: `<p>Veuillez confirmer votre email en entrant ce code dans l'application: <strong>${confirmationCode}</strong></p>`,
   };
   await transporter.sendMail(mailOptions);
 };
@@ -36,13 +46,7 @@ export const sendResetPasswordEmail = async (email, token) => {
   await transporter.sendMail(mailOptions);
 };
 
-export const sendConfirmationEmailToUser = async (email, token) => {
-  console.log(`Confirmation email sent to: ${email}`);
-  await sendConfirmationEmail(email, token);
-};
-
 export default {
-  sendConfirmationEmail,
   sendResetPasswordEmail,
   sendConfirmationEmailToUser,
 };
