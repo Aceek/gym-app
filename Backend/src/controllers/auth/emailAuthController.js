@@ -3,6 +3,10 @@ import emailService from "../../services/emailService.js";
 import userService from "../../services/userService.js";
 import tokenBlacklistService from "../../services/tokenBlacklistService.js";
 import rateLimitService from "../../services/rateLimitService.js";
+import {
+  sendSuccessResponse,
+  sendErrorResponse,
+} from "../../utils/responseHandler.js";
 
 export const register = async (req, res) => {
   const { email, password, displayName } = req.body;
@@ -12,7 +16,7 @@ export const register = async (req, res) => {
     const existingUser = await userService.findUserByEmail(email);
     if (existingUser) {
       console.warn(`Attempt to register with an existing email: ${email}`);
-      return res.status(400).json({ message: "Email already in use" });
+      return sendErrorResponse(res, "Email already in use", 400);
     }
 
     const newUser = await userService.registerUserTransaction(
@@ -25,13 +29,15 @@ export const register = async (req, res) => {
       newUser.emailConfirmationToken
     );
 
-    res.status(201).json({
-      message:
-        "User registered. Please check your email to confirm your account.",
-    });
+    return sendSuccessResponse(
+      res,
+      null,
+      "User registered successfully. Please check your email to confirm your account.",
+      201
+    );
   } catch (error) {
     console.error("Error registering user:", error);
-    res.status(500).json({ message: "Error registering user", error });
+    return sendErrorResponse(res, "Internal Server Error", 500);
   }
 };
 
@@ -46,13 +52,42 @@ export const login = async (req, res) => {
       tokenService.generateTokensForUser(user);
     console.log(`Tokens generated for user id: ${user.id}`);
 
-    res.status(200).json({ accessToken, refreshToken, user });
+    const data = { accessToken, refreshToken, user };
+    return sendSuccessResponse(res, "Login successful", data, 200);
   } catch (error) {
     const statusCode = error.statusCode || 500;
     console.error("Error logging in:", error.message);
-    res.status(statusCode).json({ message: error.message });
+    return sendErrorResponse(res, error.message, statusCode);
   }
 };
+
+// export const sendSuccessResponse = (
+//   res,
+//   data = null,
+//   message = "Operation successful",
+//   statusCode = 200
+// ) => {
+//   const response = {
+//     status: "success",
+//     message,
+//   };
+
+//   if (data !== null) {
+//     response.data = data;
+//   }
+
+//   return res.status(statusCode).json(response);
+// };
+
+// export const sendErrorResponse = (res, errorMessage, errorCode = 500) => {
+//   return res.status(errorCode).json({
+//     status: "error",
+//     error: {
+//       code: errorCode,
+//       message: errorMessage,
+//     },
+//   });
+// };
 
 export const confirmEmail = async (req, res) => {
   try {
@@ -72,10 +107,11 @@ export const confirmEmail = async (req, res) => {
     await userService.confirmUserEmail(user.id);
 
     console.log(`Email confirmed for user id: ${user.id}`);
-    res.json({ message: "Email confirmed successfully. You can now login." });
+    const message = "Email confirmed successfully. You can now login.";
+    return sendSuccessResponse(res, null, message, 200);
   } catch (error) {
     console.error("Error confirming email:", error.message);
-    res.status(400).json({ message: error.message });
+    return sendErrorResponse(res, error.message, 400);
   }
 };
 
@@ -90,21 +126,20 @@ export const forgotPassword = async (req, res) => {
     const user = await userService.handlePasswordResetRequest(email);
     console.log(`Password reset email sent to: ${user.email}`);
 
-    res.json({ message: "Password reset email sent" });
+    return sendSuccessResponse(res, null, "Password reset email sent", 200);
   } catch (error) {
     if (error.message === "Rate limit exceeded") {
       console.warn(`Rate limit exceeded for email: ${email}`);
-      res
-        .status(429)
-        .json({ message: "Too many requests. Please try again later." });
+      const message = "Too many requests. Please try again later.";
+      return sendErrorResponse(res, message, 429);
     } else if (error.message === "No account with that email found") {
       console.warn(
         `Forgot password failed, no account found for email: ${email}`
       );
-      res.status(400).json({ message: error.message });
+      return sendErrorResponse(res, error.message, 400);
     } else {
       console.error("Error sending reset email:", error);
-      res.status(500).json({ message: "Error sending reset email", error });
+      return sendErrorResponse(res, "Error sending reset email", 500);
     }
   }
 };
@@ -122,24 +157,23 @@ export const resetPassword = async (req, res) => {
     const user = await userService.findUserById(decoded.id);
     if (!user) {
       console.warn("User not found for password reset");
-      return res.status(400).json({ message: "User not found" });
+      return sendErrorResponse(res, "User not found", 400);
     }
 
     if (user.resetToken !== token) {
       console.warn("Invalid or expired token for password reset");
-      return res.status(400).json({ message: "Invalid or expired token" });
+      return sendErrorResponse(res, "Invalid or expired token", 400);
     }
 
     await userService.resetPassword(user, newPassword);
 
     console.log(`Password reset successfully for user id: ${user.id}`);
 
-    res.json({
-      message: "Password reset successfully. Please login again.",
-    });
+    const message = "Password reset successfully. Please login again.";
+    return sendSuccessResponse(res, null, message, 200);
   } catch (error) {
     console.error("Error resetting password:", error);
-    res.status(500).json({ message: "Error resetting password", error });
+    return sendErrorResponse(res, "Error resetting password", 500);
   }
 };
 
@@ -165,17 +199,16 @@ export const changePassword = async (req, res) => {
 
     console.log(`Password changed successfully for user id: ${user.id}`);
 
-    res.json({
-      message: "Password changed successfully. Please login again.",
-    });
+    const message = "Password changed successfully. Please login again.";
+    return sendSuccessResponse(res, null, message, 200);
   } catch (error) {
     if (error.message === "User not found") {
       console.warn(error.message);
-      return res.status(400).json({ message: error.message });
+      return sendErrorResponse(res, error.message, 400);
     }
 
     console.error("Error changing password:", error);
-    res.status(500).json({ message: "Error changing password", error });
+    return sendErrorResponse(res, "Error changing password", 500);
   }
 };
 
@@ -191,16 +224,14 @@ export const resendConfirmationEmail = async (req, res) => {
       console.warn(
         `Attempt to resend confirmation email to a non-existent email: ${email}`
       );
-      return res
-        .status(400)
-        .json({ message: "No account with that email found" });
+      return sendErrorResponse(res, "No account with that email found", 400);
     }
 
     if (user.isVerified) {
       console.warn(
         `Attempt to resend confirmation email to an already verified email: ${email}`
       );
-      return res.status(400).json({ message: "Email is already confirmed" });
+      return sendErrorResponse(res, "Email is already confirmed", 400);
     }
 
     const rateLimitKey = `resend_confirmation_${email}`;
@@ -212,21 +243,21 @@ export const resendConfirmationEmail = async (req, res) => {
     await emailService.sendConfirmationEmail(user.email, confirmationToken);
     console.log(`Confirmation email re-sent to: ${user.email}`);
 
-    res.json({
-      message: "Confirmation email resent. Please check your inbox.",
-    });
+    // res.status(200).json({
+    //   message: "Confirmation email resent. Please check your inbox.",
+    // });
+    const message = "Confirmation email resent. Please check your inbox.";
+    return sendSuccessResponse(res, null, message, 200);
   } catch (error) {
     if (error.message === "Rate limit exceeded") {
       console.warn(`Rate limit exceeded for email: ${email}`);
-      return res
-        .status(429)
-        .json({ message: "Too many requests. Please try again later." });
+      const message = "Too many requests. Please try again later.";
+      return sendErrorResponse(res, message, 429);
     }
 
     console.error("Error resending confirmation email:", error);
-    res
-      .status(500)
-      .json({ message: "Error resending confirmation email", error });
+    const message = "Error resending confirmation email";
+    return sendErrorResponse(res, message, 500);
   }
 };
 
@@ -240,14 +271,14 @@ export const logout = async (req, res) => {
         : null;
 
     if (!token || !refreshToken) {
-      return res.status(400).json({ message: "Missing tokens" });
+      return sendErrorResponse(res, "Missing tokens", 400);
     }
 
     await tokenBlacklistService.blacklistTokens(token, refreshToken);
 
-    res.status(200).json({ message: "Logged out successfully" });
+    return sendSuccessResponse(res, null, "Logged out successfully", 200);
   } catch (error) {
     console.error("Error during logout:", error);
-    res.status(500).json({ message: "Error during logout", error });
+    return sendErrorResponse(res, "Error during logout", 500);
   }
 };

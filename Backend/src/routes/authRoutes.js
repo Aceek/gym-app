@@ -1,6 +1,6 @@
 import * as authControllers from "../controllers/auth/emailAuthController.js";
 import * as googleAuthControllers from "../controllers/auth/googleAuthController.js";
-import * as authValidators from "../utils/authValidators.js";
+import * as authValidators from "../utils/validators/authValidators.js";
 import validationMiddleware from "../middlewares/validationMiddleware.js";
 import googleAuthMiddleware from "../middlewares/googleAuthMiddleware.js";
 import { Router } from "express";

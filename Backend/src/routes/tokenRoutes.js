@@ -1,6 +1,6 @@
 import express from "express";
 import tokenController from "../controllers/auth/tokenController.js";
-import { validateRefreshToken } from "../utils/tokenValidators.js";
+import { validateRefreshToken } from "../utils/validators/tokenValidators.js";
 import validationMiddleware from "../middlewares/validationMiddleware.js";
 import jwtMiddleware from "../middlewares/jwtMiddleware.js";
 
