@@ -19,6 +19,7 @@ const SignUpScreen = ({navigation}) => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
+  const [serverError, setServerError] = useState('');
 
   const handleDisplayNameBlur = () => {
     const displayNameValidation = validateDisplayName(displayName);
@@ -35,12 +36,6 @@ const SignUpScreen = ({navigation}) => {
     setErrors(prevErrors => ({
       ...prevErrors,
       email: emailValidation.valid ? null : emailValidation.message,
-    }));
-
-    setErrors(prevErrors => ({
-      ...prevErrors,
-      confirmEmail:
-        email === confirmEmail ? null : 'Email and confirmation do not match.',
     }));
   };
 
@@ -60,14 +55,6 @@ const SignUpScreen = ({navigation}) => {
         ? null
         : passwordValidation.errors.join(', '),
     }));
-
-    setErrors(prevErrors => ({
-      ...prevErrors,
-      confirmPassword:
-        password === confirmPassword
-          ? null
-          : 'Password and confirmation do not match.',
-    }));
   };
 
   const handleConfirmPasswordBlur = () => {
@@ -81,6 +68,7 @@ const SignUpScreen = ({navigation}) => {
   };
 
   const handleSignUp = async () => {
+    setServerError('');
     setIsLoading(true);
     const {
       valid,
@@ -102,13 +90,9 @@ const SignUpScreen = ({navigation}) => {
 
     try {
       await register(normalizedEmail, password, displayName);
-      Alert.alert(
-        'Success',
-        'Account created! Please check your email to confirm.',
-      );
-      navigation.navigate('Login');
+      navigation.navigate('Confirmation', {email: normalizedEmail});
     } catch (error) {
-      Alert.alert('Registration Error', error.message);
+      setServerError(error.message);
     } finally {
       setIsLoading(false);
     }
@@ -117,6 +101,7 @@ const SignUpScreen = ({navigation}) => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Sign Up</Text>
+      {serverError ? <Text style={styles.errorText}>{serverError}</Text> : null}
       <InputField
         label="Display Name"
         placeholder="Enter your display name"
@@ -165,6 +150,11 @@ const SignUpScreen = ({navigation}) => {
         isLoading={isLoading}
         disabled={isLoading}
       />
+      {/* add redirect to login button */}
+      <Button
+        title="Already have an account? Login"
+        onPress={() => navigation.navigate('Login')}
+      />
     </View>
   );
 };
@@ -180,6 +170,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 40,
     textAlign: 'center',
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 12,
+    marginTop: 5,
   },
 });
 

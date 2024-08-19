@@ -52,8 +52,7 @@ export const AuthProvider = ({children}) => {
 
   const register = async (email, password, displayName) => {
     try {
-      const userData = await registerUser(email, password, displayName);
-      setUser(userData);
+      await registerUser(email, password, displayName);
     } catch (error) {
       console.error('Error during registration:', error);
       throw error;

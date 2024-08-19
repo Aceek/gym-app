@@ -84,12 +84,21 @@ export const registerUser = async (email, password, displayName) => {
       password,
       displayName,
     });
-    console.log('response from register user', response);
-    const {accessToken, refreshToken, user} = response.data;
 
-    await storeTokensAndUser(accessToken, refreshToken, user);
+    return response;
+  } catch (error) {
+    const errorMessage = handleError(error);
+    throw new Error(errorMessage);
+  }
+};
 
-    return user;
+export const resendConfirmationEmail = async email => {
+  try {
+    const response = await api.post('/auth/resend-confirmation-email', {
+      email,
+    });
+
+    return response;
   } catch (error) {
     const errorMessage = handleError(error);
     throw new Error(errorMessage);

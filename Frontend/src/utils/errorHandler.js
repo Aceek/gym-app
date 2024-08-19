@@ -1,20 +1,19 @@
 export const handleError = error => {
   let errorMessage = 'An unknown error occurred';
 
-  if (error.response) {
-    const {message, errors} = error.response.data;
+  if (error.response && error.response.data) {
+    const {error: errorDetails} = error.response.data;
 
-    if (errors && Array.isArray(errors)) {
-      // Construire un message d'erreur détaillé à partir des erreurs de validation
-      errorMessage = errors
-        .map(err => `${err.field}: ${err.message}`)
-        .join('\n');
-    } else if (message) {
-      // Utiliser le message général si aucun détail d'erreur n'est fourni
-      errorMessage = message;
+    if (errorDetails) {
+      if (errorDetails.details && Array.isArray(errorDetails.details)) {
+        errorMessage = errorDetails.details
+          .map(err => `${err.field}: ${err.message}`)
+          .join('\n');
+      } else if (errorDetails.message) {
+        errorMessage = errorDetails.message;
+      }
     }
   } else if (error.message) {
-    // Erreurs capturées par le client (ex: problème de réseau)
     errorMessage = error.message;
   }
 
