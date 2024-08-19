@@ -1,9 +1,13 @@
 import tokenService from "../../services/tokenService.js";
+import {
+  sendErrorResponse,
+  sendSuccessResponse,
+} from "../../utils/responseHandler.js";
 
 export const refreshToken = (req, res) => {
   const { refreshToken } = req.body;
   if (!refreshToken) {
-    return res.status(400).json({ message: "Refresh token is required" });
+    return sendErrorResponse(res, "Refresh token is required", 400);
   }
 
   try {
@@ -12,9 +16,14 @@ export const refreshToken = (req, res) => {
       process.env.REFRESH_TOKEN_SECRET
     );
     const newAccessToken = tokenService.generateAccessToken(user);
-    res.status(200).json({ accessToken: newAccessToken });
+    return sendSuccessResponse(
+      res,
+      { accessToken: newAccessToken },
+      "Token refreshed successfully",
+      200
+    );
   } catch (error) {
-    res.status(401).json({ message: "Invalid refresh token" });
+    return sendErrorResponse(res, "Invalid refresh token", 401);
   }
 };
 

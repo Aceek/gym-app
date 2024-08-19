@@ -1,12 +1,17 @@
 import { prisma } from "../config/prismaClient.js";
+import {
+  sendSuccessResponse,
+  sendErrorResponse,
+} from "../utils/responseHandler.js";
 
 const testDbConnection = async (req, res) => {
   try {
     const result = await prisma.$queryRaw`SELECT NOW()`;
-    res.json(result[0]);
+    const message = "Database connection successful!";
+    return sendSuccessResponse(res, result[0], message, 200);
   } catch (err) {
     console.error(err);
-    res.status(500).send("Server Error");
+    return sendErrorResponse(res, "Database connection failed!", 500);
   }
 };
 

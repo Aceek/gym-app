@@ -3,6 +3,10 @@ import authRoutes from "./routes/authRoutes.js";
 import tokenRoutes from "./routes/tokenRoutes.js";
 import protectedRoutes from "./routes/protectedRoutes.js";
 import { prisma } from "./config/prismaClient.js";
+import {
+  sendSuccessResponse,
+  sendErrorResponse,
+} from "./utils/responseHandler.js";
 
 const app = express();
 
@@ -16,15 +20,16 @@ app.use("/api/protected", protectedRoutes);
 app.get("/test-db", async (req, res) => {
   try {
     await prisma.$connect();
-    res.status(200).send("Database connection successful!");
+    const message = "Database connection successful!";
+    return sendSuccessResponse(res, null, message, 200);
   } catch (error) {
-    res.status(500).send("Database connection failed!");
+    return sendErrorResponse(res, "Database connection failed!", 500);
   }
 });
 
 app.get("/api/health", (req, res) => {
   console.log("Health check");
-  res.send("Hello World!");
+  return sendSuccessResponse(res, null, "Health check successful", 200);
 });
 
 export default app;

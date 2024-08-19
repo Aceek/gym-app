@@ -2,6 +2,10 @@
 import dotenv from "dotenv";
 import userService from "../../services/userService.js";
 import tokenService from "../../services/tokenService.js";
+import {
+  sendErrorResponse,
+  sendSuccessResponse,
+} from "../../utils/responseHandler.js";
 
 dotenv.config();
 
@@ -13,14 +17,11 @@ export const authenticateGoogleUser = async (req, res) => {
     const refreshToken = tokenService.generateRefreshToken(user);
     console.log("accessToken\n\n", accessToken);
 
-    res.status(200).json({
-      message: created ? "User created" : "User logged in",
-      accessToken,
-      refreshToken,
-      user,
-    });
+    const message = created ? "User created" : "User logged in";
+    const data = { accessToken, refreshToken, user };
+    return sendSuccessResponse(res, data, message, 200);
   } catch (error) {
     console.error("Error during authentication:", error);
-    res.status(500).json({ message: "Internal Server Error" });
+    return sendErrorResponse(res, "Internal Server Error", 500);
   }
 };

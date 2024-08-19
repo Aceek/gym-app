@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
-import { isTokenBlacklisted } from "../services/tokenBlacklistService.js";
+import { isTokenBlacklisted } from "../../services/tokenBlacklistService.js";
+import { sendErrorResponse } from "../../utils/responseHandler.js";
 
 const verifyRefreshToken = async (refreshToken) => {
   try {
@@ -23,15 +24,13 @@ const jwtMiddleware = async (req, res, next) => {
       : null;
 
   if (!token) {
-    return res
-      .status(401)
-      .json({ message: "Access token is missing or invalid" });
+    return sendErrorResponse(res, "Access token is missing or invalid", 401);
   }
 
   try {
     const isBlacklisted = await isTokenBlacklisted(token);
     if (isBlacklisted) {
-      return res.status(401).json({ message: "Token has been revoked" });
+      return sendErrorResponse(res, "Token has been revoked", 401);
     }
 
     const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
@@ -45,7 +44,7 @@ const jwtMiddleware = async (req, res, next) => {
     next();
   } catch (error) {
     console.log("Error verifying token:", error.message);
-    return res.status(401).json({ message: "Invalid or expired token" });
+    return sendErrorResponse(res, "Invalid or expired token", 401);
   }
 };
 

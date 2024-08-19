@@ -1,10 +1,10 @@
 import * as authControllers from "../controllers/auth/emailAuthController.js";
 import * as googleAuthControllers from "../controllers/auth/googleAuthController.js";
 import * as authValidators from "../utils/validators/authValidators.js";
-import validationMiddleware from "../middlewares/validationMiddleware.js";
-import googleAuthMiddleware from "../middlewares/googleAuthMiddleware.js";
+import validationMiddleware from "../middlewares/validation/validationMiddleware.js";
+import googleAuthMiddleware from "../middlewares/auth/googleAuthMiddleware.js";
 import { Router } from "express";
-import jwtMiddleware from "../middlewares/jwtMiddleware.js";
+import jwtMiddleware from "../middlewares/auth/jwtMiddleware.js";
 
 const router = Router();
 

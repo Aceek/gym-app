@@ -16,12 +16,23 @@ export const sendSuccessResponse = (
   return res.status(statusCode).json(response);
 };
 
-export const sendErrorResponse = (res, errorMessage, errorCode = 500) => {
-  return res.status(errorCode).json({
+export const sendErrorResponse = (
+  res,
+  errorMessage,
+  errorCode = 500,
+  details = null
+) => {
+  const response = {
     status: "error",
     error: {
       code: errorCode,
       message: errorMessage,
     },
-  });
+  };
+
+  if (details) {
+    response.error.details = details;
+  }
+
+  return res.status(errorCode).json(response);
 };

@@ -61,33 +61,7 @@ export const login = async (req, res) => {
   }
 };
 
-// export const sendSuccessResponse = (
-//   res,
-//   data = null,
-//   message = "Operation successful",
-//   statusCode = 200
-// ) => {
-//   const response = {
-//     status: "success",
-//     message,
-//   };
 
-//   if (data !== null) {
-//     response.data = data;
-//   }
-
-//   return res.status(statusCode).json(response);
-// };
-
-// export const sendErrorResponse = (res, errorMessage, errorCode = 500) => {
-//   return res.status(errorCode).json({
-//     status: "error",
-//     error: {
-//       code: errorCode,
-//       message: errorMessage,
-//     },
-//   });
-// };
 
 export const confirmEmail = async (req, res) => {
   try {
@@ -243,9 +217,6 @@ export const resendConfirmationEmail = async (req, res) => {
     await emailService.sendConfirmationEmail(user.email, confirmationToken);
     console.log(`Confirmation email re-sent to: ${user.email}`);
 
-    // res.status(200).json({
-    //   message: "Confirmation email resent. Please check your inbox.",
-    // });
     const message = "Confirmation email resent. Please check your inbox.";
     return sendSuccessResponse(res, null, message, 200);
   } catch (error) {
