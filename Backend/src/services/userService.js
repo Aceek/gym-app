@@ -1,7 +1,10 @@
 import bcrypt from "bcrypt";
 import { prisma } from "../config/prismaClient.js";
-import tokenService, { generateConfirmationCode } from "./tokenService.js";
 import emailService from "./emailService.js";
+import redisService from "./redisService.js";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 export const findOrCreateUser = async (googleUser) => {
   try {
@@ -109,37 +112,20 @@ export const updateUserWithConfirmationCode = async (
   }
 };
 
-export const clearEmailConfirmationCode = async (userId) => {
-  try {
-    await prisma.user.update({
-      where: { id: userId },
-      data: {
-        emailConfirmationCode: null,
-      },
-    });
-    console.log(`Email confirmation code cleared for user id: ${userId}`);
-  } catch (error) {
-    console.error(
-      `Error clearing email confirmation code for user id: ${userId}`,
-      error
-    );
-    throw new Error("Failed to clear email confirmation code");
-  }
-};
-
 export const registerUserTransaction = async (email, password, displayName) => {
   return prisma.$transaction(async (prisma) => {
     const user = await createUser(email, password, displayName, prisma);
 
-    const confirmationCode = tokenService.generateConfirmationCode();
-
-    const updatedUser = await updateUserWithConfirmationCode(
-      user.id,
-      confirmationCode,
-      prisma
+    const expiryTimeInSeconds = parseInt(
+      process.env.CONFIRMATION_CODE_EXPIRY_TIME
+    );
+    const confirmationCode = await redisService.generateAndStoreCode(
+      email,
+      "confirmEmail",
+      expiryTimeInSeconds
     );
 
-    return updatedUser;
+    return { user, confirmationCode };
   });
 };
 
@@ -177,17 +163,23 @@ export const validateUserForConfirmationByCode = async (email, code) => {
     throw new Error("Email already confirmed");
   }
 
-  if (user.emailConfirmationCode !== code) {
-    throw new Error("Invalid confirmation code");
-  }
+  await redisService.verifyCode(email, code, 'confirmEmail');
 
   return user;
 };
 
-export const confirmUserEmail = async (userId) => {
-  await verifyUser(userId);
-  await clearEmailConfirmationCode(userId);
-};
+// export const handlePasswordResetRequest = async (email) => {
+//   const user = await findUserByEmail(email);
+//   if (!user) {
+//     throw new Error("No account with that email found");
+//   }
+
+//   const resetCode = generateConfirmationCode();
+//   await setResetCode(user, resetCode);
+//   await emailService.sendResetPasswordEmail(user.email, resetCode);
+
+//   return user;
+// };
 
 export const handlePasswordResetRequest = async (email) => {
   const user = await findUserByEmail(email);
@@ -195,8 +187,13 @@ export const handlePasswordResetRequest = async (email) => {
     throw new Error("No account with that email found");
   }
 
-  const resetCode = generateConfirmationCode();
-  await setResetCode(user, resetCode);
+  const expiryTimeInSeconds = parseInt(process.env.RESET_CODE_EXPIRY_TIME);
+  const resetCode = await redisService.generateAndStoreCode(
+    email,
+    "resetPassword",
+    expiryTimeInSeconds
+  );
+
   await emailService.sendResetPasswordEmail(user.email, resetCode);
 
   return user;
@@ -222,11 +219,9 @@ export default {
   verifyUser,
   resetPassword,
   updateUserWithConfirmationCode,
-  clearEmailConfirmationCode,
   registerUserTransaction,
   validateUserForLogin,
   validateUserForConfirmationByCode,
-  confirmUserEmail,
   handlePasswordResetRequest,
   findUserByToken,
 };

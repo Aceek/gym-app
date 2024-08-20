@@ -7,6 +7,8 @@ import {
   sendSuccessResponse,
   sendErrorResponse,
 } from "../../utils/responseHandler.js";
+import redisService from "../../services/redisService.js";
+import { AppError } from "../../errors/AppError.js";
 
 export const register = async (req, res) => {
   const { email, password, displayName } = req.body;
@@ -19,14 +21,11 @@ export const register = async (req, res) => {
       return sendErrorResponse(res, "Email already in use", 400);
     }
 
-    const newUser = await userService.registerUserTransaction(
-      email,
-      password,
-      displayName
-    );
+    const { user: newUser, confirmationCode } =
+      await userService.registerUserTransaction(email, password, displayName);
     await emailService.sendConfirmationEmailToUser(
       newUser.email,
-      newUser.emailConfirmationCode
+      confirmationCode
     );
 
     return sendSuccessResponse(
@@ -71,12 +70,15 @@ export const confirmEmail = async (req, res) => {
       code
     );
 
-    await userService.confirmUserEmail(user.id);
+    await userService.verifyUser(user.id);
 
     console.log(`Email confirmed for user id: ${user.id}`);
     const message = "Email confirmed successfully. You can now login.";
     return sendSuccessResponse(res, null, message, 200);
   } catch (error) {
+    if (error instanceof AppError) {
+      return sendErrorResponse(res, error.message, error.statusCode);
+    }
     console.error("Error confirming email:", error.message);
     return sendErrorResponse(res, error.message, 400);
   }
@@ -118,15 +120,12 @@ export const resetPassword = async (req, res) => {
       `Password reset request received with code: ${code} for email: ${email}`
     );
 
+    await redisService.verifyCode(email, code, "resetPassword");
+
     const user = await userService.findUserByEmail(email);
     if (!user) {
       console.warn("User not found for password reset");
-      return sendErrorResponse(res, "User not found", 400);
-    }
-
-    if (user.resetCode !== code) {
-      console.warn("Invalid or expired reset code");
-      return sendErrorResponse(res, "Invalid or expired reset code", 400);
+      return sendErrorResponse(res, "User not found", 404);
     }
 
     await userService.resetPassword(user, newPassword);
@@ -136,8 +135,11 @@ export const resetPassword = async (req, res) => {
     const message = "Password reset successfully. Please login again.";
     return sendSuccessResponse(res, null, message, 200);
   } catch (error) {
+    if (error instanceof AppError) {
+      return sendErrorResponse(res, error.message, error.statusCode);
+    }
     console.error("Error resetting password:", error);
-    return sendErrorResponse(res, "Error resetting password", 500);
+    return sendErrorResponse(res, "An unexpected error occurred", 500);
   }
 };
 
@@ -179,9 +181,7 @@ export const changePassword = async (req, res) => {
 export const resendConfirmationEmail = async (req, res) => {
   const { email } = req.body;
   try {
-    console.log(
-      `Resend confirmation email request received for email: ${email}`
-    );
+    console.log(`Resend confirm email request received for email: ${email}`);
 
     const user = await userService.findUserByEmail(email);
     if (!user) {
@@ -201,8 +201,14 @@ export const resendConfirmationEmail = async (req, res) => {
     const rateLimitKey = `resend_confirmation_${email}`;
     await rateLimitService.checkAndIncrementRateLimit(rateLimitKey, 3);
 
-    const confirmationCode = tokenService.generateConfirmationCode();
-    await userService.updateUserWithConfirmationCode(user.id, confirmationCode);
+    const expiryTimeInSeconds = parseInt(
+      process.env.CONFIRMATION_CODE_EXPIRY_TIME
+    );
+    const confirmationCode = await generateAndStoreCode(
+      email,
+      "confirmEmail",
+      expiryTimeInSeconds
+    );
 
     await emailService.sendConfirmationEmailToUser(
       user.email,

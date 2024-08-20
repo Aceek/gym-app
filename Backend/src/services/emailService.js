@@ -12,6 +12,16 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+// export const sendConfirmationEmailToUser = async (email, confirmationCode) => {
+//   const mailOptions = {
+//     from: process.env.SES_SMTP_VERIFIED_MAIL,
+//     to: email,
+//     subject: "Confirm your email",
+//     html: `<p>Veuillez confirmer votre email en entrant ce code dans l'application: <strong>${confirmationCode}</strong></p>`,
+//   };
+//   await transporter.sendMail(mailOptions);
+// };
+
 export const sendConfirmationEmailToUser = async (email, confirmationCode) => {
   const mailOptions = {
     from: process.env.SES_SMTP_VERIFIED_MAIL,

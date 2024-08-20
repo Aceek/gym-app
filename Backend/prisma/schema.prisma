@@ -13,8 +13,6 @@ model User {
   email                  String   @unique
   password               String?
   isVerified             Boolean  @default(false)
-  resetCode              String?
-  emailConfirmationCode  String?
   displayName            String?
   photo                  String?
   createdAt              DateTime @default(now())
