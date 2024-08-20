@@ -3,6 +3,7 @@ import {
   loginWithGoogle,
   googleLogout,
   registerUser,
+  LoginEmail,
 } from '../services/authService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {USER_KEY} from '@env';
@@ -30,13 +31,19 @@ export const AuthProvider = ({children}) => {
     loadUser();
   }, []);
 
-  const login = async () => {
+  const login = async (isGoogleLogin, userInfo) => {
     try {
-      const userData = await loginWithGoogle();
+      let userData = null;
+      if (!isGoogleLogin) {
+        userData = await LoginEmail(userInfo.email, userInfo.password);
+      } else {
+        userData = await loginWithGoogle();
+      }
 
       setUser(userData);
     } catch (error) {
       console.error('Error during login:', error);
+      throw error;
     }
   };
 

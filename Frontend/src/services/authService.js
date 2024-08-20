@@ -30,6 +30,26 @@ export const loginWithGoogle = async () => {
   }
 };
 
+export const LoginEmail = async (email, password) => {
+  try {
+    const response = await api.post('/auth/login', {
+      email,
+      password,
+    });
+
+    const {accessToken, refreshToken, user} = response.data.data;
+
+    console.log('user = ', user);
+
+    await storeTokensAndUser(accessToken, refreshToken, user);
+
+    return user;
+  } catch (error) {
+    const errorMessage = handleError(error);
+    throw new Error(errorMessage);
+  }
+};
+
 export const googleLogout = async () => {
   try {
     await GoogleSignin.signOut();

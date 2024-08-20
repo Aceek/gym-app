@@ -67,8 +67,12 @@ const ConfirmationScreen = ({route, navigation}) => {
       const response = await sendConfirmationCode(email, code);
 
       if (response.data.status === 'success') {
-        setMessage('Code vérifié avec succès.');
-        navigation.navigate('Login');
+        setMessage(
+          'Code vérifié avec succès redirection vers la page de connection...',
+        );
+        setTimeout(() => {
+          navigation.replace('Login');
+        }, 2000);
       } else {
         setError(
           response.data.error.message || 'Code invalide. Veuillez réessayer.',
