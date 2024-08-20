@@ -104,3 +104,17 @@ export const resendConfirmationEmail = async email => {
     throw new Error(errorMessage);
   }
 };
+
+export const sendConfirmationCode = async (email, code) => {
+  try {
+    const response = await api.post('/auth/confirm-email', {
+      email,
+      code,
+    });
+
+    return response;
+  } catch (error) {
+    const errorMessage = handleError(error);
+    throw new Error(errorMessage);
+  }
+};

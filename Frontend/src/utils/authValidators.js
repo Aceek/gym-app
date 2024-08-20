@@ -28,7 +28,7 @@ export const validateSignUpData = ({
     errors.password = passwordValidation.errors.join(', ');
   }
 
-  if (email !== confirmEmail) {
+  if (email.trim().toLowerCase() !== confirmEmail.trim().toLowerCase()) {
     errors.confirmEmail = 'Email and confirmation do not match.';
   }
 

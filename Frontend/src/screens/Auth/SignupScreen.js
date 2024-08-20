@@ -43,7 +43,9 @@ const SignUpScreen = ({navigation}) => {
     setErrors(prevErrors => ({
       ...prevErrors,
       confirmEmail:
-        confirmEmail === email ? null : 'Email and confirmation do not match.',
+        confirmEmail.trim().toLowerCase() === email.trim().toLowerCase()
+          ? null
+          : 'Email and confirmation do not match.',
     }));
   };
 
@@ -150,7 +152,6 @@ const SignUpScreen = ({navigation}) => {
         isLoading={isLoading}
         disabled={isLoading}
       />
-      {/* add redirect to login button */}
       <Button
         title="Already have an account? Login"
         onPress={() => navigation.navigate('Login')}

@@ -1,12 +1,19 @@
 import React, {useEffect, useState} from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 import Button from '../../components/Button';
-import {resendConfirmationEmail} from '../../services/authService';
+import {
+  resendConfirmationEmail,
+  sendConfirmationCode,
+} from '../../services/authService';
+import {validateConfirmationCode} from '../../utils/fieldsValidators';
 import useCountdown from '../../hooks/useCountdown';
+import ConfirmationCodeInput from '../../components/ConfirmationCodeInput';
 
 const ConfirmationScreen = ({route, navigation}) => {
   const {email} = route.params;
+  const [code, setCode] = useState('');
   const [isSending, setIsSending] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
 
@@ -44,15 +51,52 @@ const ConfirmationScreen = ({route, navigation}) => {
     }
   };
 
+  const handleVerifyCode = async () => {
+    setIsVerifying(true);
+    setError('');
+    setMessage('');
+
+    try {
+      const isValid = validateConfirmationCode(code);
+      if (!isValid) {
+        setError('Le code doit être un nombre de 6 chiffres.');
+        setIsVerifying(false);
+        return;
+      }
+
+      const response = await sendConfirmationCode(email, code);
+
+      if (response.data.status === 'success') {
+        setMessage('Code vérifié avec succès.');
+        navigation.navigate('Login');
+      } else {
+        setError(
+          response.data.error.message || 'Code invalide. Veuillez réessayer.',
+        );
+      }
+    } catch (err) {
+      setError(err.message || 'Une erreur est survenue. Veuillez réessayer.');
+    } finally {
+      setIsVerifying(false);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Vérification de l'Email Requise</Text>
       <Text style={styles.message}>
-        Un email de confirmation a été envoyé à {email}. Veuillez vérifier votre
-        boîte de réception et cliquer sur le lien pour activer votre compte.
+        Un code de confirmation a été envoyé à {email}. Veuillez entrer le code
+        ci-dessous pour activer votre compte.
       </Text>
+      <ConfirmationCodeInput code={code} setCode={setCode} />
       {message ? <Text style={styles.successText}>{message}</Text> : null}
       {error ? <Text style={styles.errorText}>{error}</Text> : null}
+      <Button
+        onPress={handleVerifyCode}
+        title="Vérifier le Code"
+        disabled={isVerifying}
+        isLoading={isVerifying}
+      />
       <Button
         onPress={handleResendEmail}
         title={

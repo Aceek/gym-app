@@ -53,3 +53,8 @@ export const validateDisplayName = displayName => {
     errors,
   };
 };
+
+export const validateConfirmationCode = code => {
+  const codePattern = /^\d{6}$/;
+  return codePattern.test(code);
+};
