@@ -204,7 +204,7 @@ export const resendConfirmationEmail = async (req, res) => {
     const expiryTimeInSeconds = parseInt(
       process.env.CONFIRMATION_CODE_EXPIRY_TIME
     );
-    const confirmationCode = await generateAndStoreCode(
+    const confirmationCode = await redisService.generateAndStoreCode(
       email,
       "confirmEmail",
       expiryTimeInSeconds
