@@ -52,7 +52,8 @@ export const login = async (req, res) => {
     console.log(`Tokens generated for user id: ${user.id}`);
 
     const data = { accessToken, refreshToken, user };
-    return sendSuccessResponse(res, "Login successful", data, 200);
+
+    return sendSuccessResponse(res, data, "Login succesful", 200);
   } catch (error) {
     const statusCode = error.statusCode || 500;
     console.error("Error logging in:", error.message);
