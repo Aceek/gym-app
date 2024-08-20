@@ -14,7 +14,7 @@ const transporter = nodemailer.createTransport({
 });
 
 const mailOptions = {
-  from: "linhardtilan@gmail.com", // Adresse vérifiée
+  from: "linhardtilan@gmail.com",
   to: "linhardtilan@gmail.com",
   subject: "Test Email via SMTP",
   text: "Ceci est un email de test envoyé via Amazon SES en utilisant SMTP.",

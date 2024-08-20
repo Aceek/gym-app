@@ -28,7 +28,7 @@ router.post(
   validationMiddleware,
   authControllers.login
 );
-router.get(
+router.post(
   "/confirm-email",
   authValidators.validateConfirmEmail,
   validationMiddleware,

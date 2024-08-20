@@ -61,19 +61,15 @@ export const login = async (req, res) => {
   }
 };
 
+
 export const confirmEmail = async (req, res) => {
   try {
-    const { token } = req.query;
-    console.log(`Email confirmation request received with token: ${token}`);
+    const { email, code } = req.body;
+    console.log(`Email confirmation request received with code: ${code}`);
 
-    const decoded = tokenService.verifyToken(
-      token,
-      process.env.EMAIL_CONFIRMATION_SECRET
-    );
-
-    const user = await userService.validateUserForConfirmation(
-      decoded.id,
-      token
+    const user = await userService.validateUserForConfirmationByCode(
+      email,
+      code
     );
 
     await userService.confirmUserEmail(user.id);
@@ -209,9 +205,7 @@ export const resendConfirmationEmail = async (req, res) => {
     const rateLimitKey = `resend_confirmation_${email}`;
     await rateLimitService.checkAndIncrementRateLimit(rateLimitKey, 3);
 
-    // const confirmationToken = tokenService.generateConfirmationToken(user.id);
     const confirmationCode = tokenService.generateConfirmationCode();
-    // await userService.updateUserWithToken(user.id, confirmationToken);
     await userService.updateUserWithConfirmationCode(user.id, confirmationCode);
 
     await emailService.sendConfirmationEmailToUser(

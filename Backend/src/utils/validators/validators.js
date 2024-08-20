@@ -43,13 +43,31 @@ export const validateDisplayName = () => {
     .escape();
 };
 
-export const validateToken = (tokenName = 'token', location = 'query') => {
-  return location === 'query' ? query(tokenName) : body(tokenName)
-    .notEmpty()
-    .withMessage("Token is required")
-    .isString()
-    .withMessage("Token must be a valid string");
-}
+export const validateToken = (tokenName = "token", location = "query") => {
+  return location === "query"
+    ? query(tokenName)
+    : body(tokenName)
+        .notEmpty()
+        .withMessage("Token is required")
+        .isString()
+        .withMessage("Token must be a valid string");
+};
+
+export const validateCode = (codeName = "code", location = "body") => {
+  return location === "body"
+    ? body(codeName)
+        .notEmpty()
+        .withMessage("Code is required")
+        .isLength({ min: 6, max: 6 })
+        .withMessage("Code must be exactly 6 digits")
+        .isNumeric()
+        .withMessage("Code must be a number")
+    : query(codeName)
+        .notEmpty()
+        .withMessage("Code is required")
+        .isString()
+        .withMessage("Code must be a valid string");
+};
 
 export const validateRefreshToken = () => {
   return body("refreshToken")
@@ -60,9 +78,9 @@ export const validateRefreshToken = () => {
 };
 
 export const validateResetToken = () => {
-  return body('token')
+  return body("token")
     .notEmpty()
-    .withMessage('Reset token is required')
+    .withMessage("Reset token is required")
     .isString()
-    .withMessage('Reset token must be a valid string');
+    .withMessage("Reset token must be a valid string");
 };

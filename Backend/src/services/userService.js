@@ -87,28 +87,6 @@ export const resetPassword = async (user, newPassword) => {
   });
 };
 
-// export const updateUserWithToken = async (
-//   userId,
-//   confirmationToken,
-//   prismaClient = prisma
-// ) => {
-//   try {
-//     const updatedUser = await prismaClient.user.update({
-//       where: { id: userId },
-//       data: {
-//         emailConfirmationToken: confirmationToken,
-//       },
-//     });
-//     console.log(
-//       `User with id: ${userId} updated with email confirmation token.`
-//     );
-//     return updatedUser;
-//   } catch (error) {
-//     console.error(`Error updating user with email confirmation token:`, error);
-//     throw new Error("Failed to update user with email confirmation token");
-//   }
-// };
-
 export const updateUserWithConfirmationCode = async (
   userId,
   confirmationCode,
@@ -131,21 +109,21 @@ export const updateUserWithConfirmationCode = async (
   }
 };
 
-export const clearEmailConfirmationToken = async (userId) => {
+export const clearEmailConfirmationCode = async (userId) => {
   try {
     await prisma.user.update({
       where: { id: userId },
       data: {
-        emailConfirmationToken: null,
+        emailConfirmationCode: null,
       },
     });
-    console.log(`Email confirmation token cleared for user id: ${userId}`);
+    console.log(`Email confirmation code cleared for user id: ${userId}`);
   } catch (error) {
     console.error(
-      `Error clearing email confirmation token for user id: ${userId}`,
+      `Error clearing email confirmation code for user id: ${userId}`,
       error
     );
-    throw new Error("Failed to clear email confirmation token");
+    throw new Error("Failed to clear email confirmation code");
   }
 };
 
@@ -153,14 +131,8 @@ export const registerUserTransaction = async (email, password, displayName) => {
   return prisma.$transaction(async (prisma) => {
     const user = await createUser(email, password, displayName, prisma);
 
-    // const confirmationToken = tokenService.generateConfirmationToken(user.id);
     const confirmationCode = tokenService.generateConfirmationCode();
 
-    // const updatedUser = await updateUserWithToken(
-    //   user.id,
-    //   confirmationToken,
-    //   prisma
-    // );
     const updatedUser = await updateUserWithConfirmationCode(
       user.id,
       confirmationCode,
@@ -195,18 +167,18 @@ export const validateUserForLogin = async (email, password) => {
   return user;
 };
 
-export const validateUserForConfirmation = async (userId, token) => {
-  const user = await findUserById(userId);
+export const validateUserForConfirmationByCode = async (email, code) => {
+  const user = await findUserByEmail(email);
   if (!user) {
-    throw new Error("Invalid token");
+    throw new Error("Invalid email");
   }
 
   if (user.isVerified) {
     throw new Error("Email already confirmed");
   }
 
-  if (user.emailConfirmationToken !== token) {
-    throw new Error("Invalid token");
+  if (user.emailConfirmationCode !== code) {
+    throw new Error("Invalid confirmation code");
   }
 
   return user;
@@ -214,7 +186,7 @@ export const validateUserForConfirmation = async (userId, token) => {
 
 export const confirmUserEmail = async (userId) => {
   await verifyUser(userId);
-  await clearEmailConfirmationToken(userId);
+  await clearEmailConfirmationCode(userId);
 };
 
 export const handlePasswordResetRequest = async (email) => {
@@ -250,12 +222,11 @@ export default {
   verifyUser,
   resetPassword,
   setResetToken,
-  // updateUserWithToken,
   updateUserWithConfirmationCode,
-  clearEmailConfirmationToken,
+  clearEmailConfirmationCode,
   registerUserTransaction,
   validateUserForLogin,
-  validateUserForConfirmation,
+  validateUserForConfirmationByCode,
   confirmUserEmail,
   handlePasswordResetRequest,
   findUserByToken,

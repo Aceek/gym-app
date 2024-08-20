@@ -23,14 +23,8 @@ export const verifyToken = (token, secret) => {
   return jwt.verify(token, secret);
 };
 
-// export const generateConfirmationToken = (userId) => {
-//   return jwt.sign({ id: userId }, process.env.EMAIL_CONFIRMATION_SECRET, {
-//     expiresIn: "1h",
-//   });
-// };
-
 const generateConfirmationCode = () => {
-  return Math.floor(100000 + Math.random() * 900000).toString(); // Génère un code à 6 chiffres
+  return Math.floor(100000 + Math.random() * 900000).toString();
 };
 
 export const generateResetToken = (userId) => {
@@ -49,7 +43,6 @@ export default {
   generateAccessToken,
   generateRefreshToken,
   verifyToken,
-  // generateConfirmationToken,
   generateConfirmationCode,
   generateResetToken,
   generateTokensForUser,

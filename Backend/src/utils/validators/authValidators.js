@@ -6,6 +6,7 @@ import {
   validateToken,
   validateRefreshToken,
   validateResetToken,
+  validateCode,
 } from "./validators.js";
 
 export const validateRegister = [
@@ -22,7 +23,7 @@ export const validateChangePassword = [
   validatePasswordRegister("newPassword"),
 ];
 
-export const validateConfirmEmail = [validateToken()];
+export const validateConfirmEmail = [validateCode(), validateEmail()];
 
 export const validateForgotPassword = [validateEmail()];
 
