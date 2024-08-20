@@ -2,6 +2,7 @@ import bcrypt from "bcrypt";
 import { prisma } from "../config/prismaClient.js";
 import emailService from "./emailService.js";
 import redisService from "./redisService.js";
+import tokenService from "./tokenService.js";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -85,7 +86,6 @@ export const resetPassword = async (user, newPassword) => {
     where: { id: user.id },
     data: {
       password: hashedPassword,
-      resetCode: null,
     },
   });
 };
@@ -163,7 +163,7 @@ export const validateUserForConfirmationByCode = async (email, code) => {
     throw new Error("Email already confirmed");
   }
 
-  await redisService.verifyCode(email, code, 'confirmEmail');
+  await redisService.verifyCode(email, code, "confirmEmail");
 
   return user;
 };

@@ -27,12 +27,10 @@ export const verifyCode = async (email, code, type) => {
     const storedCode = await redisClient.get(key);
 
     if (storedCode === null) {
-      console.warn("Code not found or expired");
       throw new NotFoundError("Code not found or expired");
     }
 
     if (storedCode !== code) {
-      console.warn("Invalid code");
       throw new ValidationError("Invalid code");
     }
 
@@ -41,7 +39,7 @@ export const verifyCode = async (email, code, type) => {
 
     return true;
   } catch (error) {
-    console.error("Error verifying code:", error);
+    console.error("Error verifying code:", error.message);
     throw error;
   }
 };
