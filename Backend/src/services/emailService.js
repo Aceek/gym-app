@@ -22,14 +22,12 @@ export const sendConfirmationEmailToUser = async (email, confirmationCode) => {
   await transporter.sendMail(mailOptions);
 };
 
-export const sendResetPasswordEmail = async (email, token) => {
-  const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
+export const sendResetPasswordEmail = async (email, code) => {
   const mailOptions = {
     from: process.env.SES_SMTP_VERIFIED_MAIL,
     to: email,
     subject: "Reset your password",
-    html: `<p>Click the following link to reset your password: <a href="${resetLink}">Reset Password</a>
-     your token is ${token}</p>`,
+    html: `<p>Utilisez ce code pour réinitialiser votre mot de passe : <strong>${code}</strong></p>`,
   };
   await transporter.sendMail(mailOptions);
 };

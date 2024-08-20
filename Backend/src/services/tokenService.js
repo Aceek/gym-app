@@ -23,14 +23,8 @@ export const verifyToken = (token, secret) => {
   return jwt.verify(token, secret);
 };
 
-const generateConfirmationCode = () => {
+export const generateConfirmationCode = () => {
   return Math.floor(100000 + Math.random() * 900000).toString();
-};
-
-export const generateResetToken = (userId) => {
-  return jwt.sign({ id: userId }, process.env.RESET_PASSWORD_SECRET, {
-    expiresIn: "1h",
-  });
 };
 
 export const generateTokensForUser = (user) => {
@@ -44,6 +38,5 @@ export default {
   generateRefreshToken,
   verifyToken,
   generateConfirmationCode,
-  generateResetToken,
   generateTokensForUser,
 };

@@ -34,6 +34,7 @@ export const validateGoogleAuth = [validateToken("token", "body")];
 export const validateLogout = [validateRefreshToken()];
 
 export const validateResetPassword = [
-  validateResetToken(),
+  validateEmail(),
+  validateCode(),
   validatePasswordRegister("newPassword"),
 ];

@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt";
 import { prisma } from "../config/prismaClient.js";
-import tokenService from "./tokenService.js";
+import tokenService, { generateConfirmationCode } from "./tokenService.js";
 import emailService from "./emailService.js";
 
 export const findOrCreateUser = async (googleUser) => {
@@ -69,10 +69,10 @@ export const verifyUser = async (userId) => {
   });
 };
 
-export const setResetToken = async (user, token) => {
+export const setResetCode = async (user, code) => {
   return prisma.user.update({
     where: { id: user.id },
-    data: { resetToken: token },
+    data: { resetCode: code },
   });
 };
 
@@ -82,7 +82,7 @@ export const resetPassword = async (user, newPassword) => {
     where: { id: user.id },
     data: {
       password: hashedPassword,
-      resetToken: null,
+      resetCode: null,
     },
   });
 };
@@ -195,9 +195,9 @@ export const handlePasswordResetRequest = async (email) => {
     throw new Error("No account with that email found");
   }
 
-  const resetToken = tokenService.generateResetToken(user.id);
-  await setResetToken(user, resetToken);
-  await emailService.sendResetPasswordEmail(user.email, resetToken);
+  const resetCode = generateConfirmationCode();
+  await setResetCode(user, resetCode);
+  await emailService.sendResetPasswordEmail(user.email, resetCode);
 
   return user;
 };
@@ -221,7 +221,6 @@ export default {
   findUserById,
   verifyUser,
   resetPassword,
-  setResetToken,
   updateUserWithConfirmationCode,
   clearEmailConfirmationCode,
   registerUserTransaction,

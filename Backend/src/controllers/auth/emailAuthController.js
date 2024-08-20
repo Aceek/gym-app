@@ -61,7 +61,6 @@ export const login = async (req, res) => {
   }
 };
 
-
 export const confirmEmail = async (req, res) => {
   try {
     const { email, code } = req.body;
@@ -114,23 +113,20 @@ export const forgotPassword = async (req, res) => {
 
 export const resetPassword = async (req, res) => {
   try {
-    const { token, newPassword } = req.body;
-    console.log(`Password reset request received with token: ${token}`);
-
-    const decoded = tokenService.verifyToken(
-      token,
-      process.env.RESET_PASSWORD_SECRET
+    const { email, code, newPassword } = req.body;
+    console.log(
+      `Password reset request received with code: ${code} for email: ${email}`
     );
 
-    const user = await userService.findUserById(decoded.id);
+    const user = await userService.findUserByEmail(email);
     if (!user) {
       console.warn("User not found for password reset");
       return sendErrorResponse(res, "User not found", 400);
     }
 
-    if (user.resetToken !== token) {
-      console.warn("Invalid or expired token for password reset");
-      return sendErrorResponse(res, "Invalid or expired token", 400);
+    if (user.resetCode !== code) {
+      console.warn("Invalid or expired reset code");
+      return sendErrorResponse(res, "Invalid or expired reset code", 400);
     }
 
     await userService.resetPassword(user, newPassword);
