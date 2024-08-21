@@ -151,3 +151,18 @@ export const forgotPasswordRequest = async email => {
     throw {message};
   }
 };
+
+export const resetPasswordRequest = async (email, code, newPassword) => {
+  try {
+    const response = await api.post('/auth/reset-password', {
+      email,
+      code,
+      newPassword,
+    });
+
+    return response;
+  } catch (error) {
+    const {message} = handleError(error);
+    throw {message};
+  }
+};

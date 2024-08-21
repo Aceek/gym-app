@@ -6,6 +6,7 @@ import ErrorMessage from '../../components/ErrorMessage';
 import {forgotPasswordRequest} from '../../services/authService';
 import {validateEmail} from '../../validators/fieldsValidators';
 import useCountdown from '../../hooks/useCountdown';
+import LinkButton from '../../components/LinkButton';
 
 const ForgotPasswordScreen = ({navigation}) => {
   const [email, setEmail] = useState('');
@@ -35,15 +36,34 @@ const ForgotPasswordScreen = ({navigation}) => {
         return;
       }
 
-      await forgotPasswordRequest(email);
-
-      setMessage('Password reset email sent successfully. Check your inbox.');
+      const response = await forgotPasswordRequest(email);
       startCountdown();
+      if (response.data.status === 'success') {
+        setMessage('Password reset email sent successfully. Redirecting...');
+        setTimeout(() => {
+          navigation.navigate('ResetPassword', {email});
+        }, 2000);
+      }
     } catch (err) {
       setServerError(err.message || 'An error occurred. Please try again.');
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleRedirectToReset = () => {
+    setServerError('');
+    setError('');
+    setMessage('');
+
+    const validEmail = validateEmail(email);
+
+    if (!validEmail.valid) {
+      setError(validEmail.message);
+      return;
+    }
+
+    navigation.navigate('ResetPassword', {email});
   };
 
   return (
@@ -55,6 +75,10 @@ const ForgotPasswordScreen = ({navigation}) => {
         value={email}
         onChangeText={setEmail}
         error={error}
+      />
+      <LinkButton
+        title="Enter Code"
+        onPress={() => handleRedirectToReset(email)}
       />
       {message ? <Text style={styles.successText}>{message}</Text> : null}
       <ErrorMessage message={serverError} />
