@@ -16,6 +16,7 @@ export const useConfirmation = (email, navigation) => {
   const {timer, startCountdown, resetCountdown, isActive} = useCountdown(
     45,
     () => setIsSending(false),
+    'confirmation',
   );
 
   useEffect(() => {

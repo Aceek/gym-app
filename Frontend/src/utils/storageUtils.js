@@ -52,3 +52,37 @@ export const setTokenInKeychain = async (key, token) => {
     throw error;
   }
 };
+
+export const storeTimerData = async (storageKey, timeRemaining) => {
+  try {
+    await AsyncStorage.setItem(`${storageKey}_timer`, timeRemaining.toString());
+    await AsyncStorage.setItem(
+      `${storageKey}_lastUpdate`,
+      Date.now().toString(),
+    );
+  } catch (error) {
+    console.error('Error storing timer data:', error);
+    throw error;
+  }
+};
+
+export const getStoredTimerData = async storageKey => {
+  try {
+    const storedTime = await AsyncStorage.getItem(`${storageKey}_timer`);
+    const lastUpdate = await AsyncStorage.getItem(`${storageKey}_lastUpdate`);
+    return {storedTime, lastUpdate};
+  } catch (error) {
+    console.error('Error getting stored timer data:', error);
+    throw error;
+  }
+};
+
+export const clearStoredTimerData = async storageKey => {
+  try {
+    await AsyncStorage.removeItem(`${storageKey}_timer`);
+    await AsyncStorage.removeItem(`${storageKey}_lastUpdate`);
+  } catch (error) {
+    console.error('Error clearing timer data:', error);
+    throw error;
+  }
+};

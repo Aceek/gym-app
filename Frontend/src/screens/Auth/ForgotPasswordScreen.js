@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 import InputField from '../../components/InputField';
 import Button from '../../components/Button';
@@ -14,8 +14,10 @@ const ForgotPasswordScreen = ({navigation}) => {
   const [error, setError] = useState('');
   const [serverError, setServerError] = useState('');
 
-  const {timer, startCountdown, isActive} = useCountdown(60, () =>
-    setIsLoading(false),
+  const {timer, startCountdown, isActive} = useCountdown(
+    60,
+    () => setIsLoading(false),
+    'forgotPassword',
   );
 
   const handleForgotPassword = async () => {
