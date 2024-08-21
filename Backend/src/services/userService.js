@@ -140,6 +140,7 @@ export const validateUserForLogin = async (email, password) => {
   if (!user.isVerified) {
     const error = new Error("Please confirm your email to login");
     error.statusCode = 400;
+    error.redirect = true;
     throw error;
   }
 

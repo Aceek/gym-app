@@ -1,89 +1,23 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 import Button from '../../components/Button';
-import {
-  resendConfirmationEmail,
-  sendConfirmationCode,
-} from '../../services/authService';
-import {validateConfirmationCode} from '../../utils/fieldsValidators';
-import useCountdown from '../../hooks/useCountdown';
+import {useConfirmation} from '../../hooks/authHooks/useConfirmation';
 import ConfirmationCodeInput from '../../components/ConfirmationCodeInput';
 
 const ConfirmationScreen = ({route, navigation}) => {
   const {email} = route.params;
-  const [code, setCode] = useState('');
-  const [isSending, setIsSending] = useState(false);
-  const [isVerifying, setIsVerifying] = useState(false);
-  const [message, setMessage] = useState('');
-  const [error, setError] = useState('');
-
-  const {timer, startCountdown, resetCountdown, isActive} = useCountdown(
-    45,
-    () => setIsSending(false),
-  );
-
-  useEffect(() => {
-    startCountdown();
-  }, [startCountdown]);
-
-  const handleResendEmail = async () => {
-    setIsSending(true);
-    setError('');
-    setMessage('');
-
-    try {
-      const response = await resendConfirmationEmail(email);
-
-      if (response.status === 200) {
-        setMessage("L'email de confirmation a été renvoyé avec succès.");
-        startCountdown();
-      } else {
-        setError(
-          response.data.error || 'Une erreur est survenue. Veuillez réessayer.',
-        );
-        resetCountdown();
-      }
-    } catch (err) {
-      setError(err.message || 'Une erreur est survenue. Veuillez réessayer.');
-      resetCountdown();
-    } finally {
-      setIsSending(false);
-    }
-  };
-
-  const handleVerifyCode = async () => {
-    setIsVerifying(true);
-    setError('');
-    setMessage('');
-
-    try {
-      const isValid = validateConfirmationCode(code);
-      if (!isValid) {
-        setError('Le code doit être un nombre de 6 chiffres.');
-        setIsVerifying(false);
-        return;
-      }
-
-      const response = await sendConfirmationCode(email, code);
-
-      if (response.data.status === 'success') {
-        setMessage(
-          'Code vérifié avec succès redirection vers la page de connection...',
-        );
-        setTimeout(() => {
-          navigation.replace('Login');
-        }, 2000);
-      } else {
-        setError(
-          response.data.error.message || 'Code invalide. Veuillez réessayer.',
-        );
-      }
-    } catch (err) {
-      setError(err.message || 'Une erreur est survenue. Veuillez réessayer.');
-    } finally {
-      setIsVerifying(false);
-    }
-  };
+  const {
+    code,
+    setCode,
+    isSending,
+    isVerifying,
+    message,
+    error,
+    timer,
+    isActive,
+    handleResendEmail,
+    handleVerifyCode,
+  } = useConfirmation(email, navigation);
 
   return (
     <View style={styles.container}>

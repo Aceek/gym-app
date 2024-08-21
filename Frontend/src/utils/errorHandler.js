@@ -1,22 +1,22 @@
 export const handleError = error => {
-  let errorMessage = 'An unknown error occurred';
+  let message = 'An unknown error occurred';
+  let details = {};
 
   if (error.response && error.response.data) {
-    const {error: errorDetails} = error.response.data;
+    const {error: errorInfo} = error.response.data;
 
-    if (errorDetails) {
-      if (errorDetails.details && Array.isArray(errorDetails.details)) {
-        errorMessage = errorDetails.details
-          .map(err => `${err.field}: ${err.message}`)
-          .join('\n');
-      } else if (errorDetails.message) {
-        errorMessage = errorDetails.message;
+    if (errorInfo) {
+      if (errorInfo.message) {
+        message = errorInfo.message;
+      }
+
+      if (errorInfo.details) {
+        details = errorInfo.details;
       }
     }
   } else if (error.message) {
-    errorMessage = error.message;
+    message = error.message;
   }
 
-  console.error('Error:', errorMessage);
-  return errorMessage;
+  return {message, ...details};
 };

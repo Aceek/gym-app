@@ -61,7 +61,6 @@ export const AuthProvider = ({children}) => {
     try {
       await registerUser(email, password, displayName);
     } catch (error) {
-      console.error('Error during registration:', error);
       throw error;
     }
   };

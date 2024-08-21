@@ -1,109 +1,44 @@
-import React, {useState, useContext} from 'react';
-import {View, Text, StyleSheet, Alert, ActivityIndicator} from 'react-native';
+// src/screens/SignUpScreen.js
+import React, {useContext} from 'react';
+import {View, Text, StyleSheet} from 'react-native';
 import InputField from '../../components/InputField';
 import Button from '../../components/Button';
 import {AuthContext} from '../../context/AuthContext';
-import {validateSignUpData} from '../../utils/authValidators';
-import {
-  validateDisplayName,
-  validateEmail,
-  validatePasswordRegister,
-} from '../../utils/fieldsValidators';
+import {useSignUpForm} from '../../hooks/authHooks/useSignUpForm';
+import PopupRedirect from '../../components/PopupRedirect';
+import ErrorMessage from '../../components/ErrorMessage';
 
 const SignUpScreen = ({navigation}) => {
   const {register} = useContext(AuthContext);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [displayName, setDisplayName] = useState('');
-  const [confirmEmail, setConfirmEmail] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [errors, setErrors] = useState({});
-  const [serverError, setServerError] = useState('');
-
-  const handleDisplayNameBlur = () => {
-    const displayNameValidation = validateDisplayName(displayName);
-    setErrors(prevErrors => ({
-      ...prevErrors,
-      displayName: displayNameValidation.valid
-        ? null
-        : displayNameValidation.errors.join(', '),
-    }));
-  };
-
-  const handleEmailBlur = () => {
-    const emailValidation = validateEmail(email);
-    setErrors(prevErrors => ({
-      ...prevErrors,
-      email: emailValidation.valid ? null : emailValidation.message,
-    }));
-  };
-
-  const handleConfirmEmailBlur = () => {
-    setErrors(prevErrors => ({
-      ...prevErrors,
-      confirmEmail:
-        confirmEmail.trim().toLowerCase() === email.trim().toLowerCase()
-          ? null
-          : 'Email and confirmation do not match.',
-    }));
-  };
-
-  const handlePasswordBlur = () => {
-    const passwordValidation = validatePasswordRegister(password);
-    setErrors(prevErrors => ({
-      ...prevErrors,
-      password: passwordValidation.valid
-        ? null
-        : passwordValidation.errors.join(', '),
-    }));
-  };
-
-  const handleConfirmPasswordBlur = () => {
-    setErrors(prevErrors => ({
-      ...prevErrors,
-      confirmPassword:
-        confirmPassword === password
-          ? null
-          : 'Password and confirmation do not match.',
-    }));
-  };
-
-  const handleSignUp = async () => {
-    setServerError('');
-    setIsLoading(true);
-    const {
-      valid,
-      errors: validationErrors,
-      normalizedEmail,
-    } = validateSignUpData({
-      email,
-      password,
-      confirmPassword,
-      displayName,
-      confirmEmail,
-    });
-
-    if (!valid) {
-      setErrors(validationErrors);
-      setIsLoading(false);
-      return;
-    }
-
-    try {
-      await register(normalizedEmail, password, displayName);
-      navigation.navigate('Confirmation', {email: normalizedEmail});
-    } catch (error) {
-      setServerError(error.message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const {
+    email,
+    setEmail,
+    password,
+    setPassword,
+    displayName,
+    setDisplayName,
+    confirmEmail,
+    setConfirmEmail,
+    confirmPassword,
+    setConfirmPassword,
+    errors,
+    isLoading,
+    serverError,
+    showPopup,
+    handleDisplayNameBlur,
+    handleEmailBlur,
+    handleConfirmEmailBlur,
+    handlePasswordBlur,
+    handleConfirmPasswordBlur,
+    handleSignUp,
+    handleCancel,
+    handlePopupTimeout,
+  } = useSignUpForm();
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Sign Up</Text>
-      {serverError ? <Text style={styles.errorText}>{serverError}</Text> : null}
+      <ErrorMessage message={serverError} />
       <InputField
         label="Display Name"
         placeholder="Enter your display name"
@@ -148,13 +83,19 @@ const SignUpScreen = ({navigation}) => {
       />
       <Button
         title="Sign Up"
-        onPress={handleSignUp}
+        onPress={() => handleSignUp(register, navigation)}
         isLoading={isLoading}
         disabled={isLoading}
       />
       <Button
         title="Already have an account? Login"
         onPress={() => navigation.navigate('Login')}
+      />
+      <PopupRedirect
+        visible={showPopup}
+        message="Email not verified. Redirecting to confirmation page..."
+        onCancel={handleCancel}
+        onTimeout={() => handlePopupTimeout(navigation)}
       />
     </View>
   );
@@ -171,11 +112,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 40,
     textAlign: 'center',
-  },
-  errorText: {
-    color: 'red',
-    fontSize: 12,
-    marginTop: 5,
   },
 });
 

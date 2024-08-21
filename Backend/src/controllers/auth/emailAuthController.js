@@ -16,7 +16,12 @@ export const register = async (req, res) => {
 
   try {
     const existingUser = await userService.findUserByEmail(email);
-    if (existingUser) {
+    if (existingUser && !existingUser.isVerified) {
+      console.warn(`Attempt to register with an unverified email: ${email}`);
+      return sendErrorResponse(res, "Email is not verified", 400, {
+        redirect: true,
+      });
+    } else if (existingUser) {
       console.warn(`Attempt to register with an existing email: ${email}`);
       return sendErrorResponse(res, "Email already in use", 400);
     }
@@ -56,8 +61,11 @@ export const login = async (req, res) => {
     return sendSuccessResponse(res, data, "Login succesful", 200);
   } catch (error) {
     const statusCode = error.statusCode || 500;
+    const redirect = error.redirect || false;
     console.error("Error logging in:", error.message);
-    return sendErrorResponse(res, error.message, statusCode);
+    return sendErrorResponse(res, error.message, statusCode, {
+      redirect: redirect,
+    });
   }
 };
 
@@ -91,6 +99,7 @@ export const forgotPassword = async (req, res) => {
     console.log(`Forgot password request received for email: ${email}`);
 
     const rateLimitKey = `forgot_password_${email}`;
+    // desactivate for testing purpose
     await rateLimitService.checkAndIncrementRateLimit(rateLimitKey, 3);
 
     const user = await userService.handlePasswordResetRequest(email);

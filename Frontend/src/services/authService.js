@@ -45,8 +45,8 @@ export const LoginEmail = async (email, password) => {
 
     return user;
   } catch (error) {
-    const errorMessage = handleError(error);
-    throw new Error(errorMessage);
+    const {message, ...details} = handleError(error);
+    throw {message, details};
   }
 };
 
@@ -107,8 +107,8 @@ export const registerUser = async (email, password, displayName) => {
 
     return response;
   } catch (error) {
-    const errorMessage = handleError(error);
-    throw new Error(errorMessage);
+    const {message, ...details} = handleError(error);
+    throw {message, details};
   }
 };
 
@@ -120,8 +120,8 @@ export const resendConfirmationEmail = async email => {
 
     return response;
   } catch (error) {
-    const errorMessage = handleError(error);
-    throw new Error(errorMessage);
+    const {message} = handleError(error);
+    throw {message};
   }
 };
 
@@ -134,7 +134,20 @@ export const sendConfirmationCode = async (email, code) => {
 
     return response;
   } catch (error) {
-    const errorMessage = handleError(error);
-    throw new Error(errorMessage);
+    const {message} = handleError(error);
+    throw {message};
+  }
+};
+
+export const forgotPasswordRequest = async email => {
+  try {
+    const response = await api.post('/auth/forgot-password', {
+      email,
+    });
+
+    return response;
+  } catch (error) {
+    const {message} = handleError(error);
+    throw {message};
   }
 };
