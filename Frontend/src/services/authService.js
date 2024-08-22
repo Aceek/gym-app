@@ -25,8 +25,8 @@ export const loginWithGoogle = async () => {
 
     return user;
   } catch (error) {
-    const errorMessage = handleError(error);
-    throw new Error(errorMessage);
+    const {message, ...details} = handleError(error);
+    throw {message, details};
   }
 };
 
@@ -38,8 +38,6 @@ export const LoginEmail = async (email, password) => {
     });
 
     const {accessToken, refreshToken, user} = response.data.data;
-
-    console.log('user = ', user);
 
     await storeTokensAndUser(accessToken, refreshToken, user);
 

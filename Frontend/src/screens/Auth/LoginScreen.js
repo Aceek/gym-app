@@ -17,11 +17,13 @@ const LoginScreen = ({navigation}) => {
     setPassword,
     errors,
     isLoading,
+    isGoogleLogin,
     serverError,
     showPopup,
     handleEmailBlur,
     handlePasswordBlur,
     handleLogin,
+    handleLoginWithGoogle,
     handleCancel,
     handlePopupTimeout,
   } = useLoginForm();
@@ -55,11 +57,19 @@ const LoginScreen = ({navigation}) => {
         title="Login"
         onPress={() => handleLogin(login, navigation)}
         isLoading={isLoading}
-        disabled={isLoading}
+        disabled={isLoading || isGoogleLogin}
       />
       <Button
         title="Don't have an account? Sign Up"
         onPress={() => navigation.navigate('Signup')}
+        disabled={isLoading || isGoogleLogin}
+      />
+      <Button
+        title="Login with Google"
+        onPress={() => handleLoginWithGoogle(login, navigation)}
+        disabled={isLoading || isGoogleLogin}
+        isLoading={isGoogleLogin}
+        type="google"
       />
       <PopupRedirect
         visible={showPopup}

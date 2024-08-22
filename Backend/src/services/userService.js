@@ -7,21 +7,38 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-export const findOrCreateUser = async (googleUser) => {
+export const findOrCreateUserGoogle = async (googleUser) => {
   try {
-    const user = await prisma.user.upsert({
-      where: { googleId: googleUser.id },
-      update: {},
-      create: {
-        googleId: googleUser.id,
-        email: googleUser.email,
-        displayName: googleUser.displayName,
-        photo: googleUser.photo,
-      },
+    let user = await prisma.user.findUnique({
+      where: { email: googleUser.email },
     });
-    const created = !user.updatedAt;
+
+    if (user) {
+      if (!user.googleId) {
+        user = await prisma.user.update({
+          where: { email: googleUser.email },
+          data: {
+            googleId: googleUser.googleId,
+            displayName: user.displayName || googleUser.displayName,
+            photo: user.photo || googleUser.photo,
+          },
+        });
+      }
+    } else {
+      user = await prisma.user.create({
+        data: {
+          googleId: googleUser.googleId,
+          email: googleUser.email,
+          displayName: googleUser.displayName,
+          photo: googleUser.photo,
+        },
+      });
+    }
+
+    const created = !user.googleId;
     return { user, created };
   } catch (error) {
+    console.error("Error in findOrCreateUserGoogle:", error);
     throw new Error("Error finding or creating user");
   }
 };
@@ -63,7 +80,12 @@ export const findUserById = async (id) => {
 };
 
 export const verifyPassword = async (user, password) => {
-  return bcrypt.compare(password, user.password);
+  try {
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    return isPasswordValid;
+  } catch (error) {
+    throw new Error("Failed to verify password");
+  }
 };
 
 export const verifyUser = async (userId) => {
@@ -144,6 +166,12 @@ export const validateUserForLogin = async (email, password) => {
     throw error;
   }
 
+  if (user.googleId && !user.password) {
+    const error = new Error("Please login with Google or do a password reset");
+    error.statusCode = 400;
+    throw error;
+  }
+
   const isPasswordValid = await verifyPassword(user, password);
   if (!isPasswordValid) {
     const error = new Error("Invalid email or password");
@@ -168,19 +196,6 @@ export const validateUserForConfirmationByCode = async (email, code) => {
 
   return user;
 };
-
-// export const handlePasswordResetRequest = async (email) => {
-//   const user = await findUserByEmail(email);
-//   if (!user) {
-//     throw new Error("No account with that email found");
-//   }
-
-//   const resetCode = generateConfirmationCode();
-//   await setResetCode(user, resetCode);
-//   await emailService.sendResetPasswordEmail(user.email, resetCode);
-
-//   return user;
-// };
 
 export const handlePasswordResetRequest = async (email) => {
   const user = await findUserByEmail(email);
@@ -212,7 +227,7 @@ export const findUserByToken = async (token, secret) => {
 };
 
 export default {
-  findOrCreateUser,
+  findOrCreateUserGoogle,
   createUser,
   findUserByEmail,
   verifyPassword,

@@ -15,8 +15,8 @@ const googleAuthMiddleware = async (req, res, next) => {
       audience: process.env.GOOGLE_CLIENT_ID,
     });
     const payload = ticket.getPayload();
-    req.googleUser = {
-      id: payload.sub,
+    req.user = {
+      googleId: payload.sub,
       email: payload.email,
       displayName: payload.name,
       photo: payload.picture,

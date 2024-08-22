@@ -99,7 +99,6 @@ export const forgotPassword = async (req, res) => {
     console.log(`Forgot password request received for email: ${email}`);
 
     const rateLimitKey = `forgot_password_${email}`;
-    // desactivate for testing purpose
     await rateLimitService.checkAndIncrementRateLimit(rateLimitKey, 3);
 
     const user = await userService.handlePasswordResetRequest(email);
@@ -130,13 +129,12 @@ export const resetPassword = async (req, res) => {
       `Password reset request received with code: ${code} for email: ${email}`
     );
 
-    await redisService.verifyCode(email, code, "resetPassword");
-
     const user = await userService.findUserByEmail(email);
     if (!user) {
       console.warn("User not found for password reset");
       return sendErrorResponse(res, "User not found", 404);
     }
+    await redisService.verifyCode(email, code, "resetPassword");
 
     await userService.resetPassword(user, newPassword);
 

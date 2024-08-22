@@ -18,7 +18,7 @@ export const authenticateWithGoogle = async idToken => {
   try {
     console.log('Authenticating with Google');
     const response = await api.post('/auth/google', {token: idToken});
-    return response.data;
+    return response.data.data;
   } catch (error) {
     console.error('Error authenticating with Google:', error);
     throw error;

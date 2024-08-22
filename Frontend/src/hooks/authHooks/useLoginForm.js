@@ -10,6 +10,7 @@ export const useLoginForm = () => {
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [isGoogleLogin, setIsGoogleLogin] = useState(false);
   const [serverError, setServerError] = useState('');
   const [showPopup, setShowPopup] = useState(false);
 
@@ -61,6 +62,20 @@ export const useLoginForm = () => {
     }
   };
 
+  const handleLoginWithGoogle = async (login, navigation) => {
+    setServerError('');
+    setErrors({});
+    setIsGoogleLogin(true);
+
+    try {
+      await login(true);
+    } catch (err) {
+      setServerError(err.message);
+    } finally {
+      setIsGoogleLogin(false);
+    }
+  };
+
   const handleCancel = () => {
     setShowPopup(false);
   };
@@ -77,11 +92,13 @@ export const useLoginForm = () => {
     setPassword,
     errors,
     isLoading,
+    isGoogleLogin,
     serverError,
     showPopup,
     handleEmailBlur,
     handlePasswordBlur,
     handleLogin,
+    handleLoginWithGoogle,
     handleCancel,
     handlePopupTimeout,
   };
