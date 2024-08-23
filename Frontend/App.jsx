@@ -1,11 +1,9 @@
-import React, {useEffect} from 'react';
-import {AuthProvider} from './src/context/AuthContext';
+import React, {useEffect, useContext} from 'react';
+import {AuthProvider, AuthContext} from './src/context/AuthContext';
 import AppNavigator from './src/navigation/AppNavigator';
 import {configureGoogleSignIn} from './src/config/configureGoogleSignIn';
 import {navigationRef} from './src/navigation/RootNavigation';
 import {NavigationContainer} from '@react-navigation/native';
-import {useContext} from 'react';
-import {AuthContext} from './src/context/AuthContext';
 import {initializeAxiosInterceptors} from './src/services/api';
 
 const AppContent = () => {
@@ -26,7 +24,9 @@ const AppContent = () => {
 const App = () => {
   return (
     <AuthProvider>
-      <AppContent />
+      <React.StrictMode>
+        <AppContent />
+      </React.StrictMode>
     </AuthProvider>
   );
 };

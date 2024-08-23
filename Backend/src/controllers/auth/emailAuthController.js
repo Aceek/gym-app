@@ -99,7 +99,8 @@ export const forgotPassword = async (req, res) => {
     console.log(`Forgot password request received for email: ${email}`);
 
     const rateLimitKey = `forgot_password_${email}`;
-    await rateLimitService.checkAndIncrementRateLimit(rateLimitKey, 3);
+    // test purpose to be uncommented
+    // await rateLimitService.checkAndIncrementRateLimit(rateLimitKey, 3);
 
     const user = await userService.handlePasswordResetRequest(email);
     console.log(`Password reset email sent to: ${user.email}`);
