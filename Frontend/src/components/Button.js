@@ -30,30 +30,42 @@ const buttonConfig = {
   },
 };
 
-const Button = ({title, onPress, isLoading, disabled, type = 'default'}) => {
-  const config = buttonConfig[type] || buttonConfig.default;
+const Button = React.memo(
+  ({title, onPress, isLoading, disabled, type = 'default'}) => {
+    const config = buttonConfig[type] || buttonConfig.default;
 
-  const buttonStyle = [
-    styles.button,
-    {backgroundColor: config.backgroundColor, borderColor: config.borderColor},
-    disabled && styles.buttonDisabled,
-  ];
+    const buttonStyle = [
+      styles.button,
+      {
+        backgroundColor: config.backgroundColor,
+        borderColor: config.borderColor,
+      },
+      disabled && styles.buttonDisabled,
+    ];
 
-  const textStyle = [styles.buttonText, {color: config.textColor}];
+    const textStyle = [styles.buttonText, {color: config.textColor}];
+    console.log('rendering button title = ', title);
 
-  return (
-    <TouchableOpacity style={buttonStyle} onPress={onPress} disabled={disabled}>
-      {isLoading ? (
-        <ActivityIndicator size="small" color={config.activityIndicatorColor} />
-      ) : (
-        <>
-          {config.icon && <Image source={config.icon} style={styles.icon} />}
-          <Text style={textStyle}>{title}</Text>
-        </>
-      )}
-    </TouchableOpacity>
-  );
-};
+    return (
+      <TouchableOpacity
+        style={buttonStyle}
+        onPress={onPress}
+        disabled={disabled}>
+        {isLoading ? (
+          <ActivityIndicator
+            size="small"
+            color={config.activityIndicatorColor}
+          />
+        ) : (
+          <>
+            {config.icon && <Image source={config.icon} style={styles.icon} />}
+            <Text style={textStyle}>{title}</Text>
+          </>
+        )}
+      </TouchableOpacity>
+    );
+  },
+);
 
 const styles = StyleSheet.create({
   button: {

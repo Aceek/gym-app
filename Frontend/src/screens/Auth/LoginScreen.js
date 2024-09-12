@@ -1,15 +1,14 @@
-import React, {useContext} from 'react';
+import React, {useCallback} from 'react';
 import {View, StyleSheet, Text} from 'react-native';
-import {AuthContext} from '../../context/AuthContext';
 import InputField from '../../components/InputField';
 import Button from '../../components/Button';
 import PopupRedirect from '../../components/PopupRedirect';
 import LinkButton from '../../components/LinkButton';
 import {useLoginForm} from '../../hooks/authHooks/useLoginForm';
 import ErrorMessage from '../../components/ErrorMessage';
+import Title from '../../components/Title';
 
 const LoginScreen = ({navigation}) => {
-  const {login} = useContext(AuthContext);
   const {
     email,
     setEmail,
@@ -26,11 +25,19 @@ const LoginScreen = ({navigation}) => {
     handleLoginWithGoogle,
     handleCancel,
     handlePopupTimeout,
-  } = useLoginForm();
+  } = useLoginForm(navigation);
+
+  const navigateToSignup = useCallback(() => {
+    navigation.navigate('Signup');
+  }, [navigation]);
+
+  const navigateToForgotPassword = useCallback(() => {
+    navigation.navigate('ForgotPassword');
+  }, [navigation]);
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Login</Text>
+      <Title title="Login" />
       <ErrorMessage message={serverError} />
       <InputField
         label="Email"
@@ -49,24 +56,21 @@ const LoginScreen = ({navigation}) => {
         onBlur={handlePasswordBlur}
         error={errors.password}
       />
-      <LinkButton
-        title="Forgot Password?"
-        onPress={() => navigation.navigate('ForgotPassword')}
-      />
+      <LinkButton title="Forgot Password?" onPress={navigateToForgotPassword} />
       <Button
         title="Login"
-        onPress={() => handleLogin(login, navigation)}
+        onPress={handleLogin}
         isLoading={isLoading}
         disabled={isLoading || isGoogleLogin}
       />
       <Button
         title="Don't have an account? Sign Up"
-        onPress={() => navigation.navigate('Signup')}
+        onPress={navigateToSignup}
         disabled={isLoading || isGoogleLogin}
       />
       <Button
         title="Login with Google"
-        onPress={() => handleLoginWithGoogle(login, navigation)}
+        onPress={handleLoginWithGoogle}
         disabled={isLoading || isGoogleLogin}
         isLoading={isGoogleLogin}
         type="google"
@@ -75,7 +79,7 @@ const LoginScreen = ({navigation}) => {
         visible={showPopup}
         message="Email not verified. Redirecting to confirmation page..."
         onCancel={handleCancel}
-        onTimeout={() => handlePopupTimeout(navigation)}
+        onTimeout={handlePopupTimeout}
       />
     </View>
   );
@@ -86,12 +90,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     paddingHorizontal: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 40,
-    textAlign: 'center',
   },
 });
 

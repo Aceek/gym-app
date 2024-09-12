@@ -1,30 +1,33 @@
 import React from 'react';
 import {TextInput, View, Text, StyleSheet} from 'react-native';
 
-const InputField = ({
-  label,
-  placeholder,
-  secureTextEntry,
-  value,
-  onChangeText,
-  onBlur,
-  error,
-}) => {
-  return (
-    <View style={styles.container}>
-      <Text style={styles.label}>{label}</Text>
-      <TextInput
-        style={[styles.input, error ? styles.inputError : null]}
-        placeholder={placeholder}
-        secureTextEntry={secureTextEntry}
-        value={value}
-        onChangeText={onChangeText}
-        onBlur={onBlur}
-      />
-      {error && <Text style={styles.errorText}>{error}</Text>}
-    </View>
-  );
-};
+const InputField = React.memo(
+  ({
+    label,
+    placeholder,
+    secureTextEntry,
+    value,
+    onChangeText,
+    onBlur,
+    error,
+  }) => {
+    console.log('InputField rendered = ', label);
+    return (
+      <View style={styles.container}>
+        <Text style={styles.label}>{label}</Text>
+        <TextInput
+          style={[styles.input, error ? styles.inputError : null]}
+          placeholder={placeholder}
+          secureTextEntry={secureTextEntry}
+          value={value}
+          onChangeText={onChangeText}
+          onBlur={onBlur}
+        />
+        {error && <Text style={styles.errorText}>{error}</Text>}
+      </View>
+    );
+  },
+);
 
 const styles = StyleSheet.create({
   container: {

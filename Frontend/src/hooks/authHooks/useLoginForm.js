@@ -1,11 +1,12 @@
-import {useState} from 'react';
+import {useState, useCallback, useContext} from 'react';
 import {
   validateEmail,
   validatePasswordRegister,
 } from '../../validators/fieldsValidators';
 import {validateUserForLogin} from '../../validators/loginValidators';
+import {AuthContext} from '../../context/AuthContext';
 
-export const useLoginForm = () => {
+export const useLoginForm = navigation => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({});
@@ -13,16 +14,17 @@ export const useLoginForm = () => {
   const [isGoogleLogin, setIsGoogleLogin] = useState(false);
   const [serverError, setServerError] = useState('');
   const [showPopup, setShowPopup] = useState(false);
+  const {login} = useContext(AuthContext);
 
-  const handleEmailBlur = () => {
+  const handleEmailBlur = useCallback(() => {
     const emailValidation = validateEmail(email);
     setErrors(prevErrors => ({
       ...prevErrors,
       email: emailValidation.valid ? null : emailValidation.message,
     }));
-  };
+  }, [email]);
 
-  const handlePasswordBlur = () => {
+  const handlePasswordBlur = useCallback(() => {
     const passwordValidation = validatePasswordRegister(password);
     setErrors(prevErrors => ({
       ...prevErrors,
@@ -30,9 +32,9 @@ export const useLoginForm = () => {
         ? null
         : passwordValidation.errors.join(', '),
     }));
-  };
+  }, [password]);
 
-  const handleLogin = async (login, navigation) => {
+  const handleLogin = useCallback(async () => {
     setServerError('');
     setErrors({});
     setIsLoading(true);
@@ -60,9 +62,9 @@ export const useLoginForm = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [email, password, login]);
 
-  const handleLoginWithGoogle = async (login, navigation) => {
+  const handleLoginWithGoogle = useCallback(async () => {
     setServerError('');
     setErrors({});
     setIsGoogleLogin(true);
@@ -74,16 +76,16 @@ export const useLoginForm = () => {
     } finally {
       setIsGoogleLogin(false);
     }
-  };
+  }, [login]);
 
-  const handleCancel = () => {
+  const handleCancel = useCallback(() => {
     setShowPopup(false);
-  };
+  }, []);
 
-  const handlePopupTimeout = navigation => {
+  const handlePopupTimeout = useCallback(() => {
     setShowPopup(false);
     navigation.navigate('Confirmation', {email: email.toLowerCase().trim()});
-  };
+  }, [email, navigation]);
 
   return {
     email,
