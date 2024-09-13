@@ -1,4 +1,4 @@
-import {useState, useEffect} from 'react';
+import {useState, useEffect, useCallback} from 'react';
 import {
   resendConfirmationEmail,
   sendConfirmationCode,
@@ -23,7 +23,7 @@ export const useConfirmation = (email, navigation) => {
     startCountdown();
   }, [startCountdown]);
 
-  const handleResendEmail = async () => {
+  const handleResendEmail = useCallback(async () => {
     setIsSending(true);
     setError('');
     setMessage('');
@@ -46,9 +46,9 @@ export const useConfirmation = (email, navigation) => {
     } finally {
       setIsSending(false);
     }
-  };
+  }, [email, resetCountdown, startCountdown]);
 
-  const handleVerifyCode = async () => {
+  const handleVerifyCode = useCallback(async () => {
     setIsVerifying(true);
     setError('');
     setMessage('');
@@ -81,7 +81,7 @@ export const useConfirmation = (email, navigation) => {
     } finally {
       setIsVerifying(false);
     }
-  };
+  }, [code, email, navigation]);
 
   return {
     code,

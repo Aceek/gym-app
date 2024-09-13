@@ -3,6 +3,7 @@ import {View, Text, StyleSheet} from 'react-native';
 import Button from '../../components/Button';
 import {useConfirmation} from '../../hooks/authHooks/useConfirmation';
 import ConfirmationCodeInput from '../../components/ConfirmationCodeInput';
+import Title from '../../components/Title';
 
 const ConfirmationScreen = ({route, navigation}) => {
   const {email} = route.params;
@@ -21,7 +22,7 @@ const ConfirmationScreen = ({route, navigation}) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Vérification de l'Email Requise</Text>
+      <Title title="Vérification de l'Email Requise" />
       <Text style={styles.message}>
         Un code de confirmation a été envoyé à {email}. Veuillez entrer le code
         ci-dessous pour activer votre compte.

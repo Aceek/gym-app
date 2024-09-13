@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useCallback, useState} from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 import InputField from '../../components/InputField';
 import Button from '../../components/Button';
@@ -6,6 +6,7 @@ import ConfirmationCodeInput from '../../components/ConfirmationCodeInput';
 import ErrorMessage from '../../components/ErrorMessage';
 import {resetPasswordRequest} from '../../services/authService';
 import {validateResetPasswordData} from '../../validators/resetPasswordValidators';
+import Title from '../../components/Title';
 
 const ResetPasswordScreen = ({route, navigation}) => {
   const {email} = route.params;
@@ -17,7 +18,7 @@ const ResetPasswordScreen = ({route, navigation}) => {
   const [errors, setErrors] = useState({});
   const [serverError, setServerError] = useState('');
 
-  const handleResetPassword = async () => {
+  const handleResetPassword = useCallback(async () => {
     setServerError('');
     setIsLoading(true);
     setErrors({});
@@ -51,11 +52,15 @@ const ResetPasswordScreen = ({route, navigation}) => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [email, code, password, confirmPassword, navigation]);
+
+  const navigateToLogin = useCallback(() => {
+    navigation.navigate('Login');
+  }, [navigation]);
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Reset Your Password</Text>
+      <Title title="Reset Your Password" />
       <Text style={styles.message}>
         Enter the 6-digit code sent to {email} and set a new password.
       </Text>
@@ -87,7 +92,7 @@ const ResetPasswordScreen = ({route, navigation}) => {
       />
       <Button
         title="Back to Login"
-        onPress={() => navigation.navigate('Login')}
+        onPress={navigateToLogin}
         disabled={isLoading}
       />
     </View>

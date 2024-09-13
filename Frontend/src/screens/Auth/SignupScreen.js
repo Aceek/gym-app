@@ -1,15 +1,13 @@
-// src/screens/SignUpScreen.js
-import React, {useContext} from 'react';
-import {View, Text, StyleSheet} from 'react-native';
+import React, {useCallback} from 'react';
+import {View, StyleSheet} from 'react-native';
 import InputField from '../../components/InputField';
 import Button from '../../components/Button';
-import {AuthContext} from '../../context/AuthContext';
 import {useSignUpForm} from '../../hooks/authHooks/useSignUpForm';
 import PopupRedirect from '../../components/PopupRedirect';
 import ErrorMessage from '../../components/ErrorMessage';
+import Title from '../../components/Title';
 
 const SignUpScreen = ({navigation}) => {
-  const {register} = useContext(AuthContext);
   const {
     email,
     setEmail,
@@ -33,11 +31,16 @@ const SignUpScreen = ({navigation}) => {
     handleSignUp,
     handleCancel,
     handlePopupTimeout,
-  } = useSignUpForm();
+  } = useSignUpForm(navigation);
+
+  const navigateToLogin = useCallback(() => {
+    navigation.navigate('Login');
+  }, [navigation]);
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Sign Up</Text>
+      <Title title="Sign Up" />
+
       <ErrorMessage message={serverError} />
       <InputField
         label="Display Name"
@@ -83,19 +86,19 @@ const SignUpScreen = ({navigation}) => {
       />
       <Button
         title="Sign Up"
-        onPress={() => handleSignUp(register, navigation)}
+        onPress={handleSignUp}
         isLoading={isLoading}
         disabled={isLoading}
       />
       <Button
         title="Already have an account? Login"
-        onPress={() => navigation.navigate('Login')}
+        onPress={navigateToLogin}
       />
       <PopupRedirect
         visible={showPopup}
         message="Email not verified. Redirecting to confirmation page..."
         onCancel={handleCancel}
-        onTimeout={() => handlePopupTimeout(navigation)}
+        onTimeout={handlePopupTimeout}
       />
     </View>
   );

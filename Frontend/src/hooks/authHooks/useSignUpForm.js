@@ -1,12 +1,14 @@
-import {useState} from 'react';
+import {useCallback, useState} from 'react';
 import {validateSignUpData} from '../../validators/registerValidators';
 import {
   validateDisplayName,
   validateEmail,
   validatePasswordRegister,
 } from '../../validators/fieldsValidators';
+import {useContext} from 'react';
+import {AuthContext} from '../../context/AuthContext';
 
-export const useSignUpForm = () => {
+export const useSignUpForm = navigation => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [displayName, setDisplayName] = useState('');
@@ -16,8 +18,9 @@ export const useSignUpForm = () => {
   const [errors, setErrors] = useState({});
   const [serverError, setServerError] = useState('');
   const [showPopup, setShowPopup] = useState(false);
+  const {register} = useContext(AuthContext);
 
-  const handleDisplayNameBlur = () => {
+  const handleDisplayNameBlur = useCallback(() => {
     const displayNameValidation = validateDisplayName(displayName);
     setErrors(prevErrors => ({
       ...prevErrors,
@@ -25,17 +28,17 @@ export const useSignUpForm = () => {
         ? null
         : displayNameValidation.errors.join(', '),
     }));
-  };
+  }, [displayName]);
 
-  const handleEmailBlur = () => {
+  const handleEmailBlur = useCallback(() => {
     const emailValidation = validateEmail(email);
     setErrors(prevErrors => ({
       ...prevErrors,
       email: emailValidation.valid ? null : emailValidation.message,
     }));
-  };
+  }, [email, setErrors]);
 
-  const handleConfirmEmailBlur = () => {
+  const handleConfirmEmailBlur = useCallback(() => {
     setErrors(prevErrors => ({
       ...prevErrors,
       confirmEmail:
@@ -43,9 +46,9 @@ export const useSignUpForm = () => {
           ? null
           : 'Email and confirmation do not match.',
     }));
-  };
+  }, [confirmEmail, email, setErrors]);
 
-  const handlePasswordBlur = () => {
+  const handlePasswordBlur = useCallback(() => {
     const passwordValidation = validatePasswordRegister(password);
     setErrors(prevErrors => ({
       ...prevErrors,
@@ -53,9 +56,9 @@ export const useSignUpForm = () => {
         ? null
         : passwordValidation.errors.join(', '),
     }));
-  };
+  }, [password, setErrors]);
 
-  const handleConfirmPasswordBlur = () => {
+  const handleConfirmPasswordBlur = useCallback(() => {
     setErrors(prevErrors => ({
       ...prevErrors,
       confirmPassword:
@@ -63,9 +66,9 @@ export const useSignUpForm = () => {
           ? null
           : 'Password and confirmation do not match.',
     }));
-  };
+  }, [confirmPassword, password, setErrors]);
 
-  const handleSignUp = async (register, navigation) => {
+  const handleSignUp = useCallback(async () => {
     setServerError('');
     setIsLoading(true);
     const {
@@ -98,16 +101,24 @@ export const useSignUpForm = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [
+    confirmEmail,
+    confirmPassword,
+    displayName,
+    email,
+    navigation,
+    password,
+    register,
+  ]);
 
-  const handleCancel = () => {
+  const handleCancel = useCallback(() => {
     setShowPopup(false);
-  };
+  }, []);
 
-  const handlePopupTimeout = navigation => {
+  const handlePopupTimeout = useCallback(() => {
     setShowPopup(false);
     navigation.navigate('Confirmation', {email: email.toLowerCase().trim()});
-  };
+  }, [email, navigation]);
 
   return {
     email,
