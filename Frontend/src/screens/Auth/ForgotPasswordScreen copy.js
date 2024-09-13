@@ -1,99 +1,87 @@
-import React, {useCallback} from 'react';
+import React, {useState} from 'react';
 import {View, Text, StyleSheet} from 'react-native';
+import InputField from '../../components/InputField';
 import Button from '../../components/Button';
 import ErrorMessage from '../../components/ErrorMessage';
 import {forgotPasswordRequest} from '../../services/authService';
 import {validateEmail} from '../../validators/fieldsValidators';
 import useCountdown from '../../hooks/useCountdown';
 import LinkButton from '../../components/LinkButton';
-import {useDispatch, useSelector} from 'react-redux';
-import {
-  setIsLoading,
-  setMessage,
-  setError,
-  setServerError,
-} from '../../store/slices/forgotPasswordSlice';
-import store from '../../store/store';
-import EmailInputField from '../../components/EmailInputField';
-import Title from '../../components/Title';
 
 const ForgotPasswordScreen = ({navigation}) => {
-  console.log('ForgotPasswordScreen rendered');
-  const dispatch = useDispatch();
-  const isLoading = useSelector(state => state.forgotPassword.isLoading);
-  const message = useSelector(state => state.forgotPassword.message);
+  const [email, setEmail] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
+  const [serverError, setServerError] = useState('');
 
   const {timer, startCountdown, isActive} = useCountdown(
     60,
-    () => dispatch(setIsLoading(false)),
+    () => setIsLoading(false),
     'forgotPassword',
   );
 
-  const handleForgotPassword = useCallback(async () => {
-    dispatch(setServerError(''));
-    dispatch(setIsLoading(true));
-    dispatch(setError(''));
-    dispatch(setMessage(''));
-
-    const email = store.getState().forgotPassword.email;
+  const handleForgotPassword = async () => {
+    setServerError('');
+    setIsLoading(true);
+    setError('');
+    setMessage('');
 
     try {
       const validEmail = validateEmail(email);
 
       if (!validEmail.valid) {
-        dispatch(setError(validEmail.message));
-        dispatch(setIsLoading(false));
+        setError(validEmail.message);
+        setIsLoading(false);
         return;
       }
 
       const response = await forgotPasswordRequest(email);
       startCountdown();
       if (response.data.status === 'success') {
-        dispatch(
-          setMessage('Password reset email sent successfully. Redirecting...'),
-        );
+        setMessage('Password reset email sent successfully. Redirecting...');
         setTimeout(() => {
           navigation.navigate('ResetPassword', {email});
         }, 2000);
       }
     } catch (err) {
-      dispatch(
-        setServerError(err.message || 'An error occurred. Please try again.'),
-      );
+      setServerError(err.message || 'An error occurred. Please try again.');
     } finally {
-      dispatch(setIsLoading(false));
+      setIsLoading(false);
     }
-  }, [dispatch, navigation, startCountdown]);
+  };
 
-  const navigateToLogin = useCallback(() => {
-    navigation.navigate('Login');
-  }, [navigation]);
-
-  const handleRedirectToReset = useCallback(() => {
-    dispatch(setServerError(''));
-    dispatch(setError(''));
-    dispatch(setMessage(''));
-
-    const email = store.getState().forgotPassword.email;
+  const handleRedirectToReset = () => {
+    setServerError('');
+    setError('');
+    setMessage('');
 
     const validEmail = validateEmail(email);
 
     if (!validEmail.valid) {
-      dispatch(setError(validEmail.message));
+      setError(validEmail.message);
       return;
     }
 
     navigation.navigate('ResetPassword', {email});
-  }, [dispatch, navigation]);
+  };
 
   return (
     <View style={styles.container}>
-      <Title title="Forgot Password" />
-
-      <EmailInputField />
-      <LinkButton title="Enter Code" onPress={handleRedirectToReset} />
+      <Text style={styles.title}>Forgot Password</Text>
+      <InputField
+        label="Email"
+        placeholder="Enter your email"
+        value={email}
+        onChangeText={setEmail}
+        error={error}
+      />
+      <LinkButton
+        title="Enter Code"
+        onPress={() => handleRedirectToReset(email)}
+      />
       {message ? <Text style={styles.successText}>{message}</Text> : null}
-      <ErrorMessage message={store.getState().forgotPassword.serverError} />
+      <ErrorMessage message={serverError} />
       <Button
         title={isActive ? `Resend email in ${timer}s` : 'Reset Password'}
         onPress={handleForgotPassword}
@@ -102,7 +90,7 @@ const ForgotPasswordScreen = ({navigation}) => {
       />
       <Button
         title="Back to Login"
-        onPress={navigateToLogin}
+        onPress={() => navigation.navigate('Login')}
         disabled={isLoading}
       />
     </View>

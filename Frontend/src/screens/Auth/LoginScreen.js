@@ -6,8 +6,8 @@ import LinkButton from '../../components/LinkButton';
 import {useLoginForm} from '../../hooks/authHooks/useLoginForm';
 import ErrorMessage from '../../components/ErrorMessage';
 import Title from '../../components/Title';
-import EmailInput from '../../components/EmailInput';
-import PasswordInput from '../../components/PasswordInput';
+import EmailInputBlur from '../../components/EmailInputBlur';
+import PasswordInputBlur from '../../components/PasswordInputBlur';
 
 const LoginScreen = ({navigation}) => {
   console.log('LoginScreen rendered');
@@ -35,9 +35,9 @@ const LoginScreen = ({navigation}) => {
       <Title title="Login" />
       <ErrorMessage message={serverError} />
 
-      <EmailInput />
+      <EmailInputBlur />
 
-      <PasswordInput />
+      <PasswordInputBlur />
 
       <LinkButton title="Forgot Password?" onPress={navigateToForgotPassword} />
 

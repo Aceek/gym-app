@@ -6,7 +6,7 @@ import {validateEmail} from '../validators/fieldsValidators';
 
 import InputField from './InputField';
 
-const EmailInput = React.memo(() => {
+const EmailInputBlur = React.memo(() => {
   const email = useSelector(state => state.login.email);
   const emailError = useSelector(state => state.login.errors.email);
   const dispatch = useDispatch();
@@ -32,4 +32,4 @@ const EmailInput = React.memo(() => {
   );
 });
 
-export default EmailInput;
+export default EmailInputBlur;

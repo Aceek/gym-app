@@ -5,7 +5,7 @@ import InputField from './InputField';
 import {useCallback} from 'react';
 import {validatePasswordRegister} from '../validators/fieldsValidators';
 
-const PasswordInput = React.memo(() => {
+const PasswordInputBlur = React.memo(() => {
   const password = useSelector(state => state.login.password);
   const passwordErrors = useSelector(state => state.login.errors.password);
   const dispatch = useDispatch();
@@ -34,4 +34,4 @@ const PasswordInput = React.memo(() => {
   );
 });
 
-export default PasswordInput;
+export default PasswordInputBlur;
