@@ -1,7 +1,6 @@
-// PasswordInput.js
 import React from 'react';
 import {useSelector, useDispatch} from 'react-redux';
-import {setPassword, setErrors} from '../store/actions/loginAction';
+import {setPassword, setErrors} from '../store/slices/loginSlice';
 import InputField from './InputField';
 import {useCallback} from 'react';
 import {validatePasswordRegister} from '../validators/fieldsValidators';

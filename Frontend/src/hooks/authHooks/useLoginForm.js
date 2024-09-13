@@ -2,11 +2,10 @@ import {useState, useCallback, useContext} from 'react';
 import {validateUserForLogin} from '../../validators/loginValidators';
 import {AuthContext} from '../../context/AuthContext';
 import store from '../../store/store';
-import {setErrors} from '../../store/actions/loginAction';
+import {setErrors} from '../../store/slices/loginSlice';
 import {useDispatch} from 'react-redux';
 
 export const useLoginForm = navigation => {
-  // const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLogin, setIsGoogleLogin] = useState(false);
   const [serverError, setServerError] = useState('');
@@ -17,10 +16,8 @@ export const useLoginForm = navigation => {
 
   const handleLogin = useCallback(async () => {
     const {email, password} = store.getState().login;
-
     setServerError('');
     dispatch(setErrors({}));
-    setIsLoading(true);
 
     try {
       const {
@@ -34,7 +31,7 @@ export const useLoginForm = navigation => {
         setIsLoading(false);
         return;
       }
-
+      setIsLoading(true);
       await login(false, userInfo);
     } catch (err) {
       setServerError(err.message);
@@ -50,9 +47,9 @@ export const useLoginForm = navigation => {
   const handleLoginWithGoogle = useCallback(async () => {
     setServerError('');
     dispatch(setErrors({}));
-    setIsGoogleLogin(true);
 
     try {
+      setIsGoogleLogin(true);
       await login(true);
     } catch (err) {
       setServerError(err.message);
