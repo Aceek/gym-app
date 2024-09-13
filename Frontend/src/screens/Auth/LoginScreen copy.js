@@ -1,21 +1,26 @@
 import React, {useCallback} from 'react';
 import {View, StyleSheet} from 'react-native';
+import InputField from '../../components/InputField';
 import Button from '../../components/Button';
 import PopupRedirect from '../../components/PopupRedirect';
 import LinkButton from '../../components/LinkButton';
 import {useLoginForm} from '../../hooks/authHooks/useLoginForm';
 import ErrorMessage from '../../components/ErrorMessage';
 import Title from '../../components/Title';
-import EmailInput from '../../components/EmailInput';
-import PasswordInput from '../../components/PasswordInput';
 
 const LoginScreen = ({navigation}) => {
-  console.log('LoginScreen rendered');
   const {
+    email,
+    setEmail,
+    password,
+    setPassword,
+    errors,
     isLoading,
     isGoogleLogin,
     serverError,
     showPopup,
+    handleEmailBlur,
+    handlePasswordBlur,
     handleLogin,
     handleLoginWithGoogle,
     handleCancel,
@@ -34,13 +39,24 @@ const LoginScreen = ({navigation}) => {
     <View style={styles.container}>
       <Title title="Login" />
       <ErrorMessage message={serverError} />
-
-      <EmailInput />
-
-      <PasswordInput />
-
+      <InputField
+        label="Email"
+        placeholder="Enter your email"
+        value={email}
+        onChangeText={setEmail}
+        onBlur={handleEmailBlur}
+        error={errors.email}
+      />
+      <InputField
+        label="Password"
+        placeholder="Enter your password"
+        secureTextEntry
+        value={password}
+        onChangeText={setPassword}
+        onBlur={handlePasswordBlur}
+        error={errors.password}
+      />
       <LinkButton title="Forgot Password?" onPress={navigateToForgotPassword} />
-
       <Button
         title="Login"
         onPress={handleLogin}

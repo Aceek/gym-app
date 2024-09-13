@@ -5,6 +5,8 @@ import {configureGoogleSignIn} from './src/config/configureGoogleSignIn';
 import {navigationRef} from './src/navigation/RootNavigation';
 import {NavigationContainer} from '@react-navigation/native';
 import {initializeAxiosInterceptors} from './src/services/api';
+import {Provider} from 'react-redux';
+import store from './src/store/store';
 
 const AppContent = () => {
   const {logout} = useContext(AuthContext);
@@ -23,11 +25,13 @@ const AppContent = () => {
 
 const App = () => {
   return (
-    <AuthProvider>
-      <React.StrictMode>
-        <AppContent />
-      </React.StrictMode>
-    </AuthProvider>
+    <Provider store={store}>
+      <AuthProvider>
+        <React.StrictMode>
+          <AppContent />
+        </React.StrictMode>
+      </AuthProvider>
+    </Provider>
   );
 };
 

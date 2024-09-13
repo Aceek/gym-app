@@ -1,25 +1,42 @@
 import {useState, useCallback, useContext} from 'react';
+import {
+  validateEmail,
+  validatePasswordRegister,
+} from '../../validators/fieldsValidators';
 import {validateUserForLogin} from '../../validators/loginValidators';
 import {AuthContext} from '../../context/AuthContext';
-import store from '../../store/store';
-import {setErrors} from '../../store/actions/loginAction';
-import {useDispatch} from 'react-redux';
 
 export const useLoginForm = navigation => {
-  // const [errors, setErrors] = useState({});
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLogin, setIsGoogleLogin] = useState(false);
   const [serverError, setServerError] = useState('');
   const [showPopup, setShowPopup] = useState(false);
   const {login} = useContext(AuthContext);
 
-  const dispatch = useDispatch();
+  const handleEmailBlur = useCallback(() => {
+    const emailValidation = validateEmail(email);
+    setErrors(prevErrors => ({
+      ...prevErrors,
+      email: emailValidation.valid ? null : emailValidation.message,
+    }));
+  }, [email]);
+
+  const handlePasswordBlur = useCallback(() => {
+    const passwordValidation = validatePasswordRegister(password);
+    setErrors(prevErrors => ({
+      ...prevErrors,
+      password: passwordValidation.valid
+        ? null
+        : passwordValidation.errors.join(', '),
+    }));
+  }, [password]);
 
   const handleLogin = useCallback(async () => {
-    const {email, password} = store.getState().login;
-
     setServerError('');
-    dispatch(setErrors({}));
+    setErrors({});
     setIsLoading(true);
 
     try {
@@ -30,7 +47,7 @@ export const useLoginForm = navigation => {
       } = await validateUserForLogin(email, password);
 
       if (!valid) {
-        dispatch(setErrors(validationErrors));
+        setErrors(validationErrors);
         setIsLoading(false);
         return;
       }
@@ -39,17 +56,17 @@ export const useLoginForm = navigation => {
     } catch (err) {
       setServerError(err.message);
       if (err.details && err.details.redirect) {
-        dispatch(setErrors({}));
+        setErrors({});
         setShowPopup(true);
       }
     } finally {
       setIsLoading(false);
     }
-  }, [login, dispatch]);
+  }, [email, password, login]);
 
   const handleLoginWithGoogle = useCallback(async () => {
     setServerError('');
-    dispatch(setErrors({}));
+    setErrors({});
     setIsGoogleLogin(true);
 
     try {
@@ -59,23 +76,29 @@ export const useLoginForm = navigation => {
     } finally {
       setIsGoogleLogin(false);
     }
-  }, [login, dispatch]);
+  }, [login]);
 
   const handleCancel = useCallback(() => {
     setShowPopup(false);
   }, []);
 
   const handlePopupTimeout = useCallback(() => {
-    const {email} = store.getState().login;
     setShowPopup(false);
     navigation.navigate('Confirmation', {email: email.toLowerCase().trim()});
-  }, [navigation]);
+  }, [email, navigation]);
 
   return {
+    email,
+    setEmail,
+    password,
+    setPassword,
+    errors,
     isLoading,
     isGoogleLogin,
     serverError,
     showPopup,
+    handleEmailBlur,
+    handlePasswordBlur,
     handleLogin,
     handleLoginWithGoogle,
     handleCancel,
