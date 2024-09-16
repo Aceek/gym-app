@@ -18,7 +18,6 @@ import EmailInputField from '../../components/EmailInputField';
 import Title from '../../components/Title';
 
 const ForgotPasswordScreen = ({navigation}) => {
-  console.log('ForgotPasswordScreen rendered');
   const dispatch = useDispatch();
   const isLoading = useSelector(state => state.forgotPassword.isLoading);
   const message = useSelector(state => state.forgotPassword.message);

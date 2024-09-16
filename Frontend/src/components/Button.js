@@ -44,7 +44,6 @@ const Button = React.memo(
     ];
 
     const textStyle = [styles.buttonText, {color: config.textColor}];
-    console.log('rendering button title = ', title);
 
     return (
       <TouchableOpacity

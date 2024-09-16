@@ -2,7 +2,6 @@ import React from 'react';
 import {Text, StyleSheet} from 'react-native';
 
 const Title = React.memo(({title}) => {
-  console.log('Title rendered');
   return <Text style={styles.title}>{title}</Text>;
 });
 

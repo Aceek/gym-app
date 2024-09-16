@@ -11,7 +11,6 @@ const InputField = React.memo(
     onBlur,
     error,
   }) => {
-    console.log('InputField rendered = ', label);
     return (
       <View style={styles.container}>
         <Text style={styles.label}>{label}</Text>

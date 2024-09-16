@@ -10,7 +10,6 @@ import EmailInputBlur from '../../components/EmailInputBlur';
 import PasswordInputBlur from '../../components/PasswordInputBlur';
 
 const LoginScreen = ({navigation}) => {
-  console.log('LoginScreen rendered');
   const {
     isLoading,
     isGoogleLogin,
