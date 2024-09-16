@@ -8,7 +8,6 @@ export const storeTokensAndUser = async (accessToken, refreshToken, user) => {
     await setTokenInKeychain(REFRESH_TOKEN_KEY, refreshToken);
     await AsyncStorage.setItem(USER_KEY, JSON.stringify(user));
   } catch (error) {
-    console.error('Error storing tokens and user:', error);
     throw error;
   }
 };

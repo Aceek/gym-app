@@ -17,7 +17,8 @@ export const AuthProvider = ({children}) => {
   useEffect(() => {
     const loadUser = async () => {
       try {
-        const storedUser = await AsyncStorage.getItem(USER_KEY);
+        const USER_KEY_SAFE = USER_KEY || 'default_user_key';
+        const storedUser = await AsyncStorage.getItem(USER_KEY_SAFE);
         if (storedUser) {
           setUser(JSON.parse(storedUser));
         }
