@@ -11,9 +11,9 @@ const CreateExerciseForm = ({dayId, setExercises, setShowForm}) => {
     const newExercise = {
       id: Math.floor(Math.random() * 1000), // ID temporaire
       name,
-      weight: parseInt(weight),
-      reps: parseInt(reps),
-      sets: parseInt(sets),
+      weight: parseInt(weight, 10),
+      reps: parseInt(reps, 10),
+      sets: parseInt(sets, 10),
     };
 
     // Simuler l'ajout de l'exercice (remplacer par une requête API si besoin)
