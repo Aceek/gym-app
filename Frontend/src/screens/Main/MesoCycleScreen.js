@@ -30,7 +30,7 @@ const MesoCycleScreen = () => {
   const [days, setDays] = useState([
     {
       id: 'd1',
-      columnId: 'w1',
+      columnId: 'w2',
       title: 'Day 1',
       content: 'Chest, Triceps - 5 exercises',
     },
