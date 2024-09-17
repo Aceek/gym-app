@@ -1,6 +1,8 @@
 import React from 'react';
-import {View, Text, StyleSheet, ScrollView} from 'react-native';
+import {View, Text, StyleSheet, ScrollView, Dimensions} from 'react-native';
 import Card from './Card';
+
+const {width: SCREEN_WIDTH} = Dimensions.get('window'); // Get screen width for responsiveness
 
 const Column = ({id, title, cards, onCardPress}) => {
   return (
@@ -20,27 +22,26 @@ const Column = ({id, title, cards, onCardPress}) => {
     </View>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
-    flex: 1, // Allow the container to take up the full width of the screen
-    alignItems: 'center', // Center columns horizontally
-    justifyContent: 'flex-start', // Keep the columns aligned to the top vertically
-    paddingTop: 10, // Add some padding to the top if necessary
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    paddingTop: SCREEN_WIDTH * 0.02,
   },
   column: {
-    width: 300, // Set the width for the column
+    width: SCREEN_WIDTH * 0.8,
     backgroundColor: '#f0f0f0',
-    borderRadius: 10,
-    padding: 10,
-    marginBottom: 10,
+    borderRadius: SCREEN_WIDTH * 0.03,
+    padding: SCREEN_WIDTH * 0.03,
+    marginBottom: SCREEN_WIDTH * 0.03,
     maxHeight: '100%',
   },
   columnTitle: {
-    fontSize: 18,
+    fontSize: SCREEN_WIDTH * 0.05,
     fontWeight: 'bold',
-    marginBottom: 10,
-    textAlign: 'center', // Center the title text
+    marginBottom: SCREEN_WIDTH * 0.02,
+    textAlign: 'center',
   },
 });
 

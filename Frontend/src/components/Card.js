@@ -1,5 +1,13 @@
 import React from 'react';
-import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Dimensions,
+} from 'react-native';
+
+const {width: SCREEN_WIDTH} = Dimensions.get('window'); // Get screen width for responsive design
 
 const Card = ({id, columnId, title, content, onPress}) => {
   return (
@@ -15,22 +23,22 @@ const Card = ({id, columnId, title, content, onPress}) => {
 const styles = StyleSheet.create({
   card: {
     backgroundColor: 'white',
-    borderRadius: 5,
-    padding: 10,
-    marginBottom: 10,
+    borderRadius: SCREEN_WIDTH * 0.02,
+    padding: SCREEN_WIDTH * 0.04,
+    marginBottom: SCREEN_WIDTH * 0.03,
     shadowColor: '#000',
     shadowOffset: {width: 0, height: 1},
     shadowOpacity: 0.2,
-    shadowRadius: 1,
+    shadowRadius: SCREEN_WIDTH * 0.01,
     elevation: 2,
   },
   cardTitle: {
-    fontSize: 16,
+    fontSize: SCREEN_WIDTH * 0.045,
     fontWeight: 'bold',
-    marginBottom: 5,
+    marginBottom: SCREEN_WIDTH * 0.02,
   },
   cardContent: {
-    fontSize: 14,
+    fontSize: SCREEN_WIDTH * 0.04,
     color: '#666',
   },
 });
