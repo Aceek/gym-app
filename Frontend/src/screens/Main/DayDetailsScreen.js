@@ -49,7 +49,7 @@ const DayDetailsScreen = ({route}) => {
       flatListRef.current?.scrollToIndex({
         index: initialIndex,
         animated: false,
-        viewPosition: 0.5,
+        viewPosition: 0,
       });
     }
   }, [dayId, days]);

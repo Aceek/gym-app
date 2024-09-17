@@ -54,24 +54,30 @@ const MesoCycleScreen = () => {
       title: 'Day 3',
       content: 'Legs, Shoulders - 7 exercises',
     },
-    // ... Add more cards for each day
+    // Add more days for week 1 if needed
   ]);
 
   const [currentWeekIndex, setCurrentWeekIndex] = useState(0);
 
   useEffect(() => {
     const newCards = [];
-    weeks.forEach(week => {
+
+    weeks.forEach((week, weekIndex) => {
       const weekCards = cards.filter(card => card.columnId === week.id);
-      if (weekCards.length === 0) {
-        newCards.push({
-          id: `d${cards.length + newCards.length + 1}`,
+      const dayCount = weekCards.length > 0 ? weekCards.length : 0; // Count existing days
+
+      // Add new days to the week if none exist
+      if (dayCount === 0) {
+        const newDay = {
+          id: `d${weekIndex + 1}d1`, // Ensure unique id for each day
           columnId: week.id,
-          title: `Day ${cards.length + newCards.length + 1}`,
+          title: `Day 1`,
           content: 'Default workout day',
-        });
+        };
+        newCards.push(newDay);
       }
     });
+
     if (newCards.length > 0) {
       setCards(prevCards => [...prevCards, ...newCards]);
     }
@@ -89,13 +95,13 @@ const MesoCycleScreen = () => {
     };
     setWeeks(prevWeeks => [...prevWeeks, newWeek]);
 
-    const newCard = {
-      id: `d${cards.length + 1}`,
+    const newDay = {
+      id: `d${weeks.length + 1}d1`, // Always start with Day 1 for the new week
       columnId: newWeekId,
-      title: `Day ${cards.length + 1}`,
+      title: `Day 1`,
       content: 'New workout day',
     };
-    setCards(prevCards => [...prevCards, newCard]);
+    setCards(prevCards => [...prevCards, newDay]);
   };
 
   const renderItem = ({item: week}) => {
