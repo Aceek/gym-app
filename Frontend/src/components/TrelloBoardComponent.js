@@ -1,6 +1,7 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {FlatList, StyleSheet, View, Dimensions} from 'react-native';
 import Column from './Column';
+import ExerciseDetailsModal from './ExerciseDetailsModal';
 
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
 
@@ -10,12 +11,24 @@ const TrelloBoardComponent = ({
   onViewableItemsChanged,
   viewabilityConfig,
 }) => {
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedExercise, setSelectedExercise] = useState(null);
+
+  const handlePress = exercise => {
+    setSelectedExercise(exercise);
+    setModalVisible(true);
+  };
+
   const renderItem = ({item}) => (
     <Column
       title={item.title}
       data={item.data}
       renderCard={cardItem => (
-        <CardComponent {...cardItem} columnId={item.id} />
+        <CardComponent
+          {...cardItem}
+          columnId={item.id}
+          handlePress={handlePress}
+        />
       )}
     />
   );
@@ -32,6 +45,11 @@ const TrelloBoardComponent = ({
         onViewableItemsChanged={onViewableItemsChanged}
         viewabilityConfig={viewabilityConfig}
         contentContainerStyle={styles.flatListContent}
+      />
+      <ExerciseDetailsModal
+        isVisible={modalVisible}
+        onClose={() => setModalVisible(false)}
+        exercise={selectedExercise}
       />
     </View>
   );

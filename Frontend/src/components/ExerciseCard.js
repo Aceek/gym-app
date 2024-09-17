@@ -5,14 +5,12 @@ import {
   TouchableOpacity,
   StyleSheet,
   Dimensions,
-  TextInput,
 } from 'react-native';
 
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
 
 const ExerciseCard = props => {
-  const {id, title, initialContent, columnId} = props;
-  const [isEditing, setIsEditing] = useState(false);
+  const {id, title, initialContent, columnId, handlePress} = props;
   const [content, setContent] = useState(initialContent);
   const [weight, setWeight] = useState('');
   const [reps, setReps] = useState('');
@@ -29,54 +27,12 @@ const ExerciseCard = props => {
     });
   }, [initialContent]);
 
-  const handlePress = () => {
-    if (isEditing) {
-      // Update the content with new values
-      const newContent = `Weight: ${weight}kg, Reps: ${reps}, RPE: ${rpe}`;
-      setContent(newContent);
-      setIsEditing(false);
-    } else {
-      setIsEditing(true);
-    }
-  };
-
-  const renderContent = () => {
-    if (isEditing) {
-      return (
-        <View>
-          <TextInput
-            style={styles.input}
-            placeholder="Weight (kg)"
-            value={weight}
-            onChangeText={setWeight}
-            keyboardType="numeric"
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Reps"
-            value={reps}
-            onChangeText={setReps}
-            keyboardType="numeric"
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="RPE"
-            value={rpe}
-            onChangeText={setRpe}
-            keyboardType="numeric"
-          />
-        </View>
-      );
-    } else {
-      return <Text style={styles.cardContent}>{content}</Text>;
-    }
-  };
-
   return (
-    <TouchableOpacity onPress={handlePress}>
+    <TouchableOpacity
+      onPress={() => handlePress({id, title, content, weight, reps, rpe})}>
       <View style={styles.card}>
         <Text style={styles.cardTitle}>{title}</Text>
-        {renderContent()}
+        <Text style={styles.cardContent}>{content}</Text>
       </View>
     </TouchableOpacity>
   );
@@ -102,13 +58,6 @@ const styles = StyleSheet.create({
   cardContent: {
     fontSize: SCREEN_WIDTH * 0.04,
     color: '#666',
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: SCREEN_WIDTH * 0.01,
-    padding: SCREEN_WIDTH * 0.02,
-    marginBottom: SCREEN_WIDTH * 0.02,
   },
 });
 
