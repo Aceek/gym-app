@@ -2,6 +2,7 @@ import React, {useState, useRef, useEffect} from 'react';
 import {View, StyleSheet, Dimensions, Text} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import TrelloBoardComponent from '../../components/TrelloBoardComponent';
+import DayCard from '../../components/DayCard';
 
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
 
@@ -100,7 +101,7 @@ const MesoCycleScreen = () => {
     <View style={styles.container}>
       <TrelloBoardComponent
         data={boardData}
-        type="day"
+        CardComponent={DayCard}
         onViewableItemsChanged={onViewableItemsChanged}
         viewabilityConfig={{itemVisiblePercentThreshold: 50}}
       />

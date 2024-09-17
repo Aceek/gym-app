@@ -10,11 +10,12 @@ import {
 
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
 
-const ExerciseCard = ({exercise, onPress, onUpdate}) => {
+const ExerciseCard = props => {
+  const {title, content, onPress, onUpdate} = props;
   const [isEditing, setIsEditing] = useState(false);
-  const [weight, setWeight] = useState(exercise.weight || '');
-  const [reps, setReps] = useState(exercise.reps || '');
-  const [rpe, setRpe] = useState(exercise.rpe || '');
+  const [weight, setWeight] = useState(props.weight || '');
+  const [reps, setReps] = useState(props.reps || '');
+  const [rpe, setRpe] = useState(props.rpe || '');
 
   const handlePress = () => {
     if (isEditing) {
@@ -54,14 +55,14 @@ const ExerciseCard = ({exercise, onPress, onUpdate}) => {
         </View>
       );
     } else {
-      return <Text style={styles.cardContent}>{exercise.content}</Text>;
+      return <Text style={styles.cardContent}>{content}</Text>;
     }
   };
 
   return (
     <TouchableOpacity onPress={handlePress}>
       <View style={styles.card}>
-        <Text style={styles.cardTitle}>{exercise.title}</Text>
+        <Text style={styles.cardTitle}>{title}</Text>
         {renderContent()}
       </View>
     </TouchableOpacity>

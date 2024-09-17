@@ -72,7 +72,7 @@ const DayDetailsScreen = ({route}) => {
 
   const handleExercisePress = (exerciseId, dayId) => {
     console.log(`Edit exercise ${exerciseId} for day ${dayId}`);
-    // Cette fonction sera gérée par le composant ExerciseCard
+    // This function will be handled by the ExerciseCard component
   };
 
   const handleExerciseUpdate = (exerciseId, dayId, updatedData) => {
@@ -111,7 +111,7 @@ const DayDetailsScreen = ({route}) => {
     <View style={styles.container}>
       <TrelloBoardComponent
         data={boardData}
-        type="exercise"
+        CardComponent={ExerciseCard}
         onViewableItemsChanged={onViewableItemsChanged}
         viewabilityConfig={{itemVisiblePercentThreshold: 50}}
       />

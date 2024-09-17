@@ -1,14 +1,12 @@
 import React from 'react';
 import {FlatList, StyleSheet, View, Dimensions} from 'react-native';
 import Column from './Column';
-import DayCard from './DayCard';
-import ExerciseCard from './ExerciseCard';
 
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
 
 const TrelloBoardComponent = ({
   data,
-  type,
+  CardComponent,
   onViewableItemsChanged,
   viewabilityConfig,
 }) => {
@@ -16,20 +14,13 @@ const TrelloBoardComponent = ({
     <Column
       title={item.title}
       data={item.data}
-      renderCard={cardItem =>
-        type === 'day' ? (
-          <DayCard
-            day={cardItem}
-            onPress={() => cardItem.onPress(cardItem.id, item.id)}
-          />
-        ) : (
-          <ExerciseCard
-            exercise={cardItem}
-            onPress={() => cardItem.onPress(cardItem.id, item.id)}
-            onUpdate={cardItem.onUpdate}
-          />
-        )
-      }
+      renderCard={cardItem => (
+        <CardComponent
+          {...cardItem}
+          onPress={() => cardItem.onPress(cardItem.id, item.id)}
+          onUpdate={cardItem.onUpdate}
+        />
+      )}
     />
   );
 
@@ -57,7 +48,7 @@ const styles = StyleSheet.create({
   },
   flatListContent: {
     flexGrow: 1,
-    justifyContent: 'flex-start', // Change this to align content to the top
+    justifyContent: 'flex-start',
   },
 });
 

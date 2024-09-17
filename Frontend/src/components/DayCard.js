@@ -9,12 +9,14 @@ import {
 
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
 
-const DayCard = ({day, onPress}) => {
+const DayCard = props => {
+  const {title, content, onPress} = props;
+
   return (
     <TouchableOpacity onPress={onPress}>
       <View style={styles.card}>
-        <Text style={styles.cardTitle}>{day.title}</Text>
-        <Text style={styles.cardContent}>{day.content}</Text>
+        <Text style={styles.cardTitle}>{title}</Text>
+        <Text style={styles.cardContent}>{content}</Text>
       </View>
     </TouchableOpacity>
   );
