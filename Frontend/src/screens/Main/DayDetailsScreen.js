@@ -1,4 +1,4 @@
-import React, {useState, useRef, useEffect, useMemo} from 'react';
+import React, {useState, useRef, useEffect} from 'react';
 import {View, FlatList, StyleSheet, Dimensions, Text} from 'react-native';
 import Column from '../../components/Column';
 
@@ -8,44 +8,37 @@ const DayDetailsScreen = ({route}) => {
   const {weekId, dayId} = route.params;
   const flatListRef = useRef(null);
 
-  // Mock data for demonstration purposes
-  const days = useMemo(
-    () => [
-      {id: 'd1', title: 'Monday', cardIds: ['e1', 'e2', 'e3']},
-      {id: 'd2', title: 'Tuesday', cardIds: ['e4', 'e5', 'e6']},
-      {id: 'd3', title: 'Wednesday', cardIds: ['e7', 'e8', 'e9']},
-      {id: 'd4', title: 'Thursday', cardIds: ['e10', 'e11', 'e12']},
-      {id: 'd5', title: 'Friday', cardIds: ['e13', 'e14', 'e15']},
-      {id: 'd6', title: 'Saturday', cardIds: ['e16', 'e17']},
-      {id: 'd7', title: 'Sunday', cardIds: []},
-    ],
-    [],
-  ); // Empty dependency array as this data is static
+  const [days, setDays] = useState([
+    {id: 'd1', title: 'Monday'},
+    {id: 'd2', title: 'Tuesday'},
+    {id: 'd3', title: 'Wednesday'},
+    {id: 'd4', title: 'Thursday'},
+    {id: 'd5', title: 'Friday'},
+    {id: 'd6', title: 'Saturday'},
+    {id: 'd7', title: 'Sunday'},
+  ]);
 
-  const exercises = useMemo(
-    () => [
-      {
-        id: 'e1',
-        columnId: 'd1',
-        title: 'Bench Press',
-        content: 'Weight: 80kg, Max RPE: 8',
-      },
-      {
-        id: 'e2',
-        columnId: 'd1',
-        title: 'Incline DB Press',
-        content: 'Weight: 30kg, Max RPE: 7',
-      },
-      {
-        id: 'e3',
-        columnId: 'd1',
-        title: 'Tricep Pushdown',
-        content: 'Weight: 25kg, Max RPE: 8',
-      },
-      // ... Add more exercises for each day
-    ],
-    [],
-  ); // Empty dependency array as this data is static
+  const [exercises, setExercises] = useState([
+    {
+      id: 'e1',
+      columnId: 'd1',
+      title: 'Bench Press',
+      content: 'Weight: 80kg, Max RPE: 8',
+    },
+    {
+      id: 'e2',
+      columnId: 'd1',
+      title: 'Incline DB Press',
+      content: 'Weight: 30kg, Max RPE: 7',
+    },
+    {
+      id: 'e3',
+      columnId: 'd2',
+      title: 'Squat',
+      content: 'Weight: 100kg, Max RPE: 8',
+    },
+    // ... Add more exercises for each day
+  ]);
 
   const [currentDayIndex, setCurrentDayIndex] = useState(0);
 
@@ -56,26 +49,57 @@ const DayDetailsScreen = ({route}) => {
       flatListRef.current?.scrollToIndex({
         index: initialIndex,
         animated: false,
+        viewPosition: 0.5,
       });
     }
   }, [dayId, days]);
+
+  useEffect(() => {
+    const newExercises = [];
+    days.forEach(day => {
+      const dayExercises = exercises.filter(
+        exercise => exercise.columnId === day.id,
+      );
+      if (dayExercises.length === 0) {
+        newExercises.push({
+          id: `e${exercises.length + newExercises.length + 1}`,
+          columnId: day.id,
+          title: 'New Exercise',
+          content: 'Add details here',
+        });
+      }
+    });
+    if (newExercises.length > 0) {
+      setExercises(prevExercises => [...prevExercises, ...newExercises]);
+    }
+  }, [days, exercises]);
 
   const handleExercisePress = (exerciseId, dayId) => {
     console.log(`Edit exercise ${exerciseId} for day ${dayId}`);
     // Implement exercise editing logic here
   };
 
-  const renderItem = ({item: day}) => (
-    <View style={styles.columnContainer}>
-      <Column
-        id={day.id}
-        title={day.title}
-        cardIds={day.cardIds}
-        cards={exercises.filter(exercise => day.cardIds.includes(exercise.id))}
-        onCardPress={handleExercisePress}
-      />
-    </View>
-  );
+  const renderItem = ({item: day}) => {
+    const dayExercises = exercises.filter(
+      exercise => exercise.columnId === day.id,
+    );
+    return (
+      <View style={styles.columnContainer}>
+        <Column
+          id={day.id}
+          title={day.title}
+          cards={dayExercises}
+          onCardPress={handleExercisePress}
+        />
+      </View>
+    );
+  };
+
+  const getItemLayout = (data, index) => ({
+    length: SCREEN_WIDTH,
+    offset: SCREEN_WIDTH * index,
+    index,
+  });
 
   const onViewableItemsChanged = useRef(({viewableItems}) => {
     if (viewableItems.length > 0) {
@@ -95,6 +119,7 @@ const DayDetailsScreen = ({route}) => {
         showsHorizontalScrollIndicator={false}
         onViewableItemsChanged={onViewableItemsChanged}
         viewabilityConfig={{itemVisiblePercentThreshold: 50}}
+        getItemLayout={getItemLayout}
       />
       <View style={styles.navigation}>
         <Text style={styles.navigationText}>

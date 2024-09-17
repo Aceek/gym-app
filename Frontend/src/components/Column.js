@@ -2,21 +2,18 @@ import React from 'react';
 import {View, Text, StyleSheet, ScrollView} from 'react-native';
 import Card from './Card';
 
-const Column = ({id, title, cardIds, cards, onCardPress}) => {
+const Column = ({id, title, cards, onCardPress}) => {
   return (
     <View style={styles.column}>
       <Text style={styles.columnTitle}>{title}</Text>
       <ScrollView>
-        {cardIds.map(cardId => {
-          const card = cards.find(c => c.id === cardId);
-          return card ? (
-            <Card
-              key={cardId}
-              {...card}
-              onPress={() => onCardPress(cardId, id)}
-            />
-          ) : null;
-        })}
+        {cards.map(card => (
+          <Card
+            key={card.id}
+            {...card}
+            onPress={() => onCardPress(card.id, id)}
+          />
+        ))}
       </ScrollView>
     </View>
   );

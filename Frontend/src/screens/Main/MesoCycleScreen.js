@@ -1,4 +1,4 @@
-import React, {useState, useRef} from 'react';
+import React, {useState, useRef, useEffect} from 'react';
 import {
   View,
   FlatList,
@@ -20,22 +20,18 @@ const MesoCycleScreen = () => {
     {
       id: 'w1',
       title: 'Week 1',
-      cardIds: ['d1', 'd2', 'd3', 'd4', 'd5', 'd6', 'd7'],
     },
     {
       id: 'w2',
       title: 'Week 2',
-      cardIds: ['d8', 'd9', 'd10', 'd11', 'd12', 'd13', 'd14'],
     },
     {
       id: 'w3',
       title: 'Week 3',
-      cardIds: ['d15', 'd16', 'd17', 'd18', 'd19', 'd20', 'd21'],
     },
     {
       id: 'w4',
       title: 'Week 4',
-      cardIds: ['d22', 'd23', 'd24', 'd25', 'd26', 'd27', 'd28'],
     },
   ]);
 
@@ -48,14 +44,38 @@ const MesoCycleScreen = () => {
     },
     {
       id: 'd2',
-      columnId: 'w2',
+      columnId: 'w1',
       title: 'Day 2',
       content: 'Back, Biceps - 6 exercises',
+    },
+    {
+      id: 'd3',
+      columnId: 'w1',
+      title: 'Day 3',
+      content: 'Legs, Shoulders - 7 exercises',
     },
     // ... Add more cards for each day
   ]);
 
   const [currentWeekIndex, setCurrentWeekIndex] = useState(0);
+
+  useEffect(() => {
+    const newCards = [];
+    weeks.forEach(week => {
+      const weekCards = cards.filter(card => card.columnId === week.id);
+      if (weekCards.length === 0) {
+        newCards.push({
+          id: `d${cards.length + newCards.length + 1}`,
+          columnId: week.id,
+          title: `Day ${cards.length + newCards.length + 1}`,
+          content: 'Default workout day',
+        });
+      }
+    });
+    if (newCards.length > 0) {
+      setCards(prevCards => [...prevCards, ...newCards]);
+    }
+  }, [weeks, cards]);
 
   const handleCardPress = (cardId, columnId) => {
     navigation.navigate('DayDetails', {weekId: columnId, dayId: cardId});
@@ -66,22 +86,31 @@ const MesoCycleScreen = () => {
     const newWeek = {
       id: newWeekId,
       title: `Week ${weeks.length + 1}`,
-      cardIds: [],
     };
-    setWeeks([...weeks, newWeek]);
+    setWeeks(prevWeeks => [...prevWeeks, newWeek]);
+
+    const newCard = {
+      id: `d${cards.length + 1}`,
+      columnId: newWeekId,
+      title: `Day ${cards.length + 1}`,
+      content: 'New workout day',
+    };
+    setCards(prevCards => [...prevCards, newCard]);
   };
 
-  const renderItem = ({item: week, index}) => (
-    <View style={styles.columnContainer}>
-      <Column
-        id={week.id}
-        title={week.title}
-        cardIds={week.cardIds}
-        cards={cards.filter(card => week.cardIds.includes(card.id))}
-        onCardPress={handleCardPress}
-      />
-    </View>
-  );
+  const renderItem = ({item: week}) => {
+    const weekCards = cards.filter(card => card.columnId === week.id);
+    return (
+      <View style={styles.columnContainer}>
+        <Column
+          id={week.id}
+          title={week.title}
+          cards={weekCards}
+          onCardPress={handleCardPress}
+        />
+      </View>
+    );
+  };
 
   const onViewableItemsChanged = useRef(({viewableItems}) => {
     if (viewableItems.length > 0) {
