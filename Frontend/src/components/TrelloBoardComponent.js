@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {FlatList, StyleSheet, View, Dimensions} from 'react-native';
+import {FlatList, StyleSheet, View, Dimensions, Button} from 'react-native';
 import Column from './Column';
 import ExerciseDetailsModal from './ExerciseDetailsModal';
 
@@ -10,6 +10,7 @@ const TrelloBoardComponent = ({
   CardComponent,
   onViewableItemsChanged,
   viewabilityConfig,
+  onAddCard,
 }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedExercise, setSelectedExercise] = useState(null);
@@ -29,8 +30,9 @@ const TrelloBoardComponent = ({
           columnId={item.id}
           handlePress={handlePress}
         />
-      )}
-    />
+      )}>
+      <Button title="Add Card" onPress={() => onAddCard(item.id)} />
+    </Column>
   );
 
   return (

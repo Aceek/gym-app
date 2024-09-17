@@ -74,6 +74,19 @@ const MesoCycleScreen = () => {
     }
   }, [weeks, days]);
 
+  // Nouvelle fonction pour ajouter une carte
+  const handleAddCard = columnId => {
+    setDays(prevDays => [
+      ...prevDays,
+      {
+        id: `d${prevDays.length + 1}`,
+        columnId: columnId,
+        title: `Day ${prevDays.length + 1}`,
+        content: 'New day description',
+      },
+    ]);
+  };
+
   const boardData = weeks.map(week => ({
     id: week.id,
     title: week.title,
@@ -93,6 +106,7 @@ const MesoCycleScreen = () => {
         CardComponent={DayCard}
         onViewableItemsChanged={onViewableItemsChanged}
         viewabilityConfig={{itemVisiblePercentThreshold: 50}}
+        onAddCard={handleAddCard}
       />
       <View style={styles.navigation}>
         <Text style={styles.navigationText}>

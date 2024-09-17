@@ -3,7 +3,7 @@ import {View, Text, StyleSheet, ScrollView, Dimensions} from 'react-native';
 
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
 
-const Column = ({title, data, renderCard}) => {
+const Column = ({title, data, renderCard, children}) => {
   return (
     <View style={styles.container}>
       <View style={styles.column}>
@@ -13,6 +13,7 @@ const Column = ({title, data, renderCard}) => {
             <View key={item.id || index}>{renderCard(item)}</View>
           ))}
         </ScrollView>
+        {children}
       </View>
     </View>
   );

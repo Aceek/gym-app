@@ -50,25 +50,32 @@ const DayDetailsScreen = ({route}) => {
     }
   }, [dayId, days]);
 
-  useEffect(() => {
-    const newExercises = [];
-    days.forEach(day => {
-      const dayExercises = exercises.filter(
-        exercise => exercise.columnId === day.id,
-      );
-      if (dayExercises.length === 0) {
-        newExercises.push({
-          id: `e${exercises.length + newExercises.length + 1}`,
-          columnId: day.id,
+  // Nouvelle fonction pour ajouter une carte
+  const handleAddCard = columnId => {
+    if (dayId) {
+      // Ajouter un exercice
+      setExercises(prevExercises => [
+        ...prevExercises,
+        {
+          id: `e${prevExercises.length + 1}`,
+          columnId: columnId,
           title: 'New Exercise',
           initialContent: 'Weight: 0kg, Reps: 0, RPE: 0',
-        });
-      }
-    });
-    if (newExercises.length > 0) {
-      setExercises(prevExercises => [...prevExercises, ...newExercises]);
+        },
+      ]);
+    } else {
+      // Ajouter un jour
+      setDays(prevDays => [
+        ...prevDays,
+        {
+          id: `d${prevDays.length + 1}`,
+          columnId: columnId,
+          title: `Day ${prevDays.length + 1}`,
+          content: 'New day description',
+        },
+      ]);
     }
-  }, [days, exercises]);
+  };
 
   const boardData = days.map(day => ({
     id: day.id,
@@ -89,6 +96,7 @@ const DayDetailsScreen = ({route}) => {
         CardComponent={ExerciseCard}
         onViewableItemsChanged={onViewableItemsChanged}
         viewabilityConfig={{itemVisiblePercentThreshold: 50}}
+        onAddCard={handleAddCard}
       />
       <View style={styles.navigation}>
         <Text style={styles.navigationText}>
