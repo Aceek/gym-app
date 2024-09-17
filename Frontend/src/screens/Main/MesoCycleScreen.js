@@ -1,8 +1,7 @@
 import React, {useState, useRef, useEffect} from 'react';
-import {View, FlatList, StyleSheet, Dimensions, Text} from 'react-native';
+import {View, StyleSheet, Dimensions, Text} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
-import Column from '../../components/Column';
-import DayCard from '../../components/DayCard';
+import TrelloBoardComponent from '../../components/TrelloBoardComponent';
 
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
 
@@ -80,27 +79,16 @@ const MesoCycleScreen = () => {
     navigation.navigate('DayDetails', {weekId: columnId, dayId: dayId});
   };
 
-  const renderItem = ({item: week}) => {
-    const weekDays = days.filter(day => day.columnId === week.id);
-    return (
-      <View style={styles.columnContainer}>
-        <Column
-          id={week.id}
-          title={week.title}
-          cards={weekDays.map(day => (
-            <DayCard
-              key={day.id}
-              id={day.id}
-              columnId={day.columnId}
-              title={day.title}
-              content={day.content}
-              onPress={handleDayPress}
-            />
-          ))}
-        />
-      </View>
-    );
-  };
+  const boardData = weeks.map(week => ({
+    id: week.id,
+    title: week.title,
+    data: days
+      .filter(day => day.columnId === week.id)
+      .map(day => ({
+        ...day,
+        onPress: () => handleDayPress(day.id, day.columnId),
+      })),
+  }));
 
   const onViewableItemsChanged = useRef(({viewableItems}) => {
     if (viewableItems.length > 0) {
@@ -110,14 +98,9 @@ const MesoCycleScreen = () => {
 
   return (
     <View style={styles.container}>
-      <FlatList
-        ref={flatListRef}
-        data={weeks}
-        renderItem={renderItem}
-        keyExtractor={item => item.id}
-        horizontal
-        pagingEnabled
-        showsHorizontalScrollIndicator={false}
+      <TrelloBoardComponent
+        data={boardData}
+        type="day"
         onViewableItemsChanged={onViewableItemsChanged}
         viewabilityConfig={{itemVisiblePercentThreshold: 50}}
       />
@@ -133,10 +116,6 @@ const MesoCycleScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  columnContainer: {
-    width: SCREEN_WIDTH,
-    paddingHorizontal: 10,
   },
   navigation: {
     flexDirection: 'row',

@@ -1,6 +1,6 @@
 import React, {useState, useRef, useEffect} from 'react';
-import {View, FlatList, StyleSheet, Dimensions, Text} from 'react-native';
-import Column from '../../components/Column';
+import {View, StyleSheet, Dimensions, Text} from 'react-native';
+import TrelloBoardComponent from '../../components/TrelloBoardComponent';
 import ExerciseCard from '../../components/ExerciseCard';
 
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
@@ -47,11 +47,6 @@ const DayDetailsScreen = ({route}) => {
     const initialIndex = days.findIndex(day => day.id === dayId);
     if (initialIndex !== -1) {
       setCurrentDayIndex(initialIndex);
-      flatListRef.current?.scrollToIndex({
-        index: initialIndex,
-        animated: false,
-        viewPosition: 0,
-      });
     }
   }, [dayId, days]);
 
@@ -93,36 +88,18 @@ const DayDetailsScreen = ({route}) => {
     );
   };
 
-  const renderItem = ({item: day}) => {
-    const dayExercises = exercises.filter(
-      exercise => exercise.columnId === day.id,
-    );
-    return (
-      <View style={styles.columnContainer}>
-        <Column
-          id={day.id}
-          title={day.title}
-          cards={dayExercises.map(exercise => (
-            <ExerciseCard
-              key={exercise.id}
-              id={exercise.id}
-              columnId={day.id}
-              title={exercise.title}
-              initialContent={exercise.content}
-              onPress={handleExercisePress}
-              onUpdate={handleExerciseUpdate}
-            />
-          ))}
-        />
-      </View>
-    );
-  };
-
-  const getItemLayout = (data, index) => ({
-    length: SCREEN_WIDTH,
-    offset: SCREEN_WIDTH * index,
-    index,
-  });
+  const boardData = days.map(day => ({
+    id: day.id,
+    title: day.title,
+    data: exercises
+      .filter(exercise => exercise.columnId === day.id)
+      .map(exercise => ({
+        ...exercise,
+        onPress: () => handleExercisePress(exercise.id, day.id),
+        onUpdate: updatedData =>
+          handleExerciseUpdate(exercise.id, day.id, updatedData),
+      })),
+  }));
 
   const onViewableItemsChanged = useRef(({viewableItems}) => {
     if (viewableItems.length > 0) {
@@ -132,17 +109,11 @@ const DayDetailsScreen = ({route}) => {
 
   return (
     <View style={styles.container}>
-      <FlatList
-        ref={flatListRef}
-        data={days}
-        renderItem={renderItem}
-        keyExtractor={item => item.id}
-        horizontal
-        pagingEnabled
-        showsHorizontalScrollIndicator={false}
+      <TrelloBoardComponent
+        data={boardData}
+        type="exercise"
         onViewableItemsChanged={onViewableItemsChanged}
         viewabilityConfig={{itemVisiblePercentThreshold: 50}}
-        getItemLayout={getItemLayout}
       />
       <View style={styles.navigation}>
         <Text style={styles.navigationText}>
@@ -156,10 +127,6 @@ const DayDetailsScreen = ({route}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  columnContainer: {
-    width: SCREEN_WIDTH,
-    paddingHorizontal: 10,
   },
   navigation: {
     flexDirection: 'row',
