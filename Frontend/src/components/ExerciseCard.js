@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -11,19 +11,32 @@ import {
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
 
 const ExerciseCard = props => {
-  const {title, content, onPress, onUpdate} = props;
+  const {id, title, initialContent, columnId} = props;
   const [isEditing, setIsEditing] = useState(false);
-  const [weight, setWeight] = useState(props.weight || '');
-  const [reps, setReps] = useState(props.reps || '');
-  const [rpe, setRpe] = useState(props.rpe || '');
+  const [content, setContent] = useState(initialContent);
+  const [weight, setWeight] = useState('');
+  const [reps, setReps] = useState('');
+  const [rpe, setRpe] = useState('');
+
+  useEffect(() => {
+    // Parse initial content to set weight, reps, and rpe
+    const contentParts = initialContent.split(', ');
+    contentParts.forEach(part => {
+      const [key, value] = part.split(': ');
+      if (key === 'Weight') setWeight(value.replace('kg', ''));
+      if (key === 'Reps') setReps(value);
+      if (key === 'RPE') setRpe(value);
+    });
+  }, [initialContent]);
 
   const handlePress = () => {
     if (isEditing) {
-      onUpdate({weight, reps, rpe});
+      // Update the content with new values
+      const newContent = `Weight: ${weight}kg, Reps: ${reps}, RPE: ${rpe}`;
+      setContent(newContent);
       setIsEditing(false);
     } else {
       setIsEditing(true);
-      onPress();
     }
   };
 
@@ -33,7 +46,7 @@ const ExerciseCard = props => {
         <View>
           <TextInput
             style={styles.input}
-            placeholder="Weight"
+            placeholder="Weight (kg)"
             value={weight}
             onChangeText={setWeight}
             keyboardType="numeric"

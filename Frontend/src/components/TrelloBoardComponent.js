@@ -15,11 +15,7 @@ const TrelloBoardComponent = ({
       title={item.title}
       data={item.data}
       renderCard={cardItem => (
-        <CardComponent
-          {...cardItem}
-          onPress={() => cardItem.onPress(cardItem.id, item.id)}
-          onUpdate={cardItem.onUpdate}
-        />
+        <CardComponent {...cardItem} columnId={item.id} />
       )}
     />
   );

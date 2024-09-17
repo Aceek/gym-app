@@ -1,13 +1,11 @@
 import React, {useState, useRef, useEffect} from 'react';
 import {View, StyleSheet, Dimensions, Text} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
 import TrelloBoardComponent from '../../components/TrelloBoardComponent';
 import DayCard from '../../components/DayCard';
 
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
 
 const MesoCycleScreen = () => {
-  const navigation = useNavigation();
   const flatListRef = useRef(null);
 
   const [weeks, setWeeks] = useState([
@@ -76,19 +74,10 @@ const MesoCycleScreen = () => {
     }
   }, [weeks, days]);
 
-  const handleDayPress = (dayId, columnId) => {
-    navigation.navigate('DayDetails', {weekId: columnId, dayId: dayId});
-  };
-
   const boardData = weeks.map(week => ({
     id: week.id,
     title: week.title,
-    data: days
-      .filter(day => day.columnId === week.id)
-      .map(day => ({
-        ...day,
-        onPress: () => handleDayPress(day.id, day.columnId),
-      })),
+    data: days.filter(day => day.columnId === week.id),
   }));
 
   const onViewableItemsChanged = useRef(({viewableItems}) => {

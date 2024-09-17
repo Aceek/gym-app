@@ -24,19 +24,19 @@ const DayDetailsScreen = ({route}) => {
       id: 'e1',
       columnId: 'd1',
       title: 'Bench Press',
-      content: 'Weight: 80kg, Max RPE: 8',
+      initialContent: 'Weight: 80kg, Reps: 5, RPE: 8',
     },
     {
       id: 'e2',
       columnId: 'd1',
       title: 'Incline DB Press',
-      content: 'Weight: 30kg, Max RPE: 7',
+      initialContent: 'Weight: 30kg, Reps: 8, RPE: 7',
     },
     {
       id: 'e3',
       columnId: 'd2',
       title: 'Squat',
-      content: 'Weight: 100kg, Max RPE: 8',
+      initialContent: 'Weight: 100kg, Reps: 5, RPE: 8',
     },
     // ... Add more exercises for each day
   ]);
@@ -61,7 +61,7 @@ const DayDetailsScreen = ({route}) => {
           id: `e${exercises.length + newExercises.length + 1}`,
           columnId: day.id,
           title: 'New Exercise',
-          content: 'Add details here',
+          initialContent: 'Weight: 0kg, Reps: 0, RPE: 0',
         });
       }
     });
@@ -70,35 +70,10 @@ const DayDetailsScreen = ({route}) => {
     }
   }, [days, exercises]);
 
-  const handleExercisePress = (exerciseId, dayId) => {
-    console.log(`Edit exercise ${exerciseId} for day ${dayId}`);
-    // This function will be handled by the ExerciseCard component
-  };
-
-  const handleExerciseUpdate = (exerciseId, dayId, updatedData) => {
-    setExercises(prevExercises =>
-      prevExercises.map(exercise =>
-        exercise.id === exerciseId
-          ? {
-              ...exercise,
-              content: `Weight: ${updatedData.weight}kg, Reps: ${updatedData.reps}, RPE: ${updatedData.rpe}`,
-            }
-          : exercise,
-      ),
-    );
-  };
-
   const boardData = days.map(day => ({
     id: day.id,
     title: day.title,
-    data: exercises
-      .filter(exercise => exercise.columnId === day.id)
-      .map(exercise => ({
-        ...exercise,
-        onPress: () => handleExercisePress(exercise.id, day.id),
-        onUpdate: updatedData =>
-          handleExerciseUpdate(exercise.id, day.id, updatedData),
-      })),
+    data: exercises.filter(exercise => exercise.columnId === day.id),
   }));
 
   const onViewableItemsChanged = useRef(({viewableItems}) => {

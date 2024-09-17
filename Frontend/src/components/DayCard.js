@@ -6,14 +6,20 @@ import {
   StyleSheet,
   Dimensions,
 } from 'react-native';
+import {useNavigation} from '@react-navigation/native';
 
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
 
 const DayCard = props => {
-  const {title, content, onPress} = props;
+  const {id, title, content, columnId} = props;
+  const navigation = useNavigation();
+
+  const handlePress = () => {
+    navigation.navigate('DayDetails', {weekId: columnId, dayId: id});
+  };
 
   return (
-    <TouchableOpacity onPress={onPress}>
+    <TouchableOpacity onPress={handlePress}>
       <View style={styles.card}>
         <Text style={styles.cardTitle}>{title}</Text>
         <Text style={styles.cardContent}>{content}</Text>
