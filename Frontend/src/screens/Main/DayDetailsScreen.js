@@ -1,6 +1,7 @@
 import React, {useState, useRef, useEffect} from 'react';
 import {View, FlatList, StyleSheet, Dimensions, Text} from 'react-native';
 import Column from '../../components/Column';
+import ExerciseCard from '../../components/ExerciseCard';
 
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
 
@@ -76,7 +77,20 @@ const DayDetailsScreen = ({route}) => {
 
   const handleExercisePress = (exerciseId, dayId) => {
     console.log(`Edit exercise ${exerciseId} for day ${dayId}`);
-    // Implement exercise editing logic here
+    // Cette fonction sera gérée par le composant ExerciseCard
+  };
+
+  const handleExerciseUpdate = (exerciseId, dayId, updatedData) => {
+    setExercises(prevExercises =>
+      prevExercises.map(exercise =>
+        exercise.id === exerciseId
+          ? {
+              ...exercise,
+              content: `Weight: ${updatedData.weight}kg, Reps: ${updatedData.reps}, RPE: ${updatedData.rpe}`,
+            }
+          : exercise,
+      ),
+    );
   };
 
   const renderItem = ({item: day}) => {
@@ -88,8 +102,17 @@ const DayDetailsScreen = ({route}) => {
         <Column
           id={day.id}
           title={day.title}
-          cards={dayExercises}
-          onCardPress={handleExercisePress}
+          cards={dayExercises.map(exercise => (
+            <ExerciseCard
+              key={exercise.id}
+              id={exercise.id}
+              columnId={day.id}
+              title={exercise.title}
+              initialContent={exercise.content}
+              onPress={handleExercisePress}
+              onUpdate={handleExerciseUpdate}
+            />
+          ))}
         />
       </View>
     );

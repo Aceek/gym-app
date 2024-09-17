@@ -1,27 +1,19 @@
 import React from 'react';
 import {View, Text, StyleSheet, ScrollView, Dimensions} from 'react-native';
-import Card from './Card';
 
-const {width: SCREEN_WIDTH} = Dimensions.get('window'); // Get screen width for responsiveness
+const {width: SCREEN_WIDTH} = Dimensions.get('window');
 
-const Column = ({id, title, cards, onCardPress}) => {
+const Column = ({id, title, cards}) => {
   return (
     <View style={styles.container}>
       <View style={styles.column}>
         <Text style={styles.columnTitle}>{title}</Text>
-        <ScrollView>
-          {cards.map(card => (
-            <Card
-              key={card.id}
-              {...card}
-              onPress={() => onCardPress(card.id, id)}
-            />
-          ))}
-        </ScrollView>
+        <ScrollView>{cards}</ScrollView>
       </View>
     </View>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,

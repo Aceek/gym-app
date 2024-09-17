@@ -1,14 +1,8 @@
 import React, {useState, useRef, useEffect} from 'react';
-import {
-  View,
-  FlatList,
-  StyleSheet,
-  Button,
-  Dimensions,
-  Text,
-} from 'react-native';
+import {View, FlatList, StyleSheet, Dimensions, Text} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import Column from '../../components/Column';
+import DayCard from '../../components/DayCard';
 
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
 
@@ -35,7 +29,7 @@ const MesoCycleScreen = () => {
     },
   ]);
 
-  const [cards, setCards] = useState([
+  const [days, setDays] = useState([
     {
       id: 'd1',
       columnId: 'w1',
@@ -60,59 +54,49 @@ const MesoCycleScreen = () => {
   const [currentWeekIndex, setCurrentWeekIndex] = useState(0);
 
   useEffect(() => {
-    const newCards = [];
+    const newDays = [];
 
     weeks.forEach((week, weekIndex) => {
-      const weekCards = cards.filter(card => card.columnId === week.id);
-      const dayCount = weekCards.length > 0 ? weekCards.length : 0; // Count existing days
+      const weekDays = days.filter(day => day.columnId === week.id);
+      const dayCount = weekDays.length > 0 ? weekDays.length : 0;
 
-      // Add new days to the week if none exist
       if (dayCount === 0) {
         const newDay = {
-          id: `d${weekIndex + 1}d1`, // Ensure unique id for each day
+          id: `d${weekIndex + 1}d1`,
           columnId: week.id,
           title: `Day 1`,
           content: 'Default workout day',
         };
-        newCards.push(newDay);
+        newDays.push(newDay);
       }
     });
 
-    if (newCards.length > 0) {
-      setCards(prevCards => [...prevCards, ...newCards]);
+    if (newDays.length > 0) {
+      setDays(prevDays => [...prevDays, ...newDays]);
     }
-  }, [weeks, cards]);
+  }, [weeks, days]);
 
-  const handleCardPress = (cardId, columnId) => {
-    navigation.navigate('DayDetails', {weekId: columnId, dayId: cardId});
-  };
-
-  const addWeek = () => {
-    const newWeekId = `w${weeks.length + 1}`;
-    const newWeek = {
-      id: newWeekId,
-      title: `Week ${weeks.length + 1}`,
-    };
-    setWeeks(prevWeeks => [...prevWeeks, newWeek]);
-
-    const newDay = {
-      id: `d${weeks.length + 1}d1`, // Always start with Day 1 for the new week
-      columnId: newWeekId,
-      title: `Day 1`,
-      content: 'New workout day',
-    };
-    setCards(prevCards => [...prevCards, newDay]);
+  const handleDayPress = (dayId, columnId) => {
+    navigation.navigate('DayDetails', {weekId: columnId, dayId: dayId});
   };
 
   const renderItem = ({item: week}) => {
-    const weekCards = cards.filter(card => card.columnId === week.id);
+    const weekDays = days.filter(day => day.columnId === week.id);
     return (
       <View style={styles.columnContainer}>
         <Column
           id={week.id}
           title={week.title}
-          cards={weekCards}
-          onCardPress={handleCardPress}
+          cards={weekDays.map(day => (
+            <DayCard
+              key={day.id}
+              id={day.id}
+              columnId={day.columnId}
+              title={day.title}
+              content={day.content}
+              onPress={handleDayPress}
+            />
+          ))}
         />
       </View>
     );
@@ -142,7 +126,6 @@ const MesoCycleScreen = () => {
           {currentWeekIndex + 1} / {weeks.length}
         </Text>
       </View>
-      <Button title="Add Week" onPress={addWeek} />
     </View>
   );
 };
