@@ -27,9 +27,7 @@ const App = () => {
   return (
     <Provider store={store}>
       <AuthProvider>
-        <React.StrictMode>
-          <AppContent />
-        </React.StrictMode>
+        <AppContent />
       </AuthProvider>
     </Provider>
   );
