@@ -1,17 +1,14 @@
 // DayDetailsScreen.js
 
 import React, {useState, useRef, useEffect} from 'react';
-import {View, StyleSheet, Dimensions, Text} from 'react-native';
+import {View, StyleSheet, Text} from 'react-native';
 import TrelloBoardComponent from '../../components/TrelloBoardComponent';
 import ExerciseCard from '../../components/ExerciseCard';
 
-const {width: SCREEN_WIDTH} = Dimensions.get('window');
-
 const DayDetailsScreen = ({route}) => {
-  const {weekId, dayId} = route.params;
-  const flatListRef = useRef(null);
+  const {dayId} = route.params;
 
-  const [days, setDays] = useState([
+  const [days] = useState([
     {id: 'd1', title: 'Monday'},
     {id: 'd2', title: 'Tuesday'},
     {id: 'd3', title: 'Wednesday'},

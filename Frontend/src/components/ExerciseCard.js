@@ -12,8 +12,8 @@ import ThreeDotsModal from './ThreeDotsModal';
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
 
 const ExerciseCard = props => {
-  const {id, title, initialContent, columnId, onRemove} = props;
-  const [content, setContent] = useState(initialContent);
+  const {id, title, initialContent, onRemove} = props;
+  const content = initialContent;
   const [weight, setWeight] = useState('');
   const [reps, setReps] = useState('');
   const [rpe, setRpe] = useState('');
@@ -24,9 +24,15 @@ const ExerciseCard = props => {
     const contentParts = initialContent.split(', ');
     contentParts.forEach(part => {
       const [key, value] = part.split(': ');
-      if (key === 'Weight') setWeight(value.replace('kg', ''));
-      if (key === 'Reps') setReps(value);
-      if (key === 'RPE') setRpe(value);
+      if (key === 'Weight') {
+        setWeight(value.replace('kg', ''));
+      }
+      if (key === 'Reps') {
+        setReps(value);
+      }
+      if (key === 'RPE') {
+        setRpe(value);
+      }
     });
   }, [initialContent]);
 

@@ -1,11 +1,9 @@
-import React, {useState, useEffect, useRef} from 'react';
-import {View, StyleSheet, Dimensions, Text} from 'react-native';
+import React, {useState, useRef} from 'react';
+import {View, StyleSheet, Text} from 'react-native';
 import TrelloBoardComponent from '../../components/TrelloBoardComponent';
 import SetCard from '../../components/SetCard';
 import SetCardModal from '../../components/SetCardModal';
 import ExerciseNoteModal from '../../components/ExerciceNoteModal';
-
-const {width: SCREEN_WIDTH} = Dimensions.get('window');
 
 const ExerciseDetailsScreen = ({route, navigation}) => {
   const initialExercises = [

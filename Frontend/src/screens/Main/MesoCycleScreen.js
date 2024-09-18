@@ -1,16 +1,12 @@
 // MesoCycleScreen.js
 
 import React, {useState, useRef, useEffect} from 'react';
-import {View, StyleSheet, Dimensions, Text} from 'react-native';
+import {View, StyleSheet, Text} from 'react-native';
 import TrelloBoardComponent from '../../components/TrelloBoardComponent';
 import DayCard from '../../components/DayCard';
 
-const {width: SCREEN_WIDTH} = Dimensions.get('window');
-
 const MesoCycleScreen = () => {
-  const flatListRef = useRef(null);
-
-  const [weeks, setWeeks] = useState([
+  const [weeks] = useState([
     {id: 'w1', title: 'Week 1'},
     {id: 'w2', title: 'Week 2'},
     {id: 'w3', title: 'Week 3'},
@@ -52,7 +48,7 @@ const MesoCycleScreen = () => {
         const newDay = {
           id: `d${weekIndex + 1}d1`,
           columnId: week.id,
-          title: `Day 1`,
+          title: `Day ${dayCount + 1}`,
           content: 'Default workout day',
         };
         newDays.push(newDay);
