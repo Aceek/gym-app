@@ -10,14 +10,15 @@ const TrelloBoardComponent = ({
   onViewableItemsChanged,
   viewabilityConfig,
   onAddCard,
-  onRemoveCard,
+  onHeaderPress,
 }) => {
   const renderItem = ({item}) => (
     <Column
       title={item.title}
       data={item.data}
       headerInfo={item.headerInfo}
-      renderCard={cardItem => renderCard(cardItem, item.id)}>
+      renderCard={cardItem => renderCard(cardItem, item.id)}
+      onHeaderPress={() => onHeaderPress(item.id)}>
       <Button title={'Add Card'} onPress={() => onAddCard(item.id)} />
     </Column>
   );

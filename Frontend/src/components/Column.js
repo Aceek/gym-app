@@ -4,12 +4,21 @@ import HeaderInfoCard from './HeaderInfoCard';
 
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
 
-const Column = ({title, data, renderCard, children, headerInfo}) => {
+const Column = ({
+  title,
+  data,
+  renderCard,
+  children,
+  headerInfo,
+  onHeaderPress,
+}) => {
   return (
     <View style={styles.container}>
       <View style={styles.column}>
         <Text style={styles.columnTitle}>{title}</Text>
-        {headerInfo && <HeaderInfoCard headerInfo={headerInfo} />}
+        {headerInfo && (
+          <HeaderInfoCard headerInfo={headerInfo} onPress={onHeaderPress} />
+        )}
         <ScrollView contentContainerStyle={styles.scrollViewContent}>
           {data.map((item, index) => (
             <View key={item.id || index} style={styles.cardContainer}>
@@ -22,7 +31,6 @@ const Column = ({title, data, renderCard, children, headerInfo}) => {
     </View>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     width: SCREEN_WIDTH,

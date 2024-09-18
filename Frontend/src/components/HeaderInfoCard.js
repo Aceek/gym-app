@@ -1,18 +1,19 @@
 import React from 'react';
-import {View, Text, StyleSheet} from 'react-native';
+import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
 
-const HeaderInfoCard = ({headerInfo}) => {
+const HeaderInfoCard = ({headerInfo, onPress}) => {
   return (
-    <View style={styles.container}>
-      {Object.entries(headerInfo).map(([key, value]) => (
-        <Text key={key} style={styles.text}>
-          {key}: {value}
-        </Text>
-      ))}
-    </View>
+    <TouchableOpacity onPress={onPress} activeOpacity={0.8}>
+      <View style={styles.container}>
+        {Object.entries(headerInfo).map(([key, value]) => (
+          <Text key={key} style={styles.text}>
+            {key}: {value}
+          </Text>
+        ))}
+      </View>
+    </TouchableOpacity>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     backgroundColor: '#ffffff',
