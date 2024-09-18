@@ -10,10 +10,21 @@ import ThreeDotsModal from './ThreeDotsModal';
 
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
 
-const SetCard = ({id, reps, weight, rpe, onRemove, onPress}) => {
+const SetCard = ({id, reps, weight, rpe, type, onRemove, onPress}) => {
+  const getCardStyle = () => {
+    switch (type) {
+      case 'superset':
+        return [styles.card, styles.supersetCard];
+      case 'dropset':
+        return [styles.card, styles.dropsetCard];
+      default:
+        return styles.card;
+    }
+  };
+
   return (
     <View style={styles.cardContainer}>
-      <TouchableOpacity style={styles.card} onPress={onPress}>
+      <TouchableOpacity style={getCardStyle()} onPress={onPress}>
         <Text style={styles.cardTitle}>Set Details</Text>
         <Text style={styles.cardContent}>
           Reps: {reps} | Weight: {weight} kg
@@ -34,7 +45,7 @@ const styles = StyleSheet.create({
   },
   card: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: 'white', // Default background color
     borderRadius: SCREEN_WIDTH * 0.02,
     padding: SCREEN_WIDTH * 0.04,
     shadowColor: '#000',
@@ -42,6 +53,12 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: SCREEN_WIDTH * 0.01,
     elevation: 2,
+  },
+  supersetCard: {
+    backgroundColor: '#FFEB3B', // Yellow
+  },
+  dropsetCard: {
+    backgroundColor: '#FFCDD2', // Light Red
   },
   cardTitle: {
     fontSize: SCREEN_WIDTH * 0.045,

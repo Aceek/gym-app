@@ -1,16 +1,12 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
-  View,
-  Text,
-  TextInput,
-  StyleSheet,
-  TouchableOpacity,
   KeyboardAvoidingView,
   ScrollView,
   Platform,
+  StyleSheet,
 } from 'react-native';
 import Modal from 'react-native-modal';
-import {useEffect} from 'react';
+import SetCardModalContent from './SetCardModalContent';
 
 const SetCardModal = ({visible, onClose, onSave, initialValues}) => {
   const [reps, setReps] = useState(initialValues.reps.toString());
@@ -18,12 +14,13 @@ const SetCardModal = ({visible, onClose, onSave, initialValues}) => {
   const [rpe, setRpe] = useState(
     initialValues.rpe ? initialValues.rpe.toString() : '',
   );
+  const [type, setType] = useState(initialValues.type || 'regular');
 
-  // Add useEffect to update state when initialValues change
   useEffect(() => {
     setReps(initialValues.reps.toString());
     setWeight(initialValues.weight.toString());
     setRpe(initialValues.rpe ? initialValues.rpe.toString() : '');
+    setType(initialValues.type || 'regular');
   }, [initialValues]);
 
   const handleSave = () => {
@@ -31,6 +28,7 @@ const SetCardModal = ({visible, onClose, onSave, initialValues}) => {
       reps: parseInt(reps, 10),
       weight: parseFloat(weight),
       rpe: rpe ? parseInt(rpe, 10) : null,
+      type: type,
     });
     onClose();
   };
@@ -49,50 +47,18 @@ const SetCardModal = ({visible, onClose, onSave, initialValues}) => {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollView}>
-          <View style={styles.header}>
-            <Text style={styles.modalTitle}>Modifier Set</Text>
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Répétitions:</Text>
-            <TextInput
-              style={styles.input}
-              onChangeText={setReps}
-              value={reps}
-              keyboardType="numeric"
-            />
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Poids (kg):</Text>
-            <TextInput
-              style={styles.input}
-              onChangeText={setWeight}
-              value={weight}
-              keyboardType="numeric"
-            />
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>RPE:</Text>
-            <TextInput
-              style={styles.input}
-              onChangeText={setRpe}
-              value={rpe}
-              keyboardType="numeric"
-            />
-          </View>
-
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.button} onPress={onClose}>
-              <Text style={styles.buttonText}>Annuler</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.button, styles.saveButton]}
-              onPress={handleSave}>
-              <Text style={styles.buttonText}>Enregistrer</Text>
-            </TouchableOpacity>
-          </View>
+          <SetCardModalContent
+            reps={reps}
+            setReps={setReps}
+            weight={weight}
+            setWeight={setWeight}
+            rpe={rpe}
+            setRpe={setRpe}
+            type={type}
+            setType={setType}
+            onClose={onClose}
+            onSave={handleSave}
+          />
         </ScrollView>
       </KeyboardAvoidingView>
     </Modal>
@@ -113,49 +79,6 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     paddingHorizontal: 20,
-  },
-  header: {
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  modalTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-  },
-  inputContainer: {
-    marginBottom: 15,
-  },
-  label: {
-    fontSize: 16,
-    marginBottom: 5,
-  },
-  input: {
-    height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
-    borderRadius: 5,
-    paddingHorizontal: 10,
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 20,
-    marginBottom: 30,
-  },
-  button: {
-    borderRadius: 20,
-    padding: 10,
-    elevation: 2,
-    backgroundColor: '#2196F3',
-    width: '45%',
-  },
-  saveButton: {
-    backgroundColor: '#4CAF50',
-  },
-  buttonText: {
-    color: 'white',
-    fontWeight: 'bold',
-    textAlign: 'center',
   },
 });
 
