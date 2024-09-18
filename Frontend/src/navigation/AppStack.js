@@ -14,7 +14,7 @@ const SettingsStack = createNativeStackNavigator();
 const MesoCycleStack = createNativeStackNavigator();
 
 const MesoCycleStackNavigator = () => (
-  <MesoCycleStack.Navigator screenOptions={{headerShown: false}}>
+  <MesoCycleStack.Navigator>
     <MesoCycleStack.Screen
       name="MesoCycleScreen"
       component={MesoCycleScreen}
@@ -36,19 +36,19 @@ const MesoCycleStackNavigator = () => (
 );
 
 const HomeStackNavigator = () => (
-  <HomeStack.Navigator screenOptions={{headerShown: false}}>
+  <HomeStack.Navigator>
     <HomeStack.Screen name="HomeStackScreen" component={HomeScreen} />
   </HomeStack.Navigator>
 );
 
 const ProfileStackNavigator = () => (
-  <ProfileStack.Navigator screenOptions={{headerShown: false}}>
+  <ProfileStack.Navigator>
     <ProfileStack.Screen name="ProfileStackScreen" component={ProfileScreen} />
   </ProfileStack.Navigator>
 );
 
 const SettingsStackNavigator = () => (
-  <SettingsStack.Navigator screenOptions={{headerShown: false}}>
+  <SettingsStack.Navigator>
     <SettingsStack.Screen
       name="SettingsStackScreen"
       component={SettingsScreen}
@@ -61,10 +61,26 @@ const Tab = createBottomTabNavigator();
 const AppStack = () => {
   return (
     <Tab.Navigator>
-      <Tab.Screen name="MesoCycle" component={MesoCycleStackNavigator} />
-      <Tab.Screen name="Home" component={HomeStackNavigator} />
-      <Tab.Screen name="Profile" component={ProfileStackNavigator} />
-      <Tab.Screen name="Settings" component={SettingsStackNavigator} />
+      <Tab.Screen
+        name="MesoCycle"
+        component={MesoCycleStackNavigator}
+        options={{headerShown: false}}
+      />
+      <Tab.Screen
+        name="Home"
+        component={HomeStackNavigator}
+        options={{headerShown: false}}
+      />
+      <Tab.Screen
+        name="Profile"
+        component={ProfileStackNavigator}
+        options={{headerShown: false}}
+      />
+      <Tab.Screen
+        name="Settings"
+        component={SettingsStackNavigator}
+        options={{headerShown: false}}
+      />
     </Tab.Navigator>
   );
 };
