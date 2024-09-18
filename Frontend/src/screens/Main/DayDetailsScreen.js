@@ -1,9 +1,10 @@
 // DayDetailsScreen.js
 
 import React, {useState, useRef, useEffect} from 'react';
-import {View, StyleSheet, Text} from 'react-native';
+import {View, StyleSheet} from 'react-native';
 import TrelloBoardComponent from '../../components/TrelloBoardComponent';
 import ExerciseCard from '../../components/ExerciseCard';
+import DotNavigation from '../../components/DotNavigation';
 
 const DayDetailsScreen = ({route}) => {
   const {dayId} = route.params;
@@ -108,9 +109,7 @@ const DayDetailsScreen = ({route}) => {
         onRemoveCard={handleRemoveCard}
       />
       <View style={styles.navigation}>
-        <Text style={styles.navigationText}>
-          {days[currentDayIndex]?.title} ({currentDayIndex + 1} / {days.length})
-        </Text>
+        <DotNavigation currentIndex={currentDayIndex} total={days.length} />
       </View>
     </View>
   );
@@ -125,10 +124,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingVertical: 10,
-  },
-  navigationText: {
-    fontSize: 16,
-    fontWeight: 'bold',
   },
 });
 

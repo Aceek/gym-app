@@ -1,9 +1,8 @@
-// MesoCycleScreen.js
-
 import React, {useState, useRef, useEffect} from 'react';
-import {View, StyleSheet, Text} from 'react-native';
+import {View, StyleSheet} from 'react-native';
 import TrelloBoardComponent from '../../components/TrelloBoardComponent';
 import DayCard from '../../components/DayCard';
+import DotNavigation from '../../components/DotNavigation';
 
 const MesoCycleScreen = () => {
   const [weeks] = useState([
@@ -105,9 +104,7 @@ const MesoCycleScreen = () => {
         onRemoveCard={handleRemoveCard}
       />
       <View style={styles.navigation}>
-        <Text style={styles.navigationText}>
-          {currentWeekIndex + 1} / {weeks.length}
-        </Text>
+        <DotNavigation currentIndex={currentWeekIndex} total={weeks.length} />
       </View>
     </View>
   );
@@ -122,10 +119,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingVertical: 10,
-  },
-  navigationText: {
-    fontSize: 16,
-    fontWeight: 'bold',
   },
 });
 

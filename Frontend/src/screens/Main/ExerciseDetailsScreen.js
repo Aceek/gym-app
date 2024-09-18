@@ -1,9 +1,12 @@
+// ExerciseDetailsScreen.js
+
 import React, {useState, useRef} from 'react';
-import {View, StyleSheet, Text} from 'react-native';
+import {View, StyleSheet} from 'react-native';
 import TrelloBoardComponent from '../../components/TrelloBoardComponent';
 import SetCard from '../../components/SetCard';
 import SetCardModal from '../../components/SetCardModal';
 import ExerciseNoteModal from '../../components/ExerciceNoteModal';
+import DotNavigation from '../../components/DotNavigation';
 
 const ExerciseDetailsScreen = ({route, navigation}) => {
   const initialExercises = [
@@ -37,12 +40,10 @@ const ExerciseDetailsScreen = ({route, navigation}) => {
   const [selectedSet, setSelectedSet] = useState(null);
   const [selectedExerciseId, setSelectedExerciseId] = useState(null);
 
-  // État pour le modal de note
   const [noteModalVisible, setNoteModalVisible] = useState(false);
   const [selectedExerciseNote, setSelectedExerciseNote] = useState('');
   const [selectedExerciseForNote, setSelectedExerciseForNote] = useState(null);
 
-  // Ouvrir le modal de note
   const handleOpenNoteModal = exerciseId => {
     const exercise = exercises.find(ex => ex.id === exerciseId);
     setSelectedExerciseNote(exercise.note || '');
@@ -50,14 +51,12 @@ const ExerciseDetailsScreen = ({route, navigation}) => {
     setNoteModalVisible(true);
   };
 
-  // Fermer le modal de note
   const handleCloseNoteModal = () => {
     setNoteModalVisible(false);
     setSelectedExerciseNote('');
     setSelectedExerciseForNote(null);
   };
 
-  // Enregistrer la note
   const handleSaveNote = note => {
     setExercises(prevExercises =>
       prevExercises.map(exercise =>
@@ -90,7 +89,10 @@ const ExerciseDetailsScreen = ({route, navigation}) => {
     setExercises(prevExercises =>
       prevExercises.map(exercise =>
         exercise.id === exerciseId
-          ? {...exercise, sets: exercise.sets.filter(set => set.id !== setId)}
+          ? {
+              ...exercise,
+              sets: exercise.sets.filter(set => set.id !== setId),
+            }
           : exercise,
       ),
     );
@@ -163,13 +165,14 @@ const ExerciseDetailsScreen = ({route, navigation}) => {
         viewabilityConfig={{itemVisiblePercentThreshold: 50}}
         onAddCard={handleAddSet}
         onRemoveCard={handleRemoveSet}
-        onHeaderPress={handleOpenNoteModal} // Nouveau prop pour gérer le clic sur l'en-tête
+        onHeaderPress={handleOpenNoteModal}
       />
 
       <View style={styles.navigation}>
-        <Text style={styles.navigationText}>
-          Exercice {currentSetIndex + 1} / {exercises.length}
-        </Text>
+        <DotNavigation
+          currentIndex={currentSetIndex}
+          total={exercises.length}
+        />
       </View>
 
       <SetCardModal
@@ -179,7 +182,6 @@ const ExerciseDetailsScreen = ({route, navigation}) => {
         initialValues={selectedSet || {reps: 0, weight: 0, rpe: null}}
       />
 
-      {/* Modal pour la note de l'exercice */}
       <ExerciseNoteModal
         visible={noteModalVisible}
         onClose={handleCloseNoteModal}
@@ -200,10 +202,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingVertical: 10,
-  },
-  navigationText: {
-    fontSize: 16,
-    fontWeight: 'bold',
   },
 });
 
