@@ -7,6 +7,7 @@ import {
   Dimensions,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
+import ThreeDotsModal from './ThreeDotsModal';
 
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
 
@@ -24,9 +25,7 @@ const DayCard = props => {
         <Text style={styles.cardTitle}>{title}</Text>
         <Text style={styles.cardContent}>{content}</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={onRemove} style={styles.removeButton}>
-        <Text style={styles.removeButtonText}>X</Text>
-      </TouchableOpacity>
+      <ThreeDotsModal onRemove={onRemove} deleteText="Delete Day" />
     </View>
   );
 };
@@ -36,6 +35,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: SCREEN_WIDTH * 0.03,
+    position: 'relative',
   },
   card: {
     flex: 1,
@@ -56,17 +56,6 @@ const styles = StyleSheet.create({
   cardContent: {
     fontSize: SCREEN_WIDTH * 0.04,
     color: '#666',
-  },
-  removeButton: {
-    backgroundColor: 'red',
-    borderRadius: SCREEN_WIDTH * 0.02,
-    padding: SCREEN_WIDTH * 0.02,
-    marginLeft: SCREEN_WIDTH * 0.02,
-  },
-  removeButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: SCREEN_WIDTH * 0.04,
   },
 });
 
