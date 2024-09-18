@@ -68,9 +68,11 @@ const ExerciseDetailsScreen = ({route, navigation}) => {
   const boardData = exercises.map(exercise => ({
     id: exercise.id,
     title: exercise.title,
-    weight: exercise.weight,
-    reps: exercise.reps,
-    rpe: exercise.rpe,
+    headerInfo: {
+      'Poids cible': `${exercise.weight} kg`,
+      'Répétitions cibles': exercise.reps,
+      'RPE cible': exercise.rpe,
+    },
     data: exercise.sets, // Les sets sont les cartes dans chaque colonne
   }));
 
@@ -83,7 +85,7 @@ const ExerciseDetailsScreen = ({route, navigation}) => {
   return (
     <View style={styles.container}>
       <TrelloBoardComponent
-        data={boardData} // Affiche les sets des exercices
+        data={boardData} // Affiche les sets des exercices avec les informations d'en-tête
         CardComponent={SetCard} // Utilisation de SetCard comme composant de carte
         onViewableItemsChanged={onViewableItemsChanged}
         viewabilityConfig={{itemVisiblePercentThreshold: 50}}
@@ -92,7 +94,7 @@ const ExerciseDetailsScreen = ({route, navigation}) => {
       />
       <View style={styles.navigation}>
         <Text style={styles.navigationText}>
-          Set {currentSetIndex + 1} / {exercises.length}
+          Exercice {currentSetIndex + 1} / {exercises.length}
         </Text>
       </View>
     </View>

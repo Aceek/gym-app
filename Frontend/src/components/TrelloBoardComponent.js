@@ -46,6 +46,7 @@ const TrelloBoardComponent = ({
     <Column
       title={item.title}
       data={item.data}
+      headerInfo={item.headerInfo}
       renderCard={cardItem => (
         <CardComponent
           {...cardItem}

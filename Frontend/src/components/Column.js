@@ -3,11 +3,27 @@ import {View, Text, StyleSheet, ScrollView, Dimensions} from 'react-native';
 
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
 
-const Column = ({title, data, renderCard, children}) => {
+const Column = ({title, data, renderCard, children, headerInfo}) => {
+  const renderHeader = () => {
+    if (!headerInfo) {
+      return null;
+    }
+    return (
+      <View style={styles.headerContainer}>
+        {Object.entries(headerInfo).map(([key, value]) => (
+          <Text key={key} style={styles.headerText}>
+            {key}: {value}
+          </Text>
+        ))}
+      </View>
+    );
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.column}>
         <Text style={styles.columnTitle}>{title}</Text>
+        {renderHeader()}
         <ScrollView contentContainerStyle={styles.scrollViewContent}>
           {data.map((item, index) => (
             <View key={item.id || index} style={styles.cardContainer}>
@@ -47,15 +63,14 @@ const styles = StyleSheet.create({
   cardContainer: {
     marginBottom: SCREEN_WIDTH * 0.02,
   },
-  exerciseDetails: {
+  headerContainer: {
     backgroundColor: '#e0e0e0',
     padding: SCREEN_WIDTH * 0.02,
     borderRadius: SCREEN_WIDTH * 0.02,
     marginBottom: SCREEN_WIDTH * 0.02,
   },
-  exerciseTitle: {
-    fontSize: SCREEN_WIDTH * 0.04,
-    fontWeight: 'bold',
+  headerText: {
+    fontSize: SCREEN_WIDTH * 0.035,
     marginBottom: SCREEN_WIDTH * 0.01,
   },
 });
