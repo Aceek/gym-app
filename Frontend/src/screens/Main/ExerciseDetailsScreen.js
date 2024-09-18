@@ -1,12 +1,12 @@
 import React, {useState, useEffect, useRef} from 'react';
 import {View, StyleSheet, Dimensions, Text} from 'react-native';
 import TrelloBoardComponent from '../../components/TrelloBoardComponent';
-import SetCard from '../../components/SetCard'; // Composant pour les sets
+import SetCard from '../../components/SetCard';
+import SetCardModal from '../../components/SetCardModal';
 
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
 
 const ExerciseDetailsScreen = ({route, navigation}) => {
-  // Fake data pour tester
   const initialExercises = [
     {
       id: 'e1',
@@ -15,8 +15,8 @@ const ExerciseDetailsScreen = ({route, navigation}) => {
       reps: '5',
       rpe: '8',
       sets: [
-        {id: 's1', reps: '5', weight: '80'},
-        {id: 's2', reps: '5', weight: '82.5'},
+        {id: 's1', reps: 5, weight: 80, rpe: 8},
+        {id: 's2', reps: 5, weight: 82.5, rpe: 8},
       ],
     },
     {
@@ -26,22 +26,24 @@ const ExerciseDetailsScreen = ({route, navigation}) => {
       reps: '5',
       rpe: '8',
       sets: [
-        {id: 's3', reps: '5', weight: '100'},
-        {id: 's4', reps: '4', weight: '110'},
+        {id: 's3', reps: 5, weight: 100, rpe: 8},
+        {id: 's4', reps: 4, weight: 110, rpe: 9},
       ],
     },
   ];
 
   const [exercises, setExercises] = useState(initialExercises);
   const [currentSetIndex, setCurrentSetIndex] = useState(0);
-  const flatListRef = useRef(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedSet, setSelectedSet] = useState(null);
+  const [selectedExerciseId, setSelectedExerciseId] = useState(null);
 
-  // Méthode pour ajouter un nouveau SetCard à un exercice
   const handleAddSet = exerciseId => {
     const newSet = {
       id: `s${Date.now()}`,
-      reps: '',
-      weight: '',
+      reps: 0,
+      weight: 0,
+      rpe: null,
     };
     setExercises(prevExercises =>
       prevExercises.map(exercise =>
@@ -53,7 +55,6 @@ const ExerciseDetailsScreen = ({route, navigation}) => {
     return newSet;
   };
 
-  // Méthode pour supprimer un SetCard
   const handleRemoveSet = (exerciseId, setId) => {
     setExercises(prevExercises =>
       prevExercises.map(exercise =>
@@ -64,7 +65,34 @@ const ExerciseDetailsScreen = ({route, navigation}) => {
     );
   };
 
-  // Préparer les données pour le TrelloBoardComponent
+  const handleOpenModal = (exerciseId, set) => {
+    setSelectedExerciseId(exerciseId);
+    setSelectedSet(set);
+    setModalVisible(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalVisible(false);
+    setSelectedSet(null);
+    setSelectedExerciseId(null);
+  };
+
+  const handleSaveSet = updatedSet => {
+    setExercises(prevExercises =>
+      prevExercises.map(exercise =>
+        exercise.id === selectedExerciseId
+          ? {
+              ...exercise,
+              sets: exercise.sets.map(set =>
+                set.id === selectedSet.id ? {...set, ...updatedSet} : set,
+              ),
+            }
+          : exercise,
+      ),
+    );
+    handleCloseModal();
+  };
+
   const boardData = exercises.map(exercise => ({
     id: exercise.id,
     title: exercise.title,
@@ -73,7 +101,7 @@ const ExerciseDetailsScreen = ({route, navigation}) => {
       'Répétitions cibles': exercise.reps,
       'RPE cible': exercise.rpe,
     },
-    data: exercise.sets, // Les sets sont les cartes dans chaque colonne
+    data: exercise.sets,
   }));
 
   const onViewableItemsChanged = useRef(({viewableItems}) => {
@@ -82,21 +110,34 @@ const ExerciseDetailsScreen = ({route, navigation}) => {
     }
   }).current;
 
+  const renderSetCard = (item, columnId) => (
+    <SetCard
+      {...item}
+      onRemove={() => handleRemoveSet(columnId, item.id)}
+      onPress={() => handleOpenModal(columnId, item)}
+    />
+  );
+
   return (
     <View style={styles.container}>
       <TrelloBoardComponent
-        data={boardData} // Affiche les sets des exercices avec les informations d'en-tête
-        CardComponent={SetCard} // Utilisation de SetCard comme composant de carte
+        data={boardData}
+        CardComponent={renderSetCard}
         onViewableItemsChanged={onViewableItemsChanged}
         viewabilityConfig={{itemVisiblePercentThreshold: 50}}
-        onAddCard={handleAddSet} // Gérer l'ajout de sets
-        onRemoveCard={handleRemoveSet} // Gérer la suppression de sets
+        onAddCard={handleAddSet}
       />
       <View style={styles.navigation}>
         <Text style={styles.navigationText}>
           Exercice {currentSetIndex + 1} / {exercises.length}
         </Text>
       </View>
+      <SetCardModal
+        visible={modalVisible}
+        onClose={handleCloseModal}
+        onSave={handleSaveSet}
+        initialValues={selectedSet || {reps: 0, weight: 0, rpe: null}}
+      />
     </View>
   );
 };

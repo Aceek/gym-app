@@ -10,13 +10,14 @@ import ThreeDotsModal from './ThreeDotsModal';
 
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
 
-const SetCard = ({id, reps, weight, onRemove}) => {
+const SetCard = ({id, reps, weight, rpe, onRemove, onPress}) => {
   return (
     <View style={styles.cardContainer}>
-      <TouchableOpacity style={styles.card}>
+      <TouchableOpacity style={styles.card} onPress={onPress}>
         <Text style={styles.cardTitle}>Set Details</Text>
         <Text style={styles.cardContent}>
           Reps: {reps} | Weight: {weight} kg
+          {rpe !== undefined && rpe !== null ? ` | RPE: ${rpe}` : ''}
         </Text>
       </TouchableOpacity>
       <ThreeDotsModal onRemove={() => onRemove(id)} deleteText="Delete Set" />
