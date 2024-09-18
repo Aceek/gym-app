@@ -1,6 +1,6 @@
 import React from 'react';
 import {View, Text, StyleSheet, ScrollView, Dimensions} from 'react-native';
-import HeaderInfoCard from './HeaderInfoCard';
+import HeaderInfoCard from '../Cards/HeaderInfoCard';
 
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
 

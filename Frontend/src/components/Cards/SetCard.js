@@ -6,7 +6,7 @@ import {
   StyleSheet,
   Dimensions,
 } from 'react-native';
-import ThreeDotsModal from './ThreeDotsModal';
+import ThreeDotsModal from '../Modals/ThreeDotsModal';
 
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
 

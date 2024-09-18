@@ -1,11 +1,11 @@
 import React, {useCallback} from 'react';
 import {View, StyleSheet} from 'react-native';
-import InputField from '../../components/InputField';
-import Button from '../../components/Button';
+import InputField from '../../components/Inputs/InputField';
+import Button from '../../components/UI/Button';
 import {useSignUpForm} from '../../hooks/authHooks/useSignUpForm';
-import PopupRedirect from '../../components/PopupRedirect';
-import ErrorMessage from '../../components/ErrorMessage';
-import Title from '../../components/Title';
+import PopupRedirect from '../../components/UI/PopupRedirect';
+import ErrorMessage from '../../components/UI/ErrorMessage';
+import Title from '../../components/UI/Title';
 
 const SignUpScreen = ({navigation}) => {
   const {

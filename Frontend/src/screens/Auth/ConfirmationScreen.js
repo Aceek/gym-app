@@ -1,9 +1,9 @@
 import React from 'react';
 import {View, Text, StyleSheet} from 'react-native';
-import Button from '../../components/Button';
+import Button from '../../components/UI/Button';
 import {useConfirmation} from '../../hooks/authHooks/useConfirmation';
-import ConfirmationCodeInput from '../../components/ConfirmationCodeInput';
-import Title from '../../components/Title';
+import ConfirmationCodeInput from '../../components/Inputs/ConfirmationCodeInput';
+import Title from '../../components/UI/Title';
 
 const ConfirmationScreen = ({route, navigation}) => {
   const {email} = route.params;

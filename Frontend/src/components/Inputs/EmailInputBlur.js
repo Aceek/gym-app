@@ -1,8 +1,8 @@
 import React from 'react';
 import {useSelector, useDispatch} from 'react-redux';
-import {setEmail, setErrors} from '../store/slices/loginSlice';
+import {setEmail, setErrors} from '../../store/slices/loginSlice';
 import {useCallback} from 'react';
-import {validateEmail} from '../validators/fieldsValidators';
+import {validateEmail} from '../../validators/fieldsValidators';
 
 import InputField from './InputField';
 

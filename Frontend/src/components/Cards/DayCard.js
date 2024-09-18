@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -7,48 +7,25 @@ import {
   Dimensions,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
-import ThreeDotsModal from './ThreeDotsModal';
+import ThreeDotsModal from '../Modals/ThreeDotsModal';
 
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
 
-const ExerciseCard = props => {
-  const {id, title, initialContent, onRemove} = props;
-  const content = initialContent;
-  const [weight, setWeight] = useState('');
-  const [reps, setReps] = useState('');
-  const [rpe, setRpe] = useState('');
+const DayCard = props => {
+  const {id, title, content, columnId, onRemove} = props;
   const navigation = useNavigation();
 
-  useEffect(() => {
-    // Parse initial content to set weight, reps, and rpe
-    const contentParts = initialContent.split(', ');
-    contentParts.forEach(part => {
-      const [key, value] = part.split(': ');
-      if (key === 'Weight') {
-        setWeight(value.replace('kg', ''));
-      }
-      if (key === 'Reps') {
-        setReps(value);
-      }
-      if (key === 'RPE') {
-        setRpe(value);
-      }
-    });
-  }, [initialContent]);
-
   const handlePress = () => {
-    navigation.navigate('ExerciseDetails', {
-      exercise: {id, title, content, weight, reps, rpe},
-    });
+    navigation.navigate('DayDetails', {weekId: columnId, dayId: id});
   };
 
   return (
     <View style={styles.cardContainer}>
-      <TouchableOpacity style={styles.card} onPress={handlePress}>
+      <TouchableOpacity onPress={handlePress} style={styles.card}>
         <Text style={styles.cardTitle}>{title}</Text>
         <Text style={styles.cardContent}>{content}</Text>
       </TouchableOpacity>
-      <ThreeDotsModal onRemove={onRemove} deleteText="Delete Card" />
+      <ThreeDotsModal onRemove={onRemove} deleteText="Delete Day" />
     </View>
   );
 };
@@ -82,4 +59,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ExerciseCard;
+export default DayCard;

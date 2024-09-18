@@ -1,11 +1,11 @@
 import React, {useCallback} from 'react';
 import {View, Text, StyleSheet} from 'react-native';
-import Button from '../../components/Button';
-import ErrorMessage from '../../components/ErrorMessage';
+import Button from '../../components/UI/Button';
+import ErrorMessage from '../../components/UI/ErrorMessage';
 import {forgotPasswordRequest} from '../../services/authService';
 import {validateEmail} from '../../validators/fieldsValidators';
 import useCountdown from '../../hooks/useCountdown';
-import LinkButton from '../../components/LinkButton';
+import LinkButton from '../../components/UI/LinkButton';
 import {useDispatch, useSelector} from 'react-redux';
 import {
   setIsLoading,
@@ -14,8 +14,8 @@ import {
   setServerError,
 } from '../../store/slices/forgotPasswordSlice';
 import store from '../../store/store';
-import EmailInputField from '../../components/EmailInputField';
-import Title from '../../components/Title';
+import EmailInputField from '../../components/Inputs/EmailInputField';
+import Title from '../../components/UI/Title';
 
 const ForgotPasswordScreen = ({navigation}) => {
   console.log('ForgotPasswordScreen rendered');

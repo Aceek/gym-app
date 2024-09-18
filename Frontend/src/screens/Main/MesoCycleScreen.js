@@ -1,8 +1,8 @@
 import React, {useState, useRef, useEffect} from 'react';
 import {View, StyleSheet} from 'react-native';
-import TrelloBoardComponent from '../../components/TrelloBoardComponent';
-import DayCard from '../../components/DayCard';
-import DotNavigation from '../../components/DotNavigation';
+import TrelloBoardComponent from '../../components/Navigation/TrelloBoardComponent';
+import DayCard from '../../components/Cards/DayCard';
+import DotNavigation from '../../components/UI/DotNavigation';
 
 const MesoCycleScreen = () => {
   const [weeks] = useState([

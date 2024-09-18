@@ -2,11 +2,11 @@
 
 import React, {useState, useRef} from 'react';
 import {View, StyleSheet} from 'react-native';
-import TrelloBoardComponent from '../../components/TrelloBoardComponent';
-import SetCard from '../../components/SetCard';
-import SetCardModal from '../../components/SetCardModal';
-import ExerciseNoteModal from '../../components/ExerciceNoteModal';
-import DotNavigation from '../../components/DotNavigation';
+import TrelloBoardComponent from '../../components/Navigation/TrelloBoardComponent';
+import SetCard from '../../components/Cards/SetCard';
+import SetCardModal from '../../components/Modals/SetCardModal';
+import ExerciseNoteModal from '../../components/Modals/ExerciceNoteModal';
+import DotNavigation from '../../components/UI/DotNavigation';
 
 const ExerciseDetailsScreen = ({route, navigation}) => {
   const initialExercises = [

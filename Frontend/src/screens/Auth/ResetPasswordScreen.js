@@ -1,12 +1,12 @@
 import React, {useCallback, useState} from 'react';
 import {View, Text, StyleSheet} from 'react-native';
-import InputField from '../../components/InputField';
-import Button from '../../components/Button';
-import ConfirmationCodeInput from '../../components/ConfirmationCodeInput';
-import ErrorMessage from '../../components/ErrorMessage';
+import InputField from '../../components/Inputs/InputField';
+import Button from '../../components/UI/Button';
+import ConfirmationCodeInput from '../../components/Inputs/ConfirmationCodeInput';
+import ErrorMessage from '../../components/UI/ErrorMessage';
 import {resetPasswordRequest} from '../../services/authService';
 import {validateResetPasswordData} from '../../validators/resetPasswordValidators';
-import Title from '../../components/Title';
+import Title from '../../components/UI/Title';
 
 const ResetPasswordScreen = ({route, navigation}) => {
   const {email} = route.params;

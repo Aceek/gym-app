@@ -2,9 +2,9 @@
 
 import React, {useState, useRef, useEffect} from 'react';
 import {View, StyleSheet} from 'react-native';
-import TrelloBoardComponent from '../../components/TrelloBoardComponent';
-import ExerciseCard from '../../components/ExerciseCard';
-import DotNavigation from '../../components/DotNavigation';
+import TrelloBoardComponent from '../../components/Navigation/TrelloBoardComponent';
+import ExerciseCard from '../../components/Cards/ExerciseCard';
+import DotNavigation from '../../components/UI/DotNavigation';
 
 const DayDetailsScreen = ({route}) => {
   const {dayId} = route.params;

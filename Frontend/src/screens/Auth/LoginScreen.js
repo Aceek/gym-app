@@ -1,13 +1,13 @@
 import React, {useCallback} from 'react';
 import {View, StyleSheet} from 'react-native';
-import Button from '../../components/Button';
-import PopupRedirect from '../../components/PopupRedirect';
-import LinkButton from '../../components/LinkButton';
+import Button from '../../components/UI/Button';
+import PopupRedirect from '../../components/UI/PopupRedirect';
+import LinkButton from '../../components/UI/LinkButton';
 import {useLoginForm} from '../../hooks/authHooks/useLoginForm';
-import ErrorMessage from '../../components/ErrorMessage';
-import Title from '../../components/Title';
-import EmailInputBlur from '../../components/EmailInputBlur';
-import PasswordInputBlur from '../../components/PasswordInputBlur';
+import ErrorMessage from '../../components/UI/ErrorMessage';
+import Title from '../../components/UI/Title';
+import EmailInputBlur from '../../components/Inputs/EmailInputBlur';
+import PasswordInputBlur from '../../components/Inputs/PasswordInputBlur';
 
 const LoginScreen = ({navigation}) => {
   console.log('LoginScreen rendered');

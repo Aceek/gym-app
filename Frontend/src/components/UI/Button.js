@@ -12,14 +12,14 @@ const buttonConfig = {
     backgroundColor: '#FFFFFF',
     borderColor: '#4285F4',
     textColor: '#4285F4',
-    icon: require('../assets/google-logo.png'),
+    icon: require('../../assets/google-logo.png'),
     activityIndicatorColor: '#4285F4',
   },
   facebook: {
     backgroundColor: '#FFFFFF',
     borderColor: '#1877F2',
     textColor: '#1877F2',
-    icon: require('../assets/facebook-logo.png'),
+    icon: require('../../assets/facebook-logo.png'),
     activityIndicatorColor: '#1877F2',
   },
   default: {
