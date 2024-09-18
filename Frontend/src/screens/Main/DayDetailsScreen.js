@@ -1,3 +1,5 @@
+// DayDetailsScreen.js
+
 import React, {useState, useRef, useEffect} from 'react';
 import {View, StyleSheet, Dimensions, Text} from 'react-native';
 import TrelloBoardComponent from '../../components/TrelloBoardComponent';
@@ -61,7 +63,7 @@ const DayDetailsScreen = ({route}) => {
 
   const handleAddCard = columnId => {
     const newExercise = {
-      id: `e${exercises.length + 1}`,
+      id: `e${Date.now()}`,
       columnId: columnId,
       title: 'New Exercise',
       initialContent: 'Weight: 0kg, Reps: 0, RPE: 0',
@@ -70,7 +72,6 @@ const DayDetailsScreen = ({route}) => {
       rpe: '0',
     };
     setExercises(prevExercises => [...prevExercises, newExercise]);
-    return newExercise;
   };
 
   const handleRemoveCard = (columnId, cardId) => {
@@ -91,11 +92,19 @@ const DayDetailsScreen = ({route}) => {
     }
   }).current;
 
+  const renderExerciseCard = (item, columnId) => (
+    <ExerciseCard
+      {...item}
+      onRemove={() => handleRemoveCard(columnId, item.id)}
+      // Add any other necessary props or handlers
+    />
+  );
+
   return (
     <View style={styles.container}>
       <TrelloBoardComponent
         data={boardData}
-        CardComponent={ExerciseCard}
+        renderCard={renderExerciseCard}
         onViewableItemsChanged={onViewableItemsChanged}
         viewabilityConfig={{itemVisiblePercentThreshold: 50}}
         onAddCard={handleAddCard}

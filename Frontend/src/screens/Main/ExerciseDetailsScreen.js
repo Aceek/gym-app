@@ -122,11 +122,13 @@ const ExerciseDetailsScreen = ({route, navigation}) => {
     <View style={styles.container}>
       <TrelloBoardComponent
         data={boardData}
-        CardComponent={renderSetCard}
+        renderCard={renderSetCard}
         onViewableItemsChanged={onViewableItemsChanged}
         viewabilityConfig={{itemVisiblePercentThreshold: 50}}
         onAddCard={handleAddSet}
+        onRemoveCard={handleRemoveSet}
       />
+
       <View style={styles.navigation}>
         <Text style={styles.navigationText}>
           Exercice {currentSetIndex + 1} / {exercises.length}

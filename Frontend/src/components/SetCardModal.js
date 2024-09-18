@@ -10,6 +10,7 @@ import {
   Platform,
 } from 'react-native';
 import Modal from 'react-native-modal';
+import {useEffect} from 'react';
 
 const SetCardModal = ({visible, onClose, onSave, initialValues}) => {
   const [reps, setReps] = useState(initialValues.reps.toString());
@@ -17,6 +18,13 @@ const SetCardModal = ({visible, onClose, onSave, initialValues}) => {
   const [rpe, setRpe] = useState(
     initialValues.rpe ? initialValues.rpe.toString() : '',
   );
+
+  // Add useEffect to update state when initialValues change
+  useEffect(() => {
+    setReps(initialValues.reps.toString());
+    setWeight(initialValues.weight.toString());
+    setRpe(initialValues.rpe ? initialValues.rpe.toString() : '');
+  }, [initialValues]);
 
   const handleSave = () => {
     onSave({

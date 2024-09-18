@@ -1,3 +1,5 @@
+// MesoCycleScreen.js
+
 import React, {useState, useRef, useEffect} from 'react';
 import {View, StyleSheet, Dimensions, Text} from 'react-native';
 import TrelloBoardComponent from '../../components/TrelloBoardComponent';
@@ -9,28 +11,16 @@ const MesoCycleScreen = () => {
   const flatListRef = useRef(null);
 
   const [weeks, setWeeks] = useState([
-    {
-      id: 'w1',
-      title: 'Week 1',
-    },
-    {
-      id: 'w2',
-      title: 'Week 2',
-    },
-    {
-      id: 'w3',
-      title: 'Week 3',
-    },
-    {
-      id: 'w4',
-      title: 'Week 4',
-    },
+    {id: 'w1', title: 'Week 1'},
+    {id: 'w2', title: 'Week 2'},
+    {id: 'w3', title: 'Week 3'},
+    {id: 'w4', title: 'Week 4'},
   ]);
 
   const [days, setDays] = useState([
     {
       id: 'd1',
-      columnId: 'w2',
+      columnId: 'w1',
       title: 'Day 1',
       content: 'Chest, Triceps - 5 exercises',
     },
@@ -46,6 +36,7 @@ const MesoCycleScreen = () => {
       title: 'Day 3',
       content: 'Legs, Shoulders - 7 exercises',
     },
+    // ... Add more days for each week
   ]);
 
   const [currentWeekIndex, setCurrentWeekIndex] = useState(0);
@@ -75,13 +66,12 @@ const MesoCycleScreen = () => {
 
   const handleAddCard = columnId => {
     const newCard = {
-      id: `d${days.length + 1}`,
+      id: `d${Date.now()}`,
       columnId: columnId,
       title: `Day ${days.filter(day => day.columnId === columnId).length + 1}`,
       content: 'New day description',
     };
     setDays(prevDays => [...prevDays, newCard]);
-    return newCard;
   };
 
   const handleRemoveCard = (columnId, cardId) => {
@@ -100,11 +90,19 @@ const MesoCycleScreen = () => {
     }
   }).current;
 
+  const renderDayCard = (item, columnId) => (
+    <DayCard
+      {...item}
+      onRemove={() => handleRemoveCard(columnId, item.id)}
+      // Add any other necessary props or handlers
+    />
+  );
+
   return (
     <View style={styles.container}>
       <TrelloBoardComponent
         data={boardData}
-        CardComponent={DayCard}
+        renderCard={renderDayCard}
         onViewableItemsChanged={onViewableItemsChanged}
         viewabilityConfig={{itemVisiblePercentThreshold: 50}}
         onAddCard={handleAddCard}
