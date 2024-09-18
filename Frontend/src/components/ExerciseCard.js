@@ -6,16 +6,18 @@ import {
   StyleSheet,
   Dimensions,
 } from 'react-native';
+import {useNavigation} from '@react-navigation/native';
 import ThreeDotsModal from './ThreeDotsModal';
 
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
 
 const ExerciseCard = props => {
-  const {id, title, initialContent, columnId, handlePress, onRemove} = props;
+  const {id, title, initialContent, columnId, onRemove} = props;
   const [content, setContent] = useState(initialContent);
   const [weight, setWeight] = useState('');
   const [reps, setReps] = useState('');
   const [rpe, setRpe] = useState('');
+  const navigation = useNavigation();
 
   useEffect(() => {
     // Parse initial content to set weight, reps, and rpe
@@ -28,11 +30,15 @@ const ExerciseCard = props => {
     });
   }, [initialContent]);
 
+  const handlePress = () => {
+    navigation.navigate('ExerciseDetails', {
+      exercise: {id, title, content, weight, reps, rpe},
+    });
+  };
+
   return (
     <View style={styles.cardContainer}>
-      <TouchableOpacity
-        style={styles.card}
-        onPress={() => handlePress({id, title, content, weight, reps, rpe})}>
+      <TouchableOpacity style={styles.card} onPress={handlePress}>
         <Text style={styles.cardTitle}>{title}</Text>
         <Text style={styles.cardContent}>{content}</Text>
       </TouchableOpacity>

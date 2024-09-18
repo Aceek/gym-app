@@ -6,6 +6,7 @@ import ProfileScreen from '../screens/Main/ProfileScreen';
 import SettingsScreen from '../screens/Main/SettingsScreen';
 import MesoCycleScreen from '../screens/Main/MesoCycleScreen';
 import DayDetailsScreen from '../screens/Main/DayDetailsScreen';
+import ExerciseDetailsScreen from '../screens/Main/ExerciseDetailsScreen';
 
 const HomeStack = createNativeStackNavigator();
 const ProfileStack = createNativeStackNavigator();
@@ -23,6 +24,13 @@ const MesoCycleStackNavigator = () => (
       name="DayDetails"
       component={DayDetailsScreen}
       options={({route}) => ({title: `Day Details - ${route.params.dayId}`})}
+    />
+    <MesoCycleStack.Screen
+      name="ExerciseDetails"
+      component={ExerciseDetailsScreen}
+      options={({route}) => ({
+        title: `Exercise Details - ${route.params.exercise.name}`,
+      })}
     />
   </MesoCycleStack.Navigator>
 );

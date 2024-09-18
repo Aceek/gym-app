@@ -1,12 +1,5 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  Dimensions,
-  TouchableOpacity,
-} from 'react-native';
+import {View, Text, StyleSheet, ScrollView, Dimensions} from 'react-native';
 
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
 
@@ -53,6 +46,17 @@ const styles = StyleSheet.create({
   },
   cardContainer: {
     marginBottom: SCREEN_WIDTH * 0.02,
+  },
+  exerciseDetails: {
+    backgroundColor: '#e0e0e0',
+    padding: SCREEN_WIDTH * 0.02,
+    borderRadius: SCREEN_WIDTH * 0.02,
+    marginBottom: SCREEN_WIDTH * 0.02,
+  },
+  exerciseTitle: {
+    fontSize: SCREEN_WIDTH * 0.04,
+    fontWeight: 'bold',
+    marginBottom: SCREEN_WIDTH * 0.01,
   },
 });
 

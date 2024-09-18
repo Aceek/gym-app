@@ -25,18 +25,27 @@ const DayDetailsScreen = ({route}) => {
       columnId: 'd1',
       title: 'Bench Press',
       initialContent: 'Weight: 80kg, Reps: 5, RPE: 8',
+      weight: '80',
+      reps: '5',
+      rpe: '8',
     },
     {
       id: 'e2',
       columnId: 'd1',
       title: 'Incline DB Press',
       initialContent: 'Weight: 30kg, Reps: 8, RPE: 7',
+      weight: '30',
+      reps: '8',
+      rpe: '7',
     },
     {
       id: 'e3',
       columnId: 'd2',
       title: 'Squat',
       initialContent: 'Weight: 100kg, Reps: 5, RPE: 8',
+      weight: '100',
+      reps: '5',
+      rpe: '8',
     },
     // ... Add more exercises for each day
   ]);
@@ -56,6 +65,9 @@ const DayDetailsScreen = ({route}) => {
       columnId: columnId,
       title: 'New Exercise',
       initialContent: 'Weight: 0kg, Reps: 0, RPE: 0',
+      weight: '0',
+      reps: '0',
+      rpe: '0',
     };
     setExercises(prevExercises => [...prevExercises, newExercise]);
     return newExercise;
