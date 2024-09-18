@@ -46,7 +46,6 @@ const MesoCycleScreen = () => {
       title: 'Day 3',
       content: 'Legs, Shoulders - 7 exercises',
     },
-    // Add more days for week 1 if needed
   ]);
 
   const [currentWeekIndex, setCurrentWeekIndex] = useState(0);
@@ -74,17 +73,19 @@ const MesoCycleScreen = () => {
     }
   }, [weeks, days]);
 
-  // Nouvelle fonction pour ajouter une carte
   const handleAddCard = columnId => {
-    setDays(prevDays => [
-      ...prevDays,
-      {
-        id: `d${prevDays.length + 1}`,
-        columnId: columnId,
-        title: `Day ${prevDays.length + 1}`,
-        content: 'New day description',
-      },
-    ]);
+    const newCard = {
+      id: `d${days.length + 1}`,
+      columnId: columnId,
+      title: `Day ${days.filter(day => day.columnId === columnId).length + 1}`,
+      content: 'New day description',
+    };
+    setDays(prevDays => [...prevDays, newCard]);
+    return newCard;
+  };
+
+  const handleRemoveCard = (columnId, cardId) => {
+    setDays(prevDays => prevDays.filter(day => day.id !== cardId));
   };
 
   const boardData = weeks.map(week => ({
@@ -107,6 +108,7 @@ const MesoCycleScreen = () => {
         onViewableItemsChanged={onViewableItemsChanged}
         viewabilityConfig={{itemVisiblePercentThreshold: 50}}
         onAddCard={handleAddCard}
+        onRemoveCard={handleRemoveCard}
       />
       <View style={styles.navigation}>
         <Text style={styles.navigationText}>

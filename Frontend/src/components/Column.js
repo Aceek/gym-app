@@ -1,5 +1,12 @@
 import React from 'react';
-import {View, Text, StyleSheet, ScrollView, Dimensions} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Dimensions,
+  TouchableOpacity,
+} from 'react-native';
 
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
 
@@ -10,7 +17,9 @@ const Column = ({title, data, renderCard, children}) => {
         <Text style={styles.columnTitle}>{title}</Text>
         <ScrollView contentContainerStyle={styles.scrollViewContent}>
           {data.map((item, index) => (
-            <View key={item.id || index}>{renderCard(item)}</View>
+            <View key={item.id || index} style={styles.cardContainer}>
+              {renderCard(item)}
+            </View>
           ))}
         </ScrollView>
         {children}
@@ -23,7 +32,7 @@ const styles = StyleSheet.create({
   container: {
     width: SCREEN_WIDTH,
     alignItems: 'center',
-    justifyContent: 'flex-start', // Change this to align content to the top
+    justifyContent: 'flex-start',
     paddingVertical: SCREEN_WIDTH * 0.02,
   },
   column: {
@@ -41,6 +50,9 @@ const styles = StyleSheet.create({
   },
   scrollViewContent: {
     flexGrow: 1,
+  },
+  cardContainer: {
+    marginBottom: SCREEN_WIDTH * 0.02,
   },
 });
 

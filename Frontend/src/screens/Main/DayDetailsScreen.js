@@ -50,31 +50,21 @@ const DayDetailsScreen = ({route}) => {
     }
   }, [dayId, days]);
 
-  // Nouvelle fonction pour ajouter une carte
   const handleAddCard = columnId => {
-    if (dayId) {
-      // Ajouter un exercice
-      setExercises(prevExercises => [
-        ...prevExercises,
-        {
-          id: `e${prevExercises.length + 1}`,
-          columnId: columnId,
-          title: 'New Exercise',
-          initialContent: 'Weight: 0kg, Reps: 0, RPE: 0',
-        },
-      ]);
-    } else {
-      // Ajouter un jour
-      setDays(prevDays => [
-        ...prevDays,
-        {
-          id: `d${prevDays.length + 1}`,
-          columnId: columnId,
-          title: `Day ${prevDays.length + 1}`,
-          content: 'New day description',
-        },
-      ]);
-    }
+    const newExercise = {
+      id: `e${exercises.length + 1}`,
+      columnId: columnId,
+      title: 'New Exercise',
+      initialContent: 'Weight: 0kg, Reps: 0, RPE: 0',
+    };
+    setExercises(prevExercises => [...prevExercises, newExercise]);
+    return newExercise;
+  };
+
+  const handleRemoveCard = (columnId, cardId) => {
+    setExercises(prevExercises =>
+      prevExercises.filter(exercise => exercise.id !== cardId),
+    );
   };
 
   const boardData = days.map(day => ({
@@ -97,6 +87,7 @@ const DayDetailsScreen = ({route}) => {
         onViewableItemsChanged={onViewableItemsChanged}
         viewabilityConfig={{itemVisiblePercentThreshold: 50}}
         onAddCard={handleAddCard}
+        onRemoveCard={handleRemoveCard}
       />
       <View style={styles.navigation}>
         <Text style={styles.navigationText}>
