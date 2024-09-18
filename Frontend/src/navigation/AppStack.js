@@ -1,3 +1,5 @@
+// AppStack.js
+
 import React from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
@@ -7,6 +9,7 @@ import SettingsScreen from '../screens/Main/SettingsScreen';
 import MesoCycleScreen from '../screens/Main/MesoCycleScreen';
 import DayDetailsScreen from '../screens/Main/DayDetailsScreen';
 import ExerciseDetailsScreen from '../screens/Main/ExerciseDetailsScreen';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const HomeStack = createNativeStackNavigator();
 const ProfileStack = createNativeStackNavigator();
@@ -58,28 +61,62 @@ const SettingsStackNavigator = () => (
 
 const Tab = createBottomTabNavigator();
 
+// Define a mapping from route names to icon names
+const iconNames = {
+  MesoCycle: 'fitness-center',
+  Home: 'home',
+  Profile: 'person',
+  Settings: 'settings',
+};
+
+// Move the tabBarIcon function outside of the AppStack component
+const getTabBarIcon = routeName => {
+  const iconName = iconNames[routeName];
+
+  return ({color, size}) => <Icon name={iconName} color={color} size={size} />;
+};
+
 const AppStack = () => {
   return (
-    <Tab.Navigator>
+    <Tab.Navigator
+      screenOptions={{
+        headerShown: false,
+        tabBarActiveTintColor: '#007AFF',
+        tabBarInactiveTintColor: 'gray',
+        tabBarStyle: {
+          backgroundColor: '#fff',
+        },
+        tabBarLabelStyle: {
+          fontSize: 12,
+        },
+      }}>
       <Tab.Screen
         name="MesoCycle"
         component={MesoCycleStackNavigator}
-        options={{headerShown: false}}
+        options={{
+          tabBarIcon: getTabBarIcon('MesoCycle'),
+        }}
       />
       <Tab.Screen
         name="Home"
         component={HomeStackNavigator}
-        options={{headerShown: false}}
+        options={{
+          tabBarIcon: getTabBarIcon('Home'),
+        }}
       />
       <Tab.Screen
         name="Profile"
         component={ProfileStackNavigator}
-        options={{headerShown: false}}
+        options={{
+          tabBarIcon: getTabBarIcon('Profile'),
+        }}
       />
       <Tab.Screen
         name="Settings"
         component={SettingsStackNavigator}
-        options={{headerShown: false}}
+        options={{
+          tabBarIcon: getTabBarIcon('Settings'),
+        }}
       />
     </Tab.Navigator>
   );

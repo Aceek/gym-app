@@ -1,6 +1,15 @@
+// TrelloBoardComponent.js
+
 import React from 'react';
-import {FlatList, StyleSheet, View, Dimensions, Button} from 'react-native';
+import {
+  FlatList,
+  StyleSheet,
+  View,
+  Dimensions,
+  TouchableOpacity,
+} from 'react-native';
 import Column from './Column';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
 
@@ -19,7 +28,11 @@ const TrelloBoardComponent = ({
       headerInfo={item.headerInfo}
       renderCard={cardItem => renderCard(cardItem, item.id)}
       onHeaderPress={() => onHeaderPress(item.id)}>
-      <Button title={'Add Card'} onPress={() => onAddCard(item.id)} />
+      <TouchableOpacity
+        onPress={() => onAddCard(item.id)}
+        style={styles.addIconContainer}>
+        <Icon name="add-circle" size={40} color="#007AFF" />
+      </TouchableOpacity>
     </Column>
   );
 
@@ -48,6 +61,10 @@ const styles = StyleSheet.create({
   flatListContent: {
     flexGrow: 1,
     justifyContent: 'flex-start',
+  },
+  addIconContainer: {
+    alignItems: 'center',
+    marginVertical: 10,
   },
 });
 
