@@ -1,8 +1,9 @@
-import React, {useState, useRef, useEffect} from 'react';
+import React, {useState, useRef, useEffect, useCallback} from 'react';
 import {View, StyleSheet} from 'react-native';
 import TrelloBoardComponent from '../../components/Navigation/TrelloBoardComponent';
 import DayCard from '../../components/Cards/DayCard';
 import DotNavigation from '../../components/UI/DotNavigation';
+import DayCardModal from '../../components/Modals/DayCardModal';
 
 const MesoCycleScreen = () => {
   const [weeks] = useState([
@@ -35,6 +36,8 @@ const MesoCycleScreen = () => {
   ]);
 
   const [currentWeekIndex, setCurrentWeekIndex] = useState(0);
+  const [dayModalVisible, setDayModalVisible] = useState(false);
+  const [selectedDay, setSelectedDay] = useState(null);
 
   useEffect(() => {
     const newDays = [];
@@ -73,6 +76,31 @@ const MesoCycleScreen = () => {
     setDays(prevDays => prevDays.filter(day => day.id !== cardId));
   };
 
+  const handleOpenDayModal = useCallback(
+    dayId => {
+      const day = days.find(d => d.id === dayId);
+      if (day) {
+        setSelectedDay(day);
+        setDayModalVisible(true);
+      }
+    },
+    [days],
+  );
+
+  const handleCloseDayModal = () => {
+    setDayModalVisible(false);
+    setSelectedDay(null);
+  };
+
+  const handleSaveDay = updatedDay => {
+    setDays(prevDays =>
+      prevDays.map(day =>
+        day.id === selectedDay.id ? {...day, ...updatedDay} : day,
+      ),
+    );
+    handleCloseDayModal();
+  };
+
   const boardData = weeks.map(week => ({
     id: week.id,
     title: week.title,
@@ -89,7 +117,7 @@ const MesoCycleScreen = () => {
     <DayCard
       {...item}
       onRemove={() => handleRemoveCard(columnId, item.id)}
-      // Add any other necessary props or handlers
+      onModify={() => handleOpenDayModal(item.id)}
     />
   );
 
@@ -106,6 +134,19 @@ const MesoCycleScreen = () => {
       <View style={styles.navigation}>
         <DotNavigation currentIndex={currentWeekIndex} total={weeks.length} />
       </View>
+      <DayCardModal
+        visible={dayModalVisible}
+        onClose={handleCloseDayModal}
+        onSave={handleSaveDay}
+        initialValues={
+          selectedDay
+            ? {
+                title: selectedDay.title,
+                content: selectedDay.content,
+              }
+            : {title: '', content: ''}
+        }
+      />
     </View>
   );
 };

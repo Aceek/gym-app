@@ -12,7 +12,7 @@ import ThreeDotsModal from '../Modals/ThreeDotsModal';
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
 
 const DayCard = props => {
-  const {id, title, content, columnId, onRemove} = props;
+  const {id, title, content, columnId, onRemove, onModify} = props;
   const navigation = useNavigation();
 
   const handlePress = () => {
@@ -25,7 +25,11 @@ const DayCard = props => {
         <Text style={styles.cardTitle}>{title}</Text>
         <Text style={styles.cardContent}>{content}</Text>
       </TouchableOpacity>
-      <ThreeDotsModal onRemove={onRemove} deleteText="Delete Day" />
+      <ThreeDotsModal
+        onRemove={() => onRemove(id)}
+        onModify={() => onModify(id)}
+        deleteText="Delete Day"
+      />
     </View>
   );
 };
