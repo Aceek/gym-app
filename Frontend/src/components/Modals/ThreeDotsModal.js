@@ -1,3 +1,5 @@
+// ThreeDotsModal.js
+
 import React, {useState} from 'react';
 import {
   View,
@@ -7,6 +9,7 @@ import {
   Dimensions,
   Modal,
 } from 'react-native';
+import PropTypes from 'prop-types';
 
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
 
@@ -16,7 +19,7 @@ const ThreeDotsMenu = ({onPress}) => (
   </TouchableOpacity>
 );
 
-const ThreeDotsModal = ({onRemove, deleteText}) => {
+const ThreeDotsModal = ({onRemove, onModify, deleteText}) => {
   const [modalVisible, setModalVisible] = useState(false);
 
   const handleOpenModal = () => {
@@ -28,7 +31,16 @@ const ThreeDotsModal = ({onRemove, deleteText}) => {
   };
 
   const handleDelete = () => {
-    onRemove();
+    if (onRemove) {
+      onRemove();
+    }
+    handleCloseModal();
+  };
+
+  const handleModify = () => {
+    if (onModify) {
+      onModify();
+    }
     handleCloseModal();
   };
 
@@ -43,21 +55,50 @@ const ThreeDotsModal = ({onRemove, deleteText}) => {
         onRequestClose={handleCloseModal}>
         <TouchableOpacity
           style={styles.modalOverlay}
+          activeOpacity={1}
           onPress={handleCloseModal}>
-          <View style={styles.modalContent} activeOpacity={1}>
-            <TouchableOpacity style={styles.modalOption} onPress={handleDelete}>
-              <Text style={styles.modalOptionText}>{deleteText}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.modalOption, styles.cancelOption]}
-              onPress={handleCloseModal}>
-              <Text style={styles.cancelOptionText}>Cancel</Text>
-            </TouchableOpacity>
+          <View style={styles.modalContent} pointerEvents="box-none">
+            <View style={styles.modalOptionsContainer}>
+              {/* Option Modifier (si onModify est fourni) */}
+              {onModify && (
+                <TouchableOpacity
+                  style={styles.modalOption}
+                  onPress={handleModify}>
+                  <Text style={[styles.modalOptionText, styles.modifyText]}>
+                    Modifier
+                  </Text>
+                </TouchableOpacity>
+              )}
+
+              {/* Option Supprimer (si onRemove est fourni) */}
+              {onRemove && (
+                <TouchableOpacity
+                  style={styles.modalOption}
+                  onPress={handleDelete}>
+                  <Text style={styles.modalOptionText}>
+                    {deleteText || 'Supprimer'}
+                  </Text>
+                </TouchableOpacity>
+              )}
+
+              {/* Option Annuler (toujours présente) */}
+              <TouchableOpacity
+                style={[styles.modalOption, styles.cancelOption]}
+                onPress={handleCloseModal}>
+                <Text style={styles.cancelOptionText}>Annuler</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </TouchableOpacity>
       </Modal>
     </>
   );
+};
+
+ThreeDotsModal.propTypes = {
+  onRemove: PropTypes.func,
+  onModify: PropTypes.func,
+  deleteText: PropTypes.string,
 };
 
 const styles = StyleSheet.create({
@@ -83,6 +124,9 @@ const styles = StyleSheet.create({
     borderTopRightRadius: SCREEN_WIDTH * 0.05,
     padding: SCREEN_WIDTH * 0.05,
   },
+  modalOptionsContainer: {
+    // Optionnel : Ajoutez un conteneur pour mieux gérer les options
+  },
   modalOption: {
     paddingVertical: SCREEN_WIDTH * 0.04,
     borderBottomWidth: 1,
@@ -92,6 +136,9 @@ const styles = StyleSheet.create({
     fontSize: SCREEN_WIDTH * 0.045,
     color: 'red',
     textAlign: 'center',
+  },
+  modifyText: {
+    color: 'blue', // Couleur différente pour "Modifier"
   },
   cancelOption: {
     borderBottomWidth: 0,

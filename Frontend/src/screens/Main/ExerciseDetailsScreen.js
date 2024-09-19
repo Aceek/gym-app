@@ -1,6 +1,6 @@
 // ExerciseDetailsScreen.js
 
-import React, {useState, useRef} from 'react';
+import React, {useState, useRef, useCallback} from 'react';
 import {View, StyleSheet} from 'react-native';
 import TrelloBoardComponent from '../../components/Navigation/TrelloBoardComponent';
 import SetCard from '../../components/Cards/SetCard';
@@ -68,7 +68,7 @@ const ExerciseDetailsScreen = ({route, navigation}) => {
     handleCloseNoteModal();
   };
 
-  const handleAddSet = exerciseId => {
+  const handleAddSet = useCallback(exerciseId => {
     const newSet = {
       id: `s${Date.now()}`,
       reps: 0,
@@ -83,9 +83,9 @@ const ExerciseDetailsScreen = ({route, navigation}) => {
       ),
     );
     return newSet;
-  };
+  }, []);
 
-  const handleRemoveSet = (exerciseId, setId) => {
+  const handleRemoveSet = useCallback((exerciseId, setId) => {
     setExercises(prevExercises =>
       prevExercises.map(exercise =>
         exercise.id === exerciseId
@@ -96,13 +96,13 @@ const ExerciseDetailsScreen = ({route, navigation}) => {
           : exercise,
       ),
     );
-  };
+  }, []);
 
-  const handleOpenModal = (exerciseId, set) => {
+  const handleOpenModal = useCallback((exerciseId, set) => {
     setSelectedExerciseId(exerciseId);
     setSelectedSet(set);
     setModalVisible(true);
-  };
+  }, []);
 
   const handleCloseModal = () => {
     setModalVisible(false);
@@ -148,12 +148,17 @@ const ExerciseDetailsScreen = ({route, navigation}) => {
     }
   }).current;
 
-  const renderSetCard = (item, columnId) => (
-    <SetCard
-      {...item}
-      onRemove={() => handleRemoveSet(columnId, item.id)}
-      onPress={() => handleOpenModal(columnId, item)}
-    />
+  const renderSetCard = useCallback(
+    (item, columnId) => (
+      <SetCard
+        key={item.id}
+        {...item}
+        onRemove={() => handleRemoveSet(columnId, item.id)}
+        onPress={() => handleOpenModal(columnId, item)}
+        onModify={() => handleOpenModal(columnId, item)}
+      />
+    ),
+    [handleRemoveSet, handleOpenModal],
   );
 
   return (

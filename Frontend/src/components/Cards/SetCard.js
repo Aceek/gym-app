@@ -10,7 +10,8 @@ import ThreeDotsModal from '../Modals/ThreeDotsModal';
 
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
 
-const SetCard = ({id, reps, weight, rpe, type, onRemove, onPress}) => {
+const SetCard = props => {
+  const {id, reps, weight, rpe, type, onRemove, onPress} = props;
   const getCardStyle = () => {
     switch (type) {
       case 'superset':

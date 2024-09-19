@@ -1,5 +1,3 @@
-// SetCardModal.js
-
 import React, {useState, useEffect} from 'react';
 import {
   View,
@@ -11,36 +9,40 @@ import {
 import PropTypes from 'prop-types';
 import BaseModal from './BaseModal';
 
-const SetCardModal = ({visible, onClose, onSave, initialValues}) => {
-  const [reps, setReps] = useState(initialValues.reps.toString());
+const ExerciseCardModal = ({visible, onClose, onSave, initialValues}) => {
+  const [title, setTitle] = useState(initialValues.title || '');
   const [weight, setWeight] = useState(initialValues.weight.toString());
+  const [reps, setReps] = useState(initialValues.reps.toString());
   const [rpe, setRpe] = useState(
     initialValues.rpe ? initialValues.rpe.toString() : '',
   );
-  const [type, setType] = useState(initialValues.type || 'regular');
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
-    setReps(initialValues.reps.toString());
+    setTitle(initialValues.title || '');
     setWeight(initialValues.weight.toString());
+    setReps(initialValues.reps.toString());
     setRpe(initialValues.rpe ? initialValues.rpe.toString() : '');
-    setType(initialValues.type || 'regular');
     setErrors({});
   }, [initialValues, visible]);
 
   const handleSave = () => {
-    const parsedReps = parseInt(reps, 10);
     const parsedWeight = parseFloat(weight);
+    const parsedReps = parseInt(reps, 10);
     const parsedRpe = rpe ? parseInt(rpe, 10) : null;
 
     let currentErrors = {};
 
-    if (isNaN(parsedReps) || parsedReps <= 0) {
-      currentErrors.reps = 'Veuillez entrer un nombre de répétitions valide.';
+    if (title.trim() === '') {
+      currentErrors.title = 'Le titre ne peut pas être vide.';
     }
 
     if (isNaN(parsedWeight) || parsedWeight <= 0) {
       currentErrors.weight = 'Veuillez entrer un poids valide.';
+    }
+
+    if (isNaN(parsedReps) || parsedReps <= 0) {
+      currentErrors.reps = 'Veuillez entrer un nombre de répétitions valide.';
     }
 
     if (rpe && (isNaN(parsedRpe) || parsedRpe < 1 || parsedRpe > 10)) {
@@ -53,44 +55,39 @@ const SetCardModal = ({visible, onClose, onSave, initialValues}) => {
     }
 
     onSave({
-      reps: parsedReps,
+      title: title.trim(),
       weight: parsedWeight,
+      reps: parsedReps,
       rpe: parsedRpe,
-      type,
     });
     setErrors({});
     onClose();
   };
 
-  const toggleType = selectedType => {
-    setType(prevType => (prevType === selectedType ? 'regular' : selectedType));
-  };
-
   return (
     <BaseModal visible={visible} onClose={onClose}>
       <View style={styles.header}>
-        <Text style={styles.modalTitle}>Modifier Set</Text>
+        <Text style={styles.modalTitle}>Modifier Exercice</Text>
       </View>
 
-      {/* Reps Input */}
+      {/* Titre Input */}
       <View style={styles.inputContainer}>
-        <Text style={styles.label}>Répétitions:</Text>
+        <Text style={styles.label}>Titre:</Text>
         <TextInput
-          style={[styles.input, errors.reps && styles.inputError]}
+          style={[styles.input, errors.title && styles.inputError]}
           onChangeText={text => {
-            setReps(text);
-            if (errors.reps) {
-              setErrors(prev => ({...prev, reps: null}));
+            setTitle(text);
+            if (errors.title) {
+              setErrors(prev => ({...prev, title: null}));
             }
           }}
-          value={reps}
-          keyboardType="numeric"
-          placeholder="Ex: 5"
+          value={title}
+          placeholder="Ex: Bench Press"
         />
-        {errors.reps && <Text style={styles.errorText}>{errors.reps}</Text>}
+        {errors.title && <Text style={styles.errorText}>{errors.title}</Text>}
       </View>
 
-      {/* Weight Input */}
+      {/* Poids Input */}
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Poids (kg):</Text>
         <TextInput
@@ -106,6 +103,24 @@ const SetCardModal = ({visible, onClose, onSave, initialValues}) => {
           placeholder="Ex: 80"
         />
         {errors.weight && <Text style={styles.errorText}>{errors.weight}</Text>}
+      </View>
+
+      {/* Répétitions Input */}
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Répétitions:</Text>
+        <TextInput
+          style={[styles.input, errors.reps && styles.inputError]}
+          onChangeText={text => {
+            setReps(text);
+            if (errors.reps) {
+              setErrors(prev => ({...prev, reps: null}));
+            }
+          }}
+          value={reps}
+          keyboardType="numeric"
+          placeholder="Ex: 5"
+        />
+        {errors.reps && <Text style={styles.errorText}>{errors.reps}</Text>}
       </View>
 
       {/* RPE Input */}
@@ -126,42 +141,6 @@ const SetCardModal = ({visible, onClose, onSave, initialValues}) => {
         {errors.rpe && <Text style={styles.errorText}>{errors.rpe}</Text>}
       </View>
 
-      {/* Set Type Selection */}
-      <View style={styles.typeContainer}>
-        <Text style={styles.label}>Type de Set:</Text>
-        <View style={styles.typeButtons}>
-          <TouchableOpacity
-            style={[
-              styles.typeButton,
-              type === 'superset' && styles.typeButtonSelected,
-            ]}
-            onPress={() => toggleType('superset')}>
-            <Text
-              style={[
-                styles.typeButtonText,
-                type === 'superset' && styles.typeButtonTextSelected,
-              ]}>
-              SuperSet
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[
-              styles.typeButton,
-              type === 'dropset' && styles.typeButtonSelected,
-            ]}
-            onPress={() => toggleType('dropset')}>
-            <Text
-              style={[
-                styles.typeButtonText,
-                type === 'dropset' && styles.typeButtonTextSelected,
-              ]}>
-              DropSet
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-
       {/* Buttons */}
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.button} onPress={onClose}>
@@ -177,15 +156,15 @@ const SetCardModal = ({visible, onClose, onSave, initialValues}) => {
   );
 };
 
-SetCardModal.propTypes = {
+ExerciseCardModal.propTypes = {
   visible: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   onSave: PropTypes.func.isRequired,
   initialValues: PropTypes.shape({
-    reps: PropTypes.number.isRequired,
+    title: PropTypes.string.isRequired,
     weight: PropTypes.number.isRequired,
+    reps: PropTypes.number.isRequired,
     rpe: PropTypes.number,
-    type: PropTypes.string,
   }).isRequired,
 };
 
@@ -223,35 +202,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginTop: 5,
   },
-  typeContainer: {
-    marginBottom: 15,
-  },
-  typeButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  typeButton: {
-    flex: 1,
-    alignItems: 'center',
-    paddingVertical: 10,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
-    marginHorizontal: 5,
-    backgroundColor: '#f9f9f9',
-  },
-  typeButtonSelected: {
-    backgroundColor: '#e0e0e0',
-    borderColor: '#000',
-  },
-  typeButtonText: {
-    fontSize: 16,
-    color: '#555',
-  },
-  typeButtonTextSelected: {
-    color: '#000',
-    fontWeight: 'bold',
-  },
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -275,4 +225,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SetCardModal;
+export default ExerciseCardModal;
