@@ -1,6 +1,6 @@
 // ExerciseDetailsScreen.js
 
-import React, {useState, useRef, useCallback} from 'react';
+import React, {useState, useRef, useCallback, useEffect} from 'react';
 import {View, StyleSheet} from 'react-native';
 import TrelloBoardComponent from '../../components/Navigation/TrelloBoardComponent';
 import SetCard from '../../components/Cards/SetCard';
@@ -35,7 +35,7 @@ const ExerciseDetailsScreen = ({route, navigation}) => {
   ];
 
   const [exercises, setExercises] = useState(initialExercises);
-  const [currentSetIndex, setCurrentSetIndex] = useState(0);
+  const [currentExerciseIndex, setCurrentExerciseIndex] = useState(0);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedSet, setSelectedSet] = useState(null);
   const [selectedExerciseId, setSelectedExerciseId] = useState(null);
@@ -43,6 +43,22 @@ const ExerciseDetailsScreen = ({route, navigation}) => {
   const [noteModalVisible, setNoteModalVisible] = useState(false);
   const [selectedExerciseNote, setSelectedExerciseNote] = useState('');
   const [selectedExerciseForNote, setSelectedExerciseForNote] = useState(null);
+
+  const updateHeaderTitle = useCallback(
+    index => {
+      const currentExercise = exercises[index];
+      if (currentExercise) {
+        navigation.setOptions({
+          title: `Exercise Details - ${currentExercise.title}`,
+        });
+      }
+    },
+    [exercises, navigation],
+  );
+
+  useEffect(() => {
+    updateHeaderTitle(currentExerciseIndex);
+  }, [currentExerciseIndex, updateHeaderTitle]);
 
   const handleOpenNoteModal = exerciseId => {
     const exercise = exercises.find(ex => ex.id === exerciseId);
@@ -144,7 +160,9 @@ const ExerciseDetailsScreen = ({route, navigation}) => {
 
   const onViewableItemsChanged = useRef(({viewableItems}) => {
     if (viewableItems.length > 0) {
-      setCurrentSetIndex(viewableItems[0].index);
+      const newIndex = viewableItems[0].index;
+      setCurrentExerciseIndex(newIndex);
+      updateHeaderTitle(newIndex);
     }
   }).current;
 
@@ -175,7 +193,7 @@ const ExerciseDetailsScreen = ({route, navigation}) => {
 
       <View style={styles.navigation}>
         <DotNavigation
-          currentIndex={currentSetIndex}
+          currentIndex={currentExerciseIndex}
           total={exercises.length}
         />
       </View>

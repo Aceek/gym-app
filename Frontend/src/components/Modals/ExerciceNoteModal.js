@@ -1,3 +1,5 @@
+// ExerciseNoteModal.js
+
 import React, {useState, useEffect} from 'react';
 import {
   View,
@@ -5,82 +7,62 @@ import {
   TextInput,
   StyleSheet,
   TouchableOpacity,
-  KeyboardAvoidingView,
-  ScrollView,
-  Platform,
 } from 'react-native';
-import Modal from 'react-native-modal';
+import PropTypes from 'prop-types';
+import BaseModal from './BaseModal'; // Assurez-vous que le chemin est correct
 
 const ExerciseNoteModal = ({visible, onClose, onSave, initialNote}) => {
   const [note, setNote] = useState(initialNote);
 
   useEffect(() => {
     setNote(initialNote);
-  }, [initialNote]);
+  }, [initialNote, visible]);
 
   const handleSave = () => {
     onSave(note);
   };
 
   return (
-    <Modal
-      isVisible={visible}
-      onBackdropPress={onClose}
-      onBackButtonPress={onClose}
-      swipeDirection={['down']}
-      onSwipeComplete={onClose}
-      style={styles.modal}
-      avoidKeyboard={true}
-      propagateSwipe={true}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.container}>
-        <ScrollView contentContainerStyle={styles.scrollView}>
-          <View style={styles.header}>
-            <Text style={styles.modalTitle}>Ajouter une note</Text>
-          </View>
+    <BaseModal visible={visible} onClose={onClose}>
+      <View style={styles.header}>
+        <Text style={styles.modalTitle}>Ajouter une note</Text>
+      </View>
 
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.textArea}
-              onChangeText={setNote}
-              value={note}
-              placeholder="Entrez votre note ici..."
-              multiline={true}
-              numberOfLines={4}
-            />
-          </View>
+      {/* Note Input */}
+      <View style={styles.inputContainer}>
+        <TextInput
+          style={[styles.textArea, styles.input]}
+          onChangeText={setNote}
+          value={note}
+          placeholder="Entrez votre note ici..."
+          multiline={true}
+          numberOfLines={4}
+        />
+      </View>
 
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.button} onPress={onClose}>
-              <Text style={styles.buttonText}>Annuler</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.button, styles.saveButton]}
-              onPress={handleSave}>
-              <Text style={styles.buttonText}>Enregistrer</Text>
-            </TouchableOpacity>
-          </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </Modal>
+      {/* Boutons */}
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity style={styles.button} onPress={onClose}>
+          <Text style={styles.buttonText}>Annuler</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.button, styles.saveButton]}
+          onPress={handleSave}>
+          <Text style={styles.buttonText}>Enregistrer</Text>
+        </TouchableOpacity>
+      </View>
+    </BaseModal>
   );
 };
+
+ExerciseNoteModal.propTypes = {
+  visible: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  onSave: PropTypes.func.isRequired,
+  initialNote: PropTypes.string.isRequired,
+};
+
 const styles = StyleSheet.create({
-  modal: {
-    justifyContent: 'flex-end',
-    margin: 0,
-  },
-  container: {
-    backgroundColor: 'white',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    paddingTop: 20,
-    maxHeight: '80%',
-  },
-  scrollView: {
-    paddingHorizontal: 20,
-  },
   header: {
     alignItems: 'center',
     marginBottom: 20,
@@ -100,6 +82,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 10,
     textAlignVertical: 'top',
+    backgroundColor: '#fafafa',
   },
   buttonContainer: {
     flexDirection: 'row',

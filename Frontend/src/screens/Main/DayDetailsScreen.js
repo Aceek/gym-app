@@ -2,6 +2,7 @@
 
 import React, {useState, useRef, useEffect, useCallback} from 'react';
 import {View, StyleSheet} from 'react-native';
+import {useNavigation} from '@react-navigation/native';
 import TrelloBoardComponent from '../../components/Navigation/TrelloBoardComponent';
 import ExerciseCard from '../../components/Cards/ExerciseCard';
 import DotNavigation from '../../components/UI/DotNavigation';
@@ -9,6 +10,7 @@ import ExerciseCardModal from '../../components/Modals/ExerciseCardModal';
 
 const DayDetailsScreen = ({route}) => {
   const {dayId} = route.params;
+  const navigation = useNavigation();
 
   const [days] = useState([
     {id: 'd1', title: 'Monday'},
@@ -53,12 +55,29 @@ const DayDetailsScreen = ({route}) => {
 
   const [currentDayIndex, setCurrentDayIndex] = useState(0);
 
+  const updateHeaderTitle = useCallback(
+    index => {
+      const currentDay = days[index];
+      if (currentDay) {
+        navigation.setOptions({
+          title: `Day Details - ${currentDay.title}`,
+        });
+      }
+    },
+    [days, navigation],
+  );
+
   useEffect(() => {
     const initialIndex = days.findIndex(day => day.id === dayId);
     if (initialIndex !== -1) {
       setCurrentDayIndex(initialIndex);
+      updateHeaderTitle(initialIndex);
     }
-  }, [dayId, days]);
+  }, [dayId, days, updateHeaderTitle]);
+
+  useEffect(() => {
+    updateHeaderTitle(currentDayIndex);
+  }, [currentDayIndex, updateHeaderTitle]);
 
   const handleAddCard = columnId => {
     const newExercise = {
@@ -87,7 +106,9 @@ const DayDetailsScreen = ({route}) => {
 
   const onViewableItemsChanged = useRef(({viewableItems}) => {
     if (viewableItems.length > 0) {
-      setCurrentDayIndex(viewableItems[0].index);
+      const newIndex = viewableItems[0].index;
+      setCurrentDayIndex(newIndex);
+      updateHeaderTitle(newIndex);
     }
   }).current;
 

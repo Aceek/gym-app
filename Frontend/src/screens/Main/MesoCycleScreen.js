@@ -1,11 +1,14 @@
 import React, {useState, useRef, useEffect, useCallback} from 'react';
 import {View, StyleSheet} from 'react-native';
+import {useNavigation} from '@react-navigation/native';
 import TrelloBoardComponent from '../../components/Navigation/TrelloBoardComponent';
 import DayCard from '../../components/Cards/DayCard';
 import DotNavigation from '../../components/UI/DotNavigation';
 import DayCardModal from '../../components/Modals/DayCardModal';
 
 const MesoCycleScreen = () => {
+  const navigation = useNavigation();
+
   const [weeks] = useState([
     {id: 'w1', title: 'Week 1'},
     {id: 'w2', title: 'Week 2'},
@@ -38,6 +41,22 @@ const MesoCycleScreen = () => {
   const [currentWeekIndex, setCurrentWeekIndex] = useState(0);
   const [dayModalVisible, setDayModalVisible] = useState(false);
   const [selectedDay, setSelectedDay] = useState(null);
+
+  const updateHeaderTitle = useCallback(
+    index => {
+      const currentWeek = weeks[index];
+      if (currentWeek) {
+        navigation.setOptions({
+          title: `Meso Cycle - ${currentWeek.title}`,
+        });
+      }
+    },
+    [weeks, navigation],
+  );
+
+  useEffect(() => {
+    updateHeaderTitle(currentWeekIndex);
+  }, [currentWeekIndex, updateHeaderTitle]);
 
   useEffect(() => {
     const newDays = [];
@@ -109,7 +128,9 @@ const MesoCycleScreen = () => {
 
   const onViewableItemsChanged = useRef(({viewableItems}) => {
     if (viewableItems.length > 0) {
-      setCurrentWeekIndex(viewableItems[0].index);
+      const newIndex = viewableItems[0].index;
+      setCurrentWeekIndex(newIndex);
+      updateHeaderTitle(newIndex);
     }
   }).current;
 

@@ -32,7 +32,7 @@ const MesoCycleStackNavigator = () => (
       name="ExerciseDetails"
       component={ExerciseDetailsScreen}
       options={({route}) => ({
-        title: `Exercise Details - ${route.params.exercise.name}`,
+        title: `Exercise Details - ${route.params.exercise.title}`,
       })}
     />
   </MesoCycleStack.Navigator>
