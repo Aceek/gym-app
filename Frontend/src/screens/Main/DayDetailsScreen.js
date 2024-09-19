@@ -1,10 +1,11 @@
 // DayDetailsScreen.js
 
-import React, {useState, useRef, useEffect} from 'react';
+import React, {useState, useRef, useEffect, useCallback} from 'react';
 import {View, StyleSheet} from 'react-native';
 import TrelloBoardComponent from '../../components/Navigation/TrelloBoardComponent';
 import ExerciseCard from '../../components/Cards/ExerciseCard';
 import DotNavigation from '../../components/UI/DotNavigation';
+import ExerciseCardModal from '../../components/Modals/ExerciseCardModal';
 
 const DayDetailsScreen = ({route}) => {
   const {dayId} = route.params;
@@ -47,7 +48,7 @@ const DayDetailsScreen = ({route}) => {
       reps: '5',
       rpe: '8',
     },
-    // ... Add more exercises for each day
+    // ... Ajoutez plus d'exercices pour chaque jour
   ]);
 
   const [currentDayIndex, setCurrentDayIndex] = useState(0);
@@ -90,11 +91,47 @@ const DayDetailsScreen = ({route}) => {
     }
   }).current;
 
+  // Gestion du Modal pour Modifier un Exercice
+  const [exerciseModalVisible, setExerciseModalVisible] = useState(false);
+  const [selectedExercise, setSelectedExercise] = useState(null);
+
+  const handleOpenExerciseModal = useCallback(
+    exerciseId => {
+      const exercise = exercises.find(ex => ex.id === exerciseId);
+      if (exercise) {
+        setSelectedExercise(exercise);
+        setExerciseModalVisible(true);
+      }
+    },
+    [exercises],
+  );
+
+  const handleCloseExerciseModal = () => {
+    setExerciseModalVisible(false);
+    setSelectedExercise(null);
+  };
+
+  const handleSaveExercise = updatedExercise => {
+    setExercises(prevExercises =>
+      prevExercises.map(exercise =>
+        exercise.id === selectedExercise.id
+          ? {
+              ...exercise,
+              ...updatedExercise,
+              initialContent: `Weight: ${updatedExercise.weight}kg, Reps: ${updatedExercise.reps}, RPE: ${updatedExercise.rpe}`,
+            }
+          : exercise,
+      ),
+    );
+    handleCloseExerciseModal();
+  };
+
   const renderExerciseCard = (item, columnId) => (
     <ExerciseCard
+      key={item.id}
       {...item}
       onRemove={() => handleRemoveCard(columnId, item.id)}
-      // Add any other necessary props or handlers
+      onModify={() => handleOpenExerciseModal(item.id)}
     />
   );
 
@@ -111,6 +148,25 @@ const DayDetailsScreen = ({route}) => {
       <View style={styles.navigation}>
         <DotNavigation currentIndex={currentDayIndex} total={days.length} />
       </View>
+
+      {/* ExerciseCardModal */}
+      <ExerciseCardModal
+        visible={exerciseModalVisible}
+        onClose={handleCloseExerciseModal}
+        onSave={handleSaveExercise}
+        initialValues={
+          selectedExercise
+            ? {
+                title: selectedExercise.title,
+                weight: parseFloat(selectedExercise.weight),
+                reps: parseInt(selectedExercise.reps, 10),
+                rpe: selectedExercise.rpe
+                  ? parseInt(selectedExercise.rpe, 10)
+                  : null,
+              }
+            : {title: '', weight: 0, reps: 0, rpe: null}
+        }
+      />
     </View>
   );
 };

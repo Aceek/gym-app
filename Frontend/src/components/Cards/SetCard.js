@@ -11,7 +11,7 @@ import ThreeDotsModal from '../Modals/ThreeDotsModal';
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
 
 const SetCard = props => {
-  const {id, reps, weight, rpe, type, onRemove, onPress} = props;
+  const {id, reps, weight, rpe, type, onRemove, onPress, onModify} = props;
   const getCardStyle = () => {
     switch (type) {
       case 'superset':
@@ -32,7 +32,11 @@ const SetCard = props => {
           {rpe !== undefined && rpe !== null ? ` | RPE: ${rpe}` : ''}
         </Text>
       </TouchableOpacity>
-      <ThreeDotsModal onRemove={() => onRemove(id)} deleteText="Delete Set" />
+      <ThreeDotsModal
+        onRemove={() => onRemove(id)}
+        onModify={() => onModify(id)}
+        deleteText="Delete Set"
+      />
     </View>
   );
 };

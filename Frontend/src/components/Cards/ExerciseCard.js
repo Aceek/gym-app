@@ -12,7 +12,7 @@ import ThreeDotsModal from '../Modals/ThreeDotsModal';
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
 
 const ExerciseCard = props => {
-  const {id, title, initialContent, onRemove} = props;
+  const {id, title, initialContent, onRemove, onModify} = props;
   const content = initialContent;
   const [weight, setWeight] = useState('');
   const [reps, setReps] = useState('');
@@ -48,7 +48,11 @@ const ExerciseCard = props => {
         <Text style={styles.cardTitle}>{title}</Text>
         <Text style={styles.cardContent}>{content}</Text>
       </TouchableOpacity>
-      <ThreeDotsModal onRemove={onRemove} deleteText="Delete Card" />
+      <ThreeDotsModal
+        onRemove={() => onRemove(id)}
+        onModify={() => onModify(id)}
+        deleteText="Delete Card"
+      />
     </View>
   );
 };
