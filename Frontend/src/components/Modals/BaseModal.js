@@ -1,13 +1,5 @@
-// BaseModal.js
-
 import React from 'react';
-import {
-  KeyboardAvoidingView,
-  ScrollView,
-  Platform,
-  StyleSheet,
-  View,
-} from 'react-native';
+import {ScrollView, StyleSheet, View} from 'react-native';
 import Modal from 'react-native-modal';
 import PropTypes from 'prop-types';
 
@@ -22,13 +14,11 @@ const BaseModal = ({visible, onClose, children}) => {
       style={styles.modal}
       avoidKeyboard={true}
       propagateSwipe={true}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.container}>
+      <View style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollView}>
           {children}
         </ScrollView>
-      </KeyboardAvoidingView>
+      </View>
     </Modal>
   );
 };
@@ -41,7 +31,7 @@ BaseModal.propTypes = {
 
 const styles = StyleSheet.create({
   modal: {
-    justifyContent: 'flex-end',
+    justifyContent: 'center',
     margin: 0,
   },
   container: {
@@ -49,10 +39,11 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     paddingTop: 20,
-    maxHeight: '80%',
+    flex: 1,
   },
   scrollView: {
     paddingHorizontal: 20,
+    flexGrow: 1,
   },
 });
 
