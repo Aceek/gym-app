@@ -1,6 +1,6 @@
 // DayDetailsScreen.js
 
-import React, {useState, useRef, useEffect, useCallback} from 'react';
+import React, {useState, useRef, useEffect, useCallback, useMemo} from 'react';
 import {View, StyleSheet} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import TrelloBoardComponent from '../../components/Navigation/TrelloBoardComponent';
@@ -8,19 +8,22 @@ import ExerciseCard from '../../components/Cards/ExerciseCard';
 import DotNavigation from '../../components/UI/DotNavigation';
 import ExerciseCardModal from '../../components/Modals/ExerciseCardModal';
 
-const DayDetailsScreen = ({route}) => {
+const DayDetailsScreen = React.memo(({route}) => {
   const {dayId} = route.params;
   const navigation = useNavigation();
 
-  const [days] = useState([
-    {id: 'd1', title: 'Monday'},
-    {id: 'd2', title: 'Tuesday'},
-    {id: 'd3', title: 'Wednesday'},
-    {id: 'd4', title: 'Thursday'},
-    {id: 'd5', title: 'Friday'},
-    {id: 'd6', title: 'Saturday'},
-    {id: 'd7', title: 'Sunday'},
-  ]);
+  const days = useMemo(
+    () => [
+      {id: 'd1', title: 'Monday'},
+      {id: 'd2', title: 'Tuesday'},
+      {id: 'd3', title: 'Wednesday'},
+      {id: 'd4', title: 'Thursday'},
+      {id: 'd5', title: 'Friday'},
+      {id: 'd6', title: 'Saturday'},
+      {id: 'd7', title: 'Sunday'},
+    ],
+    [],
+  );
 
   const [exercises, setExercises] = useState([
     {
@@ -79,7 +82,7 @@ const DayDetailsScreen = ({route}) => {
     updateHeaderTitle(currentDayIndex);
   }, [currentDayIndex, updateHeaderTitle]);
 
-  const handleAddCard = columnId => {
+  const handleAddCard = useCallback(columnId => {
     const newExercise = {
       id: `e${Date.now()}`,
       columnId: columnId,
@@ -90,19 +93,23 @@ const DayDetailsScreen = ({route}) => {
       rpe: '0',
     };
     setExercises(prevExercises => [...prevExercises, newExercise]);
-  };
+  }, []);
 
-  const handleRemoveCard = (columnId, cardId) => {
+  const handleRemoveCard = useCallback((columnId, cardId) => {
     setExercises(prevExercises =>
       prevExercises.filter(exercise => exercise.id !== cardId),
     );
-  };
+  }, []);
 
-  const boardData = days.map(day => ({
-    id: day.id,
-    title: day.title,
-    data: exercises.filter(exercise => exercise.columnId === day.id),
-  }));
+  const boardData = useMemo(
+    () =>
+      days.map(day => ({
+        id: day.id,
+        title: day.title,
+        data: exercises.filter(exercise => exercise.columnId === day.id),
+      })),
+    [days, exercises],
+  );
 
   const onViewableItemsChanged = useRef(({viewableItems}) => {
     if (viewableItems.length > 0) {
@@ -127,33 +134,39 @@ const DayDetailsScreen = ({route}) => {
     [exercises],
   );
 
-  const handleCloseExerciseModal = () => {
+  const handleCloseExerciseModal = useCallback(() => {
     setExerciseModalVisible(false);
     setSelectedExercise(null);
-  };
+  }, []);
 
-  const handleSaveExercise = updatedExercise => {
-    setExercises(prevExercises =>
-      prevExercises.map(exercise =>
-        exercise.id === selectedExercise.id
-          ? {
-              ...exercise,
-              ...updatedExercise,
-              initialContent: `Weight: ${updatedExercise.weight}kg, Reps: ${updatedExercise.reps}, RPE: ${updatedExercise.rpe}`,
-            }
-          : exercise,
-      ),
-    );
-    handleCloseExerciseModal();
-  };
+  const handleSaveExercise = useCallback(
+    updatedExercise => {
+      setExercises(prevExercises =>
+        prevExercises.map(exercise =>
+          exercise.id === selectedExercise?.id
+            ? {
+                ...exercise,
+                ...updatedExercise,
+                initialContent: `Weight: ${updatedExercise.weight}kg, Reps: ${updatedExercise.reps}, RPE: ${updatedExercise.rpe}`,
+              }
+            : exercise,
+        ),
+      );
+      handleCloseExerciseModal();
+    },
+    [selectedExercise, handleCloseExerciseModal],
+  );
 
-  const renderExerciseCard = (item, columnId) => (
-    <ExerciseCard
-      key={item.id}
-      {...item}
-      onRemove={() => handleRemoveCard(columnId, item.id)}
-      onModify={() => handleOpenExerciseModal(item.id)}
-    />
+  const renderExerciseCard = useCallback(
+    (item, columnId) => (
+      <ExerciseCard
+        key={item.id}
+        {...item}
+        onRemove={() => handleRemoveCard(columnId, item.id)}
+        onModify={() => handleOpenExerciseModal(item.id)}
+      />
+    ),
+    [handleRemoveCard, handleOpenExerciseModal],
   );
 
   return (
@@ -190,7 +203,7 @@ const DayDetailsScreen = ({route}) => {
       />
     </View>
   );
-};
+});
 
 const styles = StyleSheet.create({
   container: {

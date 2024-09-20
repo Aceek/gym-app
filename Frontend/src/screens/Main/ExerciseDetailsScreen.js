@@ -1,6 +1,6 @@
 // ExerciseDetailsScreen.js
 
-import React, {useState, useRef, useCallback, useEffect} from 'react';
+import React, {useState, useRef, useCallback, useEffect, useMemo} from 'react';
 import {View, StyleSheet} from 'react-native';
 import TrelloBoardComponent from '../../components/Navigation/TrelloBoardComponent';
 import SetCard from '../../components/Cards/SetCard';
@@ -8,7 +8,7 @@ import SetCardModal from '../../components/Modals/SetCardModal';
 import ExerciseNoteModal from '../../components/Modals/ExerciceNoteModal';
 import DotNavigation from '../../components/UI/DotNavigation';
 
-const ExerciseDetailsScreen = ({route, navigation}) => {
+const ExerciseDetailsScreen = React.memo(({route, navigation}) => {
   const initialExercises = [
     {
       id: 'e1',
@@ -60,29 +60,35 @@ const ExerciseDetailsScreen = ({route, navigation}) => {
     updateHeaderTitle(currentExerciseIndex);
   }, [currentExerciseIndex, updateHeaderTitle]);
 
-  const handleOpenNoteModal = exerciseId => {
-    const exercise = exercises.find(ex => ex.id === exerciseId);
-    setSelectedExerciseNote(exercise.note || '');
-    setSelectedExerciseForNote(exerciseId);
-    setNoteModalVisible(true);
-  };
+  const handleOpenNoteModal = useCallback(
+    exerciseId => {
+      const exercise = exercises.find(ex => ex.id === exerciseId);
+      setSelectedExerciseNote(exercise.note || '');
+      setSelectedExerciseForNote(exerciseId);
+      setNoteModalVisible(true);
+    },
+    [exercises],
+  );
 
-  const handleCloseNoteModal = () => {
+  const handleCloseNoteModal = useCallback(() => {
     setNoteModalVisible(false);
     setSelectedExerciseNote('');
     setSelectedExerciseForNote(null);
-  };
+  }, []);
 
-  const handleSaveNote = note => {
-    setExercises(prevExercises =>
-      prevExercises.map(exercise =>
-        exercise.id === selectedExerciseForNote
-          ? {...exercise, note: note}
-          : exercise,
-      ),
-    );
-    handleCloseNoteModal();
-  };
+  const handleSaveNote = useCallback(
+    note => {
+      setExercises(prevExercises =>
+        prevExercises.map(exercise =>
+          exercise.id === selectedExerciseForNote
+            ? {...exercise, note: note}
+            : exercise,
+        ),
+      );
+      handleCloseNoteModal();
+    },
+    [selectedExerciseForNote, handleCloseNoteModal],
+  );
 
   const handleAddSet = useCallback(exerciseId => {
     const newSet = {
@@ -120,43 +126,50 @@ const ExerciseDetailsScreen = ({route, navigation}) => {
     setModalVisible(true);
   }, []);
 
-  const handleCloseModal = () => {
+  const handleCloseModal = useCallback(() => {
     setModalVisible(false);
     setSelectedSet(null);
     setSelectedExerciseId(null);
-  };
+  }, []);
 
-  const handleSaveSet = updatedSet => {
-    setExercises(prevExercises =>
-      prevExercises.map(exercise =>
-        exercise.id === selectedExerciseId
-          ? {
-              ...exercise,
-              sets: exercise.sets.map(set =>
-                set.id === selectedSet.id ? {...set, ...updatedSet} : set,
-              ),
-            }
-          : exercise,
-      ),
-    );
-    handleCloseModal();
-  };
-
-  const boardData = exercises.map(exercise => ({
-    id: exercise.id,
-    title: exercise.title,
-    headerInfo: {
-      'Poids cible': `${exercise.weight} kg`,
-      'Répétitions cibles': exercise.reps,
-      'RPE cible': exercise.rpe,
-      Note: exercise.note
-        ? exercise.note.length > 30
-          ? exercise.note.substring(0, 27) + '...'
-          : exercise.note
-        : 'Aucune note (cliquez pour ajouter)',
+  const handleSaveSet = useCallback(
+    updatedSet => {
+      setExercises(prevExercises =>
+        prevExercises.map(exercise =>
+          exercise.id === selectedExerciseId
+            ? {
+                ...exercise,
+                sets: exercise.sets.map(set =>
+                  set.id === selectedSet.id ? {...set, ...updatedSet} : set,
+                ),
+              }
+            : exercise,
+        ),
+      );
+      handleCloseModal();
     },
-    data: exercise.sets,
-  }));
+    [selectedExerciseId, selectedSet, handleCloseModal],
+  );
+
+  const boardData = useMemo(
+    () =>
+      exercises.map(exercise => ({
+        id: exercise.id,
+        title: exercise.title,
+        headerInfo: {
+          'Poids cible': `${exercise.weight} kg`,
+          'Répétitions cibles': exercise.reps,
+          'RPE cible': exercise.rpe,
+          Note: exercise.note
+            ? exercise.note.length > 30
+              ? exercise.note.substring(0, 27) + '...'
+              : exercise.note
+            : 'Aucune note (cliquez pour ajouter)',
+        },
+        data: exercise.sets,
+      })),
+    [exercises],
+  );
 
   const onViewableItemsChanged = useRef(({viewableItems}) => {
     if (viewableItems.length > 0) {
@@ -213,7 +226,7 @@ const ExerciseDetailsScreen = ({route, navigation}) => {
       />
     </View>
   );
-};
+});
 
 const styles = StyleSheet.create({
   container: {

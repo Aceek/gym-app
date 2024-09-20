@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useCallback, useMemo} from 'react';
 import {
   View,
   Text,
@@ -11,51 +11,60 @@ import ThreeDotsModal from '../Modals/ThreeDotsModal';
 
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
 
-const ExerciseCard = props => {
+const ExerciseCard = React.memo(props => {
   const {id, title, initialContent, onRemove, onModify} = props;
-  const content = initialContent;
   const [weight, setWeight] = useState('');
   const [reps, setReps] = useState('');
   const [rpe, setRpe] = useState('');
   const navigation = useNavigation();
 
   useEffect(() => {
-    // Parse initial content to set weight, reps, and rpe
     const contentParts = initialContent.split(', ');
-    contentParts.forEach(part => {
-      const [key, value] = part.split(': ');
-      if (key === 'Weight') {
-        setWeight(value.replace('kg', ''));
-      }
-      if (key === 'Reps') {
-        setReps(value);
-      }
-      if (key === 'RPE') {
-        setRpe(value);
-      }
-    });
+    const newWeight =
+      contentParts
+        .find(part => part.startsWith('Weight:'))
+        ?.split(': ')[1]
+        .replace('kg', '') || '';
+    const newReps =
+      contentParts.find(part => part.startsWith('Reps:'))?.split(': ')[1] || '';
+    const newRpe =
+      contentParts.find(part => part.startsWith('RPE:'))?.split(': ')[1] || '';
+
+    setWeight(newWeight);
+    setReps(newReps);
+    setRpe(newRpe);
   }, [initialContent]);
 
-  const handlePress = () => {
+  const handlePress = useCallback(() => {
     navigation.navigate('ExerciseDetails', {
-      exercise: {id, title, content, weight, reps, rpe},
+      exercise: {id, title, content: initialContent, weight, reps, rpe},
     });
-  };
+  }, [navigation, id, title, initialContent, weight, reps, rpe]);
+
+  const handleRemove = useCallback(() => onRemove(id), [onRemove, id]);
+  const handleModify = useCallback(() => onModify(id), [onModify, id]);
+
+  const memoizedThreeDotsModal = useMemo(
+    () => (
+      <ThreeDotsModal
+        onRemove={handleRemove}
+        onModify={handleModify}
+        deleteText="Delete Card"
+      />
+    ),
+    [handleRemove, handleModify],
+  );
 
   return (
     <View style={styles.cardContainer}>
       <TouchableOpacity style={styles.card} onPress={handlePress}>
         <Text style={styles.cardTitle}>{title}</Text>
-        <Text style={styles.cardContent}>{content}</Text>
+        <Text style={styles.cardContent}>{initialContent}</Text>
       </TouchableOpacity>
-      <ThreeDotsModal
-        onRemove={() => onRemove(id)}
-        onModify={() => onModify(id)}
-        deleteText="Delete Card"
-      />
+      {memoizedThreeDotsModal}
     </View>
   );
-};
+});
 
 const styles = StyleSheet.create({
   cardContainer: {

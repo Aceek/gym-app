@@ -1,4 +1,4 @@
-import React, {useState, useRef, useEffect, useCallback} from 'react';
+import React, {useState, useRef, useEffect, useCallback, useMemo} from 'react';
 import {View, StyleSheet} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import TrelloBoardComponent from '../../components/Navigation/TrelloBoardComponent';
@@ -6,15 +6,18 @@ import DayCard from '../../components/Cards/DayCard';
 import DotNavigation from '../../components/UI/DotNavigation';
 import DayCardModal from '../../components/Modals/DayCardModal';
 
-const MesoCycleScreen = () => {
+const MesoCycleScreen = React.memo(() => {
   const navigation = useNavigation();
 
-  const [weeks] = useState([
-    {id: 'w1', title: 'Week 1'},
-    {id: 'w2', title: 'Week 2'},
-    {id: 'w3', title: 'Week 3'},
-    {id: 'w4', title: 'Week 4'},
-  ]);
+  const weeks = useMemo(
+    () => [
+      {id: 'w1', title: 'Week 1'},
+      {id: 'w2', title: 'Week 2'},
+      {id: 'w3', title: 'Week 3'},
+      {id: 'w4', title: 'Week 4'},
+    ],
+    [],
+  );
 
   const [days, setDays] = useState([
     {
@@ -81,19 +84,24 @@ const MesoCycleScreen = () => {
     }
   }, [weeks, days]);
 
-  const handleAddCard = columnId => {
-    const newCard = {
-      id: `d${Date.now()}`,
-      columnId: columnId,
-      title: `Day ${days.filter(day => day.columnId === columnId).length + 1}`,
-      content: 'New day description',
-    };
-    setDays(prevDays => [...prevDays, newCard]);
-  };
+  const handleAddCard = useCallback(
+    columnId => {
+      const newCard = {
+        id: `d${Date.now()}`,
+        columnId: columnId,
+        title: `Day ${
+          days.filter(day => day.columnId === columnId).length + 1
+        }`,
+        content: 'New day description',
+      };
+      setDays(prevDays => [...prevDays, newCard]);
+    },
+    [days],
+  );
 
-  const handleRemoveCard = (columnId, cardId) => {
+  const handleRemoveCard = useCallback((columnId, cardId) => {
     setDays(prevDays => prevDays.filter(day => day.id !== cardId));
-  };
+  }, []);
 
   const handleOpenDayModal = useCallback(
     dayId => {
@@ -106,25 +114,32 @@ const MesoCycleScreen = () => {
     [days],
   );
 
-  const handleCloseDayModal = () => {
+  const handleCloseDayModal = useCallback(() => {
     setDayModalVisible(false);
     setSelectedDay(null);
-  };
+  }, []);
 
-  const handleSaveDay = updatedDay => {
-    setDays(prevDays =>
-      prevDays.map(day =>
-        day.id === selectedDay.id ? {...day, ...updatedDay} : day,
-      ),
-    );
-    handleCloseDayModal();
-  };
+  const handleSaveDay = useCallback(
+    updatedDay => {
+      setDays(prevDays =>
+        prevDays.map(day =>
+          day.id === selectedDay.id ? {...day, ...updatedDay} : day,
+        ),
+      );
+      handleCloseDayModal();
+    },
+    [selectedDay, handleCloseDayModal],
+  );
 
-  const boardData = weeks.map(week => ({
-    id: week.id,
-    title: week.title,
-    data: days.filter(day => day.columnId === week.id),
-  }));
+  const boardData = useMemo(
+    () =>
+      weeks.map(week => ({
+        id: week.id,
+        title: week.title,
+        data: days.filter(day => day.columnId === week.id),
+      })),
+    [weeks, days],
+  );
 
   const onViewableItemsChanged = useRef(({viewableItems}) => {
     if (viewableItems.length > 0) {
@@ -134,12 +149,16 @@ const MesoCycleScreen = () => {
     }
   }).current;
 
-  const renderDayCard = (item, columnId) => (
-    <DayCard
-      {...item}
-      onRemove={() => handleRemoveCard(columnId, item.id)}
-      onModify={() => handleOpenDayModal(item.id)}
-    />
+  const renderDayCard = useCallback(
+    (item, columnId) => (
+      <DayCard
+        key={item.id}
+        {...item}
+        onRemove={() => handleRemoveCard(columnId, item.id)}
+        onModify={() => handleOpenDayModal(item.id)}
+      />
+    ),
+    [handleRemoveCard, handleOpenDayModal],
   );
 
   return (
@@ -170,7 +189,7 @@ const MesoCycleScreen = () => {
       />
     </View>
   );
-};
+});
 
 const styles = StyleSheet.create({
   container: {
