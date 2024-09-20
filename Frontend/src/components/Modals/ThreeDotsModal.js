@@ -1,6 +1,4 @@
-// ThreeDotsModal.js
-
-import React, {useState} from 'react';
+import React, {useState, useCallback, useMemo} from 'react';
 import {
   View,
   Text,
@@ -13,36 +11,66 @@ import PropTypes from 'prop-types';
 
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
 
-const ThreeDotsMenu = ({onPress}) => (
+const ThreeDotsMenu = React.memo(({onPress}) => (
   <TouchableOpacity onPress={onPress} style={styles.threeDotsMenu}>
     <Text style={styles.threeDotsText}>⋮</Text>
   </TouchableOpacity>
-);
+));
 
-const ThreeDotsModal = ({onRemove, onModify, deleteText}) => {
+const ThreeDotsModal = React.memo(({onRemove, onModify, deleteText}) => {
   const [modalVisible, setModalVisible] = useState(false);
 
-  const handleOpenModal = () => {
-    setModalVisible(true);
-  };
+  const handleOpenModal = useCallback(() => {
+    if (!modalVisible) {
+      setModalVisible(true);
+    }
+  }, [modalVisible]);
 
-  const handleCloseModal = () => {
-    setModalVisible(false);
-  };
+  const handleCloseModal = useCallback(() => {
+    if (modalVisible) {
+      setModalVisible(false);
+    }
+  }, [modalVisible]);
 
-  const handleDelete = () => {
+  const handleDelete = useCallback(() => {
     if (onRemove) {
       onRemove();
     }
     handleCloseModal();
-  };
+  }, [onRemove, handleCloseModal]);
 
-  const handleModify = () => {
+  const handleModify = useCallback(() => {
     if (onModify) {
       onModify();
     }
     handleCloseModal();
-  };
+  }, [onModify, handleCloseModal]);
+
+  const modifyOption = useMemo(() => {
+    if (onModify) {
+      return (
+        <TouchableOpacity style={styles.modalOption} onPress={handleModify}>
+          <Text style={[styles.modalOptionText, styles.modifyText]}>
+            Modifier
+          </Text>
+        </TouchableOpacity>
+      );
+    }
+    return null;
+  }, [onModify, handleModify]);
+
+  const deleteOption = useMemo(() => {
+    if (onRemove) {
+      return (
+        <TouchableOpacity style={styles.modalOption} onPress={handleDelete}>
+          <Text style={styles.modalOptionText}>
+            {deleteText || 'Supprimer'}
+          </Text>
+        </TouchableOpacity>
+      );
+    }
+    return null;
+  }, [onRemove, handleDelete, deleteText]);
 
   return (
     <>
@@ -59,29 +87,8 @@ const ThreeDotsModal = ({onRemove, onModify, deleteText}) => {
           onPress={handleCloseModal}>
           <View style={styles.modalContent} pointerEvents="box-none">
             <View style={styles.modalOptionsContainer}>
-              {/* Option Modifier (si onModify est fourni) */}
-              {onModify && (
-                <TouchableOpacity
-                  style={styles.modalOption}
-                  onPress={handleModify}>
-                  <Text style={[styles.modalOptionText, styles.modifyText]}>
-                    Modifier
-                  </Text>
-                </TouchableOpacity>
-              )}
-
-              {/* Option Supprimer (si onRemove est fourni) */}
-              {onRemove && (
-                <TouchableOpacity
-                  style={styles.modalOption}
-                  onPress={handleDelete}>
-                  <Text style={styles.modalOptionText}>
-                    {deleteText || 'Supprimer'}
-                  </Text>
-                </TouchableOpacity>
-              )}
-
-              {/* Option Annuler (toujours présente) */}
+              {modifyOption}
+              {deleteOption}
               <TouchableOpacity
                 style={[styles.modalOption, styles.cancelOption]}
                 onPress={handleCloseModal}>
@@ -93,7 +100,7 @@ const ThreeDotsModal = ({onRemove, onModify, deleteText}) => {
       </Modal>
     </>
   );
-};
+});
 
 ThreeDotsModal.propTypes = {
   onRemove: PropTypes.func,

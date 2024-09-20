@@ -1,0 +1,86 @@
+{
+  "data": {
+    "mesocycles": {
+      "mesocycle_chest_focus": {
+        "id": "mesocycle_chest_focus",
+        "weeks": [
+          "week_chest_focus_1",
+          "week_chest_focus_2",
+          "week_chest_focus_3"
+        ]
+      },
+      "mesocycle_leg_focus": {
+        "id": "mesocycle_leg_focus",
+        "weeks": ["week_leg_focus_1", "week_leg_focus_2", "week_leg_focus_3"]
+      }
+    },
+    "weeks": {
+      "week_chest_focus_1": {
+        "id": "week_chest_focus_1",
+        "days": [
+          "day_chest_focus_1_1",
+          "day_chest_focus_1_2",
+          "day_chest_focus_1_3"
+        ]
+      },
+      "week_leg_focus_1": {
+        "id": "week_leg_focus_1",
+        "days": ["day_leg_focus_1_1", "day_leg_focus_1_2", "day_leg_focus_1_3"]
+      }
+    },
+    "days": {
+      "day_chest_focus_1_1": {
+        "id": "day_chest_focus_1_1",
+        "exercises": ["exercise_bench_press", "exercise_incline_db_press"]
+      },
+      "day_leg_focus_1_1": {
+        "id": "day_leg_focus_1_1",
+        "exercises": ["exercise_squat", "exercise_leg_press"]
+      }
+    },
+    "exercises": {
+      "exercise_bench_press": {
+        "id": "exercise_bench_press",
+        "title": "Bench Press",
+        "weight": "80",
+        "reps": "5",
+        "rpe": "8",
+        "sets": ["set_bench_press_1", "set_bench_press_2"]
+      },
+      "exercise_squat": {
+        "id": "exercise_squat",
+        "title": "Squat",
+        "weight": "100",
+        "reps": "5",
+        "rpe": "8",
+        "sets": ["set_squat_1", "set_squat_2"]
+      }
+    },
+    "sets": {
+      "set_bench_press_1": {
+        "id": "set_bench_press_1",
+        "reps": 5,
+        "weight": 80,
+        "rpe": 8
+      },
+      "set_bench_press_2": {
+        "id": "set_bench_press_2",
+        "reps": 5,
+        "weight": 82.5,
+        "rpe": 8
+      },
+      "set_squat_1": {
+        "id": "set_squat_1",
+        "reps": 5,
+        "weight": 100,
+        "rpe": 8
+      },
+      "set_squat_2": {
+        "id": "set_squat_2",
+        "reps": 4,
+        "weight": 110,
+        "rpe": 9
+      }
+    }
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "data": {
+    "sets": {
+      "set_bench_press_1": {
+        "weight": 85
+      },
+      "set_squat_2": {
+        "reps": 5,
+        "weight": 110
+      },
+      "set_flyes_1": {
+        "id": "set_flyes_1",
+        "reps": 12,
+        "weight": 60,
+        "rpe": 7
+      },
+      "set_flyes_2": {
+        "id": "set_flyes_2",
+        "reps": 12,
+        "weight": 62.5,
+        "rpe": 7
+      }
+    },
+    "exercises": {
+      "exercise_bench_press": {
+        "weight": "85"
+      },
+      "exercise_squat": {
+        "reps": "5"
+      },
+      "exercise_flyes": {
+        "id": "exercise_flyes",
+        "title": "Flyes",
+        "weight": "60",
+        "reps": "12",
+        "rpe": "7",
+        "sets": ["set_flyes_1", "set_flyes_2"]
+      }
+    },
+    "days": {
+      "day_chest_focus_1_1": {
+        "exercises": {
+          "add": ["exercise_flyes"],
+          "remove": ["exercise_incline_db_press"]
+        }
+      }
+    }
+  }
+}

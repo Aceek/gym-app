@@ -10,6 +10,7 @@ import MesoCycleScreen from '../screens/Main/MesoCycleScreen';
 import DayDetailsScreen from '../screens/Main/DayDetailsScreen';
 import ExerciseDetailsScreen from '../screens/Main/ExerciseDetailsScreen';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import {Settings} from 'react-native';
 
 const HomeStack = createNativeStackNavigator();
 const ProfileStack = createNativeStackNavigator();
@@ -54,6 +55,17 @@ const SettingsStackNavigator = () => (
   <SettingsStack.Navigator>
     <SettingsStack.Screen
       name="SettingsStackScreen"
+      component={SettingsScreen}
+    />
+    <SettingsStack.Screen
+      name="NotificationsScreen"
+      component={SettingsScreen}
+    />
+    <SettingsStack.Screen name="PrivacyScreen" component={SettingsScreen} />
+    <SettingsStack.Screen name="SecurityScreen" component={SettingsScreen} />
+    <SettingsStack.Screen name="LanguageScreen" component={SettingsScreen} />
+    <SettingsStack.Screen
+      name="TermsOfServiceScreen"
       component={SettingsScreen}
     />
   </SettingsStack.Navigator>
