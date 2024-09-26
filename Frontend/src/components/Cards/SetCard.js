@@ -1,3 +1,5 @@
+// SetCard.js
+
 import React from 'react';
 import {
   View,
@@ -12,6 +14,7 @@ const {width: SCREEN_WIDTH} = Dimensions.get('window');
 
 const SetCard = props => {
   const {id, reps, weight, rpe, type, onRemove, onPress, onModify} = props;
+
   const getCardStyle = () => {
     switch (type) {
       case 'superset':

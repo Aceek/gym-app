@@ -14,7 +14,16 @@ import ThreeDotsModal from '../Modals/ThreeDotsModal';
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
 
 const ExerciseCard = React.memo(props => {
-  const {id, title, initialContent, onRemove, onModify} = props;
+  const {
+    id,
+    title,
+    initialContent,
+    dayId,
+    weekId,
+    mesocycleId,
+    onRemove,
+    onModify,
+  } = props;
   const [weight, setWeight] = useState('');
   const [reps, setReps] = useState('');
   const [rpe, setRpe] = useState('');
@@ -51,9 +60,12 @@ const ExerciseCard = React.memo(props => {
 
   const handlePress = useCallback(() => {
     navigation.navigate('ExerciseDetails', {
-      exercise: {id, title, content: initialContent, weight, reps, rpe},
+      mesocycleId,
+      weekId,
+      dayId,
+      exerciseId: id,
     });
-  }, [navigation, id, title, initialContent, weight, reps, rpe]);
+  }, [navigation, mesocycleId, weekId, dayId, id]);
 
   const handleRemove = useCallback(() => onRemove(id), [onRemove, id]);
   const handleModify = useCallback(() => onModify(id), [onModify, id]);

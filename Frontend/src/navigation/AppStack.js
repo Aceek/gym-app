@@ -19,22 +19,11 @@ const MesoCycleStack = createNativeStackNavigator();
 
 const MesoCycleStackNavigator = () => (
   <MesoCycleStack.Navigator>
-    <MesoCycleStack.Screen
-      name="MesoCycleScreen"
-      component={MesoCycleScreen}
-      options={{title: 'Meso Cycle'}}
-    />
-    <MesoCycleStack.Screen
-      name="DayDetails"
-      component={DayDetailsScreen}
-      options={({route}) => ({title: `Day Details - ${route.params.dayId}`})}
-    />
+    <MesoCycleStack.Screen name="MesoCycleScreen" component={MesoCycleScreen} />
+    <MesoCycleStack.Screen name="DayDetails" component={DayDetailsScreen} />
     <MesoCycleStack.Screen
       name="ExerciseDetails"
       component={ExerciseDetailsScreen}
-      options={({route}) => ({
-        title: `Exercise Details - ${route.params.exercise.title}`,
-      })}
     />
   </MesoCycleStack.Navigator>
 );

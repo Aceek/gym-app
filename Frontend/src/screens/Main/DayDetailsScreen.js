@@ -137,11 +137,14 @@ const DayDetailsScreen = React.memo(({route}) => {
       <ExerciseCard
         key={item.id}
         {...item}
+        dayId={dayId}
+        weekId={weekId}
+        mesocycleId={mesocycleId}
         onRemove={() => handleRemoveCard(dayId, item.id)}
         onModify={() => handleOpenExerciseModal(item.id)}
       />
     ),
-    [handleRemoveCard, handleOpenExerciseModal],
+    [mesocycleId, weekId, handleRemoveCard, handleOpenExerciseModal],
   );
 
   return (
@@ -153,7 +156,7 @@ const DayDetailsScreen = React.memo(({route}) => {
         viewabilityConfig={{itemVisiblePercentThreshold: 50}}
         onAddCard={handleAddCard}
         onRemoveCard={handleRemoveCard}
-        initialColumnIndex={currentDayIndex} // Focus sur le jour cliqué
+        // initialColumnIndex={currentDayIndex} // Focus sur le jour cliqué
       />
       <View style={styles.navigation}>
         <DotNavigation currentIndex={currentDayIndex} total={days.length} />

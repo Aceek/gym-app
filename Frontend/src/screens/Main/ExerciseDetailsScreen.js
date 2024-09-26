@@ -2,39 +2,19 @@
 
 import React, {useState, useRef, useCallback, useEffect, useMemo} from 'react';
 import {View, StyleSheet} from 'react-native';
+import {useNavigation} from '@react-navigation/native';
 import TrelloBoardComponent from '../../components/Navigation/TrelloBoardComponent';
 import SetCard from '../../components/Cards/SetCard';
 import SetCardModal from '../../components/Modals/SetCardModal';
 import ExerciseNoteModal from '../../components/Modals/ExerciceNoteModal';
 import DotNavigation from '../../components/UI/DotNavigation';
+import helper from '../../helpers/helperTemplate';
 
-const ExerciseDetailsScreen = React.memo(({route, navigation}) => {
-  const initialExercises = [
-    {
-      id: 'e1',
-      title: 'Bench Press',
-      weight: '80',
-      reps: '5',
-      rpe: '8',
-      sets: [
-        {id: 's1', reps: 5, weight: 80, rpe: 8},
-        {id: 's2', reps: 5, weight: 82.5, rpe: 8},
-      ],
-    },
-    {
-      id: 'e2',
-      title: 'Squat',
-      weight: '100',
-      reps: '5',
-      rpe: '8',
-      sets: [
-        {id: 's3', reps: 5, weight: 100, rpe: 8},
-        {id: 's4', reps: 4, weight: 110, rpe: 9},
-      ],
-    },
-  ];
+const ExerciseDetailsScreen = React.memo(({route}) => {
+  const {mesocycleId, weekId, dayId, exerciseId} = route.params;
+  const navigation = useNavigation();
 
-  const [exercises, setExercises] = useState(initialExercises);
+  const [exercises, setExercises] = useState([]);
   const [currentExerciseIndex, setCurrentExerciseIndex] = useState(0);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedSet, setSelectedSet] = useState(null);
@@ -43,6 +23,31 @@ const ExerciseDetailsScreen = React.memo(({route, navigation}) => {
   const [noteModalVisible, setNoteModalVisible] = useState(false);
   const [selectedExerciseNote, setSelectedExerciseNote] = useState('');
   const [selectedExerciseForNote, setSelectedExerciseForNote] = useState(null);
+
+  // Récupérer les exercices du jour avec les sets complets
+  useEffect(() => {
+    const day = helper.getDayById(dayId);
+    if (day) {
+      const exercisesData = day.exercises.map(exId => {
+        const exercise = helper.getExerciseById(exId);
+        // Récupérer les données complètes des sets pour l'exercice
+        const sets = helper.getSetsForExercise(exId);
+        return {...exercise, sets};
+      });
+      setExercises(exercisesData);
+    }
+  }, [dayId]);
+
+  // Mettre le focus sur l'exercice cliqué
+  useEffect(() => {
+    if (exercises.length > 0) {
+      const index = exercises.findIndex(ex => ex.id === exerciseId);
+      if (index !== -1) {
+        setCurrentExerciseIndex(index);
+        updateHeaderTitle(index);
+      }
+    }
+  }, [exercises, exerciseId, updateHeaderTitle]);
 
   const updateHeaderTitle = useCallback(
     index => {
@@ -55,10 +60,6 @@ const ExerciseDetailsScreen = React.memo(({route, navigation}) => {
     },
     [exercises, navigation],
   );
-
-  useEffect(() => {
-    updateHeaderTitle(currentExerciseIndex);
-  }, [currentExerciseIndex, updateHeaderTitle]);
 
   const handleOpenNoteModal = useCallback(
     exerciseId => {
@@ -100,7 +101,7 @@ const ExerciseDetailsScreen = React.memo(({route, navigation}) => {
     setExercises(prevExercises =>
       prevExercises.map(exercise =>
         exercise.id === exerciseId
-          ? {...exercise, sets: [...exercise.sets, newSet]}
+          ? {...exercise, sets: [...(exercise.sets || []), newSet]}
           : exercise,
       ),
     );
@@ -166,27 +167,30 @@ const ExerciseDetailsScreen = React.memo(({route, navigation}) => {
               : exercise.note
             : 'Aucune note (cliquez pour ajouter)',
         },
-        data: exercise.sets,
+        data: exercise.sets || [],
       })),
     [exercises],
   );
 
-  const onViewableItemsChanged = useRef(({viewableItems}) => {
-    if (viewableItems.length > 0) {
-      const newIndex = viewableItems[0].index;
-      setCurrentExerciseIndex(newIndex);
-      updateHeaderTitle(newIndex);
-    }
-  }).current;
+  const onViewableItemsChanged = useCallback(
+    ({viewableItems}) => {
+      if (viewableItems.length > 0) {
+        const newIndex = viewableItems[0].index;
+        setCurrentExerciseIndex(newIndex);
+        updateHeaderTitle(newIndex);
+      }
+    },
+    [updateHeaderTitle],
+  );
 
   const renderSetCard = useCallback(
-    (item, columnId) => (
+    (item, exerciseId) => (
       <SetCard
         key={item.id}
         {...item}
-        onRemove={() => handleRemoveSet(columnId, item.id)}
-        onPress={() => handleOpenModal(columnId, item)}
-        onModify={() => handleOpenModal(columnId, item)}
+        onRemove={() => handleRemoveSet(exerciseId, item.id)}
+        onPress={() => handleOpenModal(exerciseId, item)}
+        onModify={() => handleOpenModal(exerciseId, item)}
       />
     ),
     [handleRemoveSet, handleOpenModal],
@@ -202,6 +206,7 @@ const ExerciseDetailsScreen = React.memo(({route, navigation}) => {
         onAddCard={handleAddSet}
         onRemoveCard={handleRemoveSet}
         onHeaderPress={handleOpenNoteModal}
+        initialColumnIndex={currentExerciseIndex} // Focus sur l'exercice cliqué
       />
 
       <View style={styles.navigation}>
@@ -215,7 +220,9 @@ const ExerciseDetailsScreen = React.memo(({route, navigation}) => {
         visible={modalVisible}
         onClose={handleCloseModal}
         onSave={handleSaveSet}
-        initialValues={selectedSet || {reps: 0, weight: 0, rpe: null}}
+        initialValues={
+          selectedSet || {reps: 0, weight: 0, rpe: null, type: 'regular'}
+        }
       />
 
       <ExerciseNoteModal
