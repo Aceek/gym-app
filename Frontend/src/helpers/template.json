@@ -61,8 +61,8 @@
     "days": {
       "day_chest_focus_1_1": {
         "id": "day_chest_focus_1_1",
-        "title": "Day 1",
-        "content": "Chest, Triceps - 2 exercises",
+        "title": "Day 1 bitch",
+        "content": "Chest, Triceps - 66 exercises",
         "exercises": ["exercise_bench_press", "exercise_incline_db_press"]
       },
       "day_chest_focus_1_2": {
@@ -79,7 +79,7 @@
       },
       "day_chest_focus_2_1": {
         "id": "day_chest_focus_2_1",
-        "title": "Day 1",
+        "title": "Day 1 ok",
         "content": "Chest, Triceps - 2 exercises",
         "exercises": ["exercise_bench_press", "exercise_incline_db_press"]
       },

@@ -5,41 +5,34 @@ import TrelloBoardComponent from '../../components/Navigation/TrelloBoardCompone
 import DayCard from '../../components/Cards/DayCard';
 import DotNavigation from '../../components/UI/DotNavigation';
 import DayCardModal from '../../components/Modals/DayCardModal';
+import helper from '../../helpers/helperTemplate';
 
 const MesoCycleScreen = React.memo(() => {
   const navigation = useNavigation();
 
-  const weeks = useMemo(
-    () => [
-      {id: 'w1', title: 'Week 1'},
-      {id: 'w2', title: 'Week 2'},
-      {id: 'w3', title: 'Week 3'},
-      {id: 'w4', title: 'Week 4'},
-    ],
-    [],
+  const [selectedMesocycleId, setSelectedMesocycleId] = useState(
+    'mesocycle_chest_focus',
   );
 
-  const [days, setDays] = useState([
-    {
-      id: 'd1',
-      columnId: 'w1',
-      title: 'Day 1',
-      content: 'Chest, Triceps - 5 exercises',
-    },
-    {
-      id: 'd2',
-      columnId: 'w1',
-      title: 'Day 2',
-      content: 'Back, Biceps - 6 exercises',
-    },
-    {
-      id: 'd3',
-      columnId: 'w1',
-      title: 'Day 3',
-      content: 'Legs, Shoulders - 7 exercises',
-    },
-    // ... Add more days for each week
-  ]);
+  const [weeks, setWeeks] = useState([]);
+  const [days, setDays] = useState([]);
+
+  useEffect(() => {
+    // Récupérer les semaines du mésocycle sélectionné
+    const weeksData = helper.getWeeksForMesocycle(selectedMesocycleId);
+    setWeeks(weeksData);
+
+    // Récupérer les jours pour chaque semaine et ajouter la propriété weekId
+    const daysData = [];
+    weeksData.forEach(week => {
+      const weekDays = week.days.map(dayId => {
+        const day = helper.getDayById(dayId);
+        return {...day, weekId: week.id};
+      });
+      daysData.push(...weekDays);
+    });
+    setDays(daysData);
+  }, [selectedMesocycleId]);
 
   const [currentWeekIndex, setCurrentWeekIndex] = useState(0);
   const [dayModalVisible, setDayModalVisible] = useState(false);
@@ -61,37 +54,12 @@ const MesoCycleScreen = React.memo(() => {
     updateHeaderTitle(currentWeekIndex);
   }, [currentWeekIndex, updateHeaderTitle]);
 
-  useEffect(() => {
-    const newDays = [];
-
-    weeks.forEach((week, weekIndex) => {
-      const weekDays = days.filter(day => day.columnId === week.id);
-      const dayCount = weekDays.length > 0 ? weekDays.length : 0;
-
-      if (dayCount === 0) {
-        const newDay = {
-          id: `d${weekIndex + 1}d1`,
-          columnId: week.id,
-          title: `Day ${dayCount + 1}`,
-          content: 'Default workout day',
-        };
-        newDays.push(newDay);
-      }
-    });
-
-    if (newDays.length > 0) {
-      setDays(prevDays => [...prevDays, ...newDays]);
-    }
-  }, [weeks, days]);
-
   const handleAddCard = useCallback(
-    columnId => {
+    weekId => {
       const newCard = {
         id: `d${Date.now()}`,
-        columnId: columnId,
-        title: `Day ${
-          days.filter(day => day.columnId === columnId).length + 1
-        }`,
+        weekId: weekId,
+        title: `Day ${days.filter(day => day.weekId === weekId).length + 1}`,
         content: 'New day description',
       };
       setDays(prevDays => [...prevDays, newCard]);
@@ -99,7 +67,7 @@ const MesoCycleScreen = React.memo(() => {
     [days],
   );
 
-  const handleRemoveCard = useCallback((columnId, cardId) => {
+  const handleRemoveCard = useCallback((weekId, cardId) => {
     setDays(prevDays => prevDays.filter(day => day.id !== cardId));
   }, []);
 
@@ -136,7 +104,7 @@ const MesoCycleScreen = React.memo(() => {
       weeks.map(week => ({
         id: week.id,
         title: week.title,
-        data: days.filter(day => day.columnId === week.id),
+        data: days.filter(day => day.weekId === week.id),
       })),
     [weeks, days],
   );
@@ -150,11 +118,11 @@ const MesoCycleScreen = React.memo(() => {
   }).current;
 
   const renderDayCard = useCallback(
-    (item, columnId) => (
+    (item, weekId) => (
       <DayCard
         key={item.id}
         {...item}
-        onRemove={() => handleRemoveCard(columnId, item.id)}
+        onRemove={() => handleRemoveCard(weekId, item.id)}
         onModify={() => handleOpenDayModal(item.id)}
       />
     ),
