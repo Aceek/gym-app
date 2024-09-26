@@ -16,7 +16,9 @@ const {width: SCREEN_WIDTH} = Dimensions.get('window');
 const ExerciseCard = ({
   id,
   title,
-  initialContent,
+  weight,
+  reps,
+  rpe,
   dayId,
   weekId,
   mesocycleId,
@@ -38,7 +40,9 @@ const ExerciseCard = ({
     <View style={styles.cardContainer}>
       <TouchableOpacity style={styles.card} onPress={handlePress}>
         <Text style={styles.cardTitle}>{title}</Text>
-        <Text style={styles.cardContent}>{initialContent || 'No content'}</Text>
+        <Text style={styles.cardContent}>
+          Weight: {weight}kg, Reps: {reps}, RPE: {rpe || 'N/A'}
+        </Text>
       </TouchableOpacity>
       <ThreeDotsModal
         onRemove={() => onRemove(id)}

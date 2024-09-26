@@ -22,7 +22,7 @@ const DayDetailsScreen = ({route}) => {
   useEffect(() => {
     const week = helper.getWeekById(weekId);
     if (week) {
-      const daysData = week.days.map(id => helper.getDayById(id));
+      const daysData = week.days.map(dayId => helper.getDayById(dayId));
       setDays(daysData);
 
       const exercisesData = daysData.flatMap(day =>
@@ -31,8 +31,9 @@ const DayDetailsScreen = ({route}) => {
           return {
             ...exercise,
             dayId: day.id,
-            initialContent:
-              exercise.initialContent || 'Weight: 0kg, Reps: 0, RPE: 0',
+            weight: exercise.weight || 0,
+            reps: exercise.reps || 0,
+            rpe: exercise.rpe || null,
           };
         }),
       );
@@ -58,10 +59,9 @@ const DayDetailsScreen = ({route}) => {
       id: `e${Date.now()}`,
       dayId: selectedDayId,
       title: 'New Exercise',
-      initialContent: 'Weight: 0kg, Reps: 0, RPE: 0',
-      weight: '0',
-      reps: '0',
-      rpe: '0',
+      weight: 0,
+      reps: 0,
+      rpe: null,
     };
     setExercises(prevExercises => [...prevExercises, newExercise]);
   }, []);
