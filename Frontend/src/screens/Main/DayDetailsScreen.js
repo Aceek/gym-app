@@ -156,7 +156,7 @@ const DayDetailsScreen = React.memo(({route}) => {
         viewabilityConfig={{itemVisiblePercentThreshold: 50}}
         onAddCard={handleAddCard}
         onRemoveCard={handleRemoveCard}
-        // initialColumnIndex={currentDayIndex} // Focus sur le jour cliqué
+        initialColumnIndex={currentDayIndex} // Focus sur le jour cliqué
       />
       <View style={styles.navigation}>
         <DotNavigation currentIndex={currentDayIndex} total={days.length} />

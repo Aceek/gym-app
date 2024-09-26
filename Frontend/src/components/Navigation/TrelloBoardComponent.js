@@ -1,6 +1,6 @@
 // TrelloBoardComponent.js
 
-import React, {useCallback, useMemo} from 'react';
+import React, {useCallback, useMemo, useRef, useEffect} from 'react';
 import {FlatList, StyleSheet, View, Dimensions} from 'react-native';
 import Column from './Column';
 
@@ -14,7 +14,36 @@ const TrelloBoardComponent = React.memo(
     viewabilityConfig,
     onAddCard,
     onHeaderPress,
+    initialColumnIndex, // Ajoutez initialColumnIndex aux props
   }) => {
+    const flatListRef = useRef(null); // Créez une référence au FlatList
+
+    // Fonction pour le calcul de la position des éléments
+    const getItemLayout = useCallback(
+      (data, index) => ({
+        length: SCREEN_WIDTH,
+        offset: SCREEN_WIDTH * index,
+        index,
+      }),
+      [],
+    );
+
+    // Défilement initial vers la colonne souhaitée
+    useEffect(() => {
+      if (
+        flatListRef.current &&
+        initialColumnIndex != null &&
+        initialColumnIndex >= 0 &&
+        initialColumnIndex < data.length
+      ) {
+        flatListRef.current.scrollToIndex({
+          index: initialColumnIndex,
+          animated: false,
+          viewPosition: 0,
+        });
+      }
+    }, [initialColumnIndex, data.length]);
+
     const renderItem = useCallback(
       ({item}) => (
         <Column
@@ -47,11 +76,13 @@ const TrelloBoardComponent = React.memo(
     return (
       <View style={styles.container}>
         <FlatList
+          ref={flatListRef} // Associez la référence au FlatList
           data={data}
           renderItem={renderItem}
           keyExtractor={keyExtractor}
           onViewableItemsChanged={onViewableItemsChanged}
           viewabilityConfig={viewabilityConfig}
+          getItemLayout={getItemLayout} // Ajoutez getItemLayout
           {...flatListProps}
         />
       </View>
