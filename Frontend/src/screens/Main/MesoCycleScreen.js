@@ -122,11 +122,13 @@ const MesoCycleScreen = React.memo(() => {
       <DayCard
         key={item.id}
         {...item}
+        weekId={weekId}
+        mesocycleId={selectedMesocycleId}
         onRemove={() => handleRemoveCard(weekId, item.id)}
         onModify={() => handleOpenDayModal(item.id)}
       />
     ),
-    [handleRemoveCard, handleOpenDayModal],
+    [selectedMesocycleId, handleRemoveCard, handleOpenDayModal],
   );
 
   return (

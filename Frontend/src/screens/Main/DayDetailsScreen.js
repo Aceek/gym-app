@@ -1,62 +1,54 @@
 // DayDetailsScreen.js
 
-import React, {useState, useRef, useEffect, useCallback, useMemo} from 'react';
+import React, {useState, useEffect, useCallback, useMemo, useRef} from 'react';
 import {View, StyleSheet} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import TrelloBoardComponent from '../../components/Navigation/TrelloBoardComponent';
 import ExerciseCard from '../../components/Cards/ExerciseCard';
 import DotNavigation from '../../components/UI/DotNavigation';
 import ExerciseCardModal from '../../components/Modals/ExerciseCardModal';
+import helper from '../../helpers/helperTemplate';
 
 const DayDetailsScreen = React.memo(({route}) => {
-  const {dayId} = route.params;
+  const {mesocycleId, weekId, dayId} = route.params;
   const navigation = useNavigation();
 
-  const days = useMemo(
-    () => [
-      {id: 'd1', title: 'Monday'},
-      {id: 'd2', title: 'Tuesday'},
-      {id: 'd3', title: 'Wednesday'},
-      {id: 'd4', title: 'Thursday'},
-      {id: 'd5', title: 'Friday'},
-      {id: 'd6', title: 'Saturday'},
-      {id: 'd7', title: 'Sunday'},
-    ],
-    [],
-  );
-
-  const [exercises, setExercises] = useState([
-    {
-      id: 'e1',
-      columnId: 'd1',
-      title: 'Bench Press',
-      initialContent: 'Weight: 80kg, Reps: 5, RPE: 8',
-      weight: '80',
-      reps: '5',
-      rpe: '8',
-    },
-    {
-      id: 'e2',
-      columnId: 'd1',
-      title: 'Incline DB Press',
-      initialContent: 'Weight: 30kg, Reps: 8, RPE: 7',
-      weight: '30',
-      reps: '8',
-      rpe: '7',
-    },
-    {
-      id: 'e3',
-      columnId: 'd2',
-      title: 'Squat',
-      initialContent: 'Weight: 100kg, Reps: 5, RPE: 8',
-      weight: '100',
-      reps: '5',
-      rpe: '8',
-    },
-    // ... Ajoutez plus d'exercices pour chaque jour
-  ]);
-
+  const [days, setDays] = useState([]);
+  const [exercises, setExercises] = useState([]);
   const [currentDayIndex, setCurrentDayIndex] = useState(0);
+  const [exerciseModalVisible, setExerciseModalVisible] = useState(false);
+  const [selectedExercise, setSelectedExercise] = useState(null);
+
+  useEffect(() => {
+    const week = helper.getWeekById(weekId);
+    if (week) {
+      const daysData = week.days.map(dayId => helper.getDayById(dayId));
+      setDays(daysData);
+
+      const exercisesData = [];
+      daysData.forEach(day => {
+        const dayExercises = day.exercises.map(exerciseId => {
+          const exercise = helper.getExerciseById(exerciseId);
+          const initialContent =
+            exercise.initialContent || 'Weight: 0kg, Reps: 0, RPE: 0';
+          return {...exercise, dayId: day.id, initialContent};
+        });
+        exercisesData.push(...dayExercises);
+      });
+      setExercises(exercisesData);
+    }
+  }, [weekId]);
+
+  // Mettre le focus sur le jour cliqué
+  useEffect(() => {
+    if (days.length > 0) {
+      const index = days.findIndex(day => day.id === dayId);
+      if (index !== -1) {
+        setCurrentDayIndex(index);
+        updateHeaderTitle(index);
+      }
+    }
+  }, [days, dayId, updateHeaderTitle]);
 
   const updateHeaderTitle = useCallback(
     index => {
@@ -70,22 +62,10 @@ const DayDetailsScreen = React.memo(({route}) => {
     [days, navigation],
   );
 
-  useEffect(() => {
-    const initialIndex = days.findIndex(day => day.id === dayId);
-    if (initialIndex !== -1) {
-      setCurrentDayIndex(initialIndex);
-      updateHeaderTitle(initialIndex);
-    }
-  }, [dayId, days, updateHeaderTitle]);
-
-  useEffect(() => {
-    updateHeaderTitle(currentDayIndex);
-  }, [currentDayIndex, updateHeaderTitle]);
-
-  const handleAddCard = useCallback(columnId => {
+  const handleAddCard = useCallback(dayId => {
     const newExercise = {
       id: `e${Date.now()}`,
-      columnId: columnId,
+      dayId: dayId,
       title: 'New Exercise',
       initialContent: 'Weight: 0kg, Reps: 0, RPE: 0',
       weight: '0',
@@ -95,33 +75,11 @@ const DayDetailsScreen = React.memo(({route}) => {
     setExercises(prevExercises => [...prevExercises, newExercise]);
   }, []);
 
-  const handleRemoveCard = useCallback((columnId, cardId) => {
+  const handleRemoveCard = useCallback((dayId, exerciseId) => {
     setExercises(prevExercises =>
-      prevExercises.filter(exercise => exercise.id !== cardId),
+      prevExercises.filter(exercise => exercise.id !== exerciseId),
     );
   }, []);
-
-  const boardData = useMemo(
-    () =>
-      days.map(day => ({
-        id: day.id,
-        title: day.title,
-        data: exercises.filter(exercise => exercise.columnId === day.id),
-      })),
-    [days, exercises],
-  );
-
-  const onViewableItemsChanged = useRef(({viewableItems}) => {
-    if (viewableItems.length > 0) {
-      const newIndex = viewableItems[0].index;
-      setCurrentDayIndex(newIndex);
-      updateHeaderTitle(newIndex);
-    }
-  }).current;
-
-  // Gestion du Modal pour Modifier un Exercice
-  const [exerciseModalVisible, setExerciseModalVisible] = useState(false);
-  const [selectedExercise, setSelectedExercise] = useState(null);
 
   const handleOpenExerciseModal = useCallback(
     exerciseId => {
@@ -144,11 +102,7 @@ const DayDetailsScreen = React.memo(({route}) => {
       setExercises(prevExercises =>
         prevExercises.map(exercise =>
           exercise.id === selectedExercise?.id
-            ? {
-                ...exercise,
-                ...updatedExercise,
-                initialContent: `Weight: ${updatedExercise.weight}kg, Reps: ${updatedExercise.reps}, RPE: ${updatedExercise.rpe}`,
-              }
+            ? {...exercise, ...updatedExercise}
             : exercise,
         ),
       );
@@ -157,12 +111,33 @@ const DayDetailsScreen = React.memo(({route}) => {
     [selectedExercise, handleCloseExerciseModal],
   );
 
+  const boardData = useMemo(
+    () =>
+      days.map(day => ({
+        id: day.id,
+        title: day.title,
+        data: exercises.filter(exercise => exercise.dayId === day.id),
+      })),
+    [days, exercises],
+  );
+
+  const onViewableItemsChanged = useCallback(
+    ({viewableItems}) => {
+      if (viewableItems.length > 0) {
+        const newIndex = viewableItems[0].index;
+        setCurrentDayIndex(newIndex);
+        updateHeaderTitle(newIndex);
+      }
+    },
+    [updateHeaderTitle],
+  );
+
   const renderExerciseCard = useCallback(
-    (item, columnId) => (
+    (item, dayId) => (
       <ExerciseCard
         key={item.id}
         {...item}
-        onRemove={() => handleRemoveCard(columnId, item.id)}
+        onRemove={() => handleRemoveCard(dayId, item.id)}
         onModify={() => handleOpenExerciseModal(item.id)}
       />
     ),
@@ -178,6 +153,7 @@ const DayDetailsScreen = React.memo(({route}) => {
         viewabilityConfig={{itemVisiblePercentThreshold: 50}}
         onAddCard={handleAddCard}
         onRemoveCard={handleRemoveCard}
+        initialColumnIndex={currentDayIndex} // Focus sur le jour cliqué
       />
       <View style={styles.navigation}>
         <DotNavigation currentIndex={currentDayIndex} total={days.length} />

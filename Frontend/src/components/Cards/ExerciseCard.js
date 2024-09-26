@@ -1,3 +1,5 @@
+// ExerciseCard.js
+
 import React, {useState, useEffect, useCallback, useMemo} from 'react';
 import {
   View,
@@ -19,20 +21,32 @@ const ExerciseCard = React.memo(props => {
   const navigation = useNavigation();
 
   useEffect(() => {
-    const contentParts = initialContent.split(', ');
-    const newWeight =
-      contentParts
-        .find(part => part.startsWith('Weight:'))
-        ?.split(': ')[1]
-        .replace('kg', '') || '';
-    const newReps =
-      contentParts.find(part => part.startsWith('Reps:'))?.split(': ')[1] || '';
-    const newRpe =
-      contentParts.find(part => part.startsWith('RPE:'))?.split(': ')[1] || '';
+    if (typeof initialContent === 'string') {
+      const contentParts = initialContent.split(', ');
+      const newWeight =
+        contentParts
+          .find(part => part.startsWith('Weight:'))
+          ?.split(': ')[1]
+          .replace('kg', '') || '';
+      const newReps =
+        contentParts.find(part => part.startsWith('Reps:'))?.split(': ')[1] ||
+        '';
+      const newRpe =
+        contentParts.find(part => part.startsWith('RPE:'))?.split(': ')[1] ||
+        '';
 
-    setWeight(newWeight);
-    setReps(newReps);
-    setRpe(newRpe);
+      setWeight(newWeight);
+      setReps(newReps);
+      setRpe(newRpe);
+    } else {
+      console.warn(
+        'ExerciseCard: initialContent is not a string:',
+        initialContent,
+      );
+      setWeight('');
+      setReps('');
+      setRpe('');
+    }
   }, [initialContent]);
 
   const handlePress = useCallback(() => {
@@ -59,7 +73,7 @@ const ExerciseCard = React.memo(props => {
     <View style={styles.cardContainer}>
       <TouchableOpacity style={styles.card} onPress={handlePress}>
         <Text style={styles.cardTitle}>{title}</Text>
-        <Text style={styles.cardContent}>{initialContent}</Text>
+        <Text style={styles.cardContent}>{initialContent || 'No content'}</Text>
       </TouchableOpacity>
       {memoizedThreeDotsModal}
     </View>

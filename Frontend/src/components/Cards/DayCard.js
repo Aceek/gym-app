@@ -12,11 +12,15 @@ import ThreeDotsModal from '../Modals/ThreeDotsModal';
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
 
 const DayCard = props => {
-  const {id, title, content, columnId, onRemove, onModify} = props;
+  const {id, title, content, weekId, mesocycleId, onRemove, onModify} = props;
   const navigation = useNavigation();
 
   const handlePress = () => {
-    navigation.navigate('DayDetails', {weekId: columnId, dayId: id});
+    navigation.navigate('DayDetails', {
+      mesocycleId: mesocycleId,
+      weekId: weekId,
+      dayId: id,
+    });
   };
 
   return (
@@ -26,7 +30,7 @@ const DayCard = props => {
         <Text style={styles.cardContent}>{content}</Text>
       </TouchableOpacity>
       <ThreeDotsModal
-        onRemove={() => onRemove(id)}
+        onRemove={() => onRemove(weekId, id)}
         onModify={() => onModify(id)}
         deleteText="Delete Day"
       />
