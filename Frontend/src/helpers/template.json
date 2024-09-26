@@ -17,25 +17,155 @@
     "weeks": {
       "week_chest_focus_1": {
         "id": "week_chest_focus_1",
+        "title": "Chest Focus Week 1",
         "days": [
           "day_chest_focus_1_1",
           "day_chest_focus_1_2",
           "day_chest_focus_1_3"
         ]
       },
+      "week_chest_focus_2": {
+        "id": "week_chest_focus_2",
+        "title": "Chest Focus Week 2",
+        "days": [
+          "day_chest_focus_2_1",
+          "day_chest_focus_2_2",
+          "day_chest_focus_2_3"
+        ]
+      },
+      "week_chest_focus_3": {
+        "id": "week_chest_focus_3",
+        "title": "Chest Focus Week 3",
+        "days": [
+          "day_chest_focus_3_1",
+          "day_chest_focus_3_2",
+          "day_chest_focus_3_3"
+        ]
+      },
       "week_leg_focus_1": {
         "id": "week_leg_focus_1",
+        "title": "Leg Focus Week 1",
         "days": ["day_leg_focus_1_1", "day_leg_focus_1_2", "day_leg_focus_1_3"]
+      },
+      "week_leg_focus_2": {
+        "id": "week_leg_focus_2",
+        "title": "Leg Focus Week 2",
+        "days": ["day_leg_focus_2_1", "day_leg_focus_2_2", "day_leg_focus_2_3"]
+      },
+      "week_leg_focus_3": {
+        "id": "week_leg_focus_3",
+        "title": "Leg Focus Week 3",
+        "days": ["day_leg_focus_3_1", "day_leg_focus_3_2", "day_leg_focus_3_3"]
       }
     },
     "days": {
       "day_chest_focus_1_1": {
         "id": "day_chest_focus_1_1",
+        "title": "Day 1",
+        "content": "Chest, Triceps - 2 exercises",
         "exercises": ["exercise_bench_press", "exercise_incline_db_press"]
+      },
+      "day_chest_focus_1_2": {
+        "id": "day_chest_focus_1_2",
+        "title": "Day 2",
+        "content": "Chest, Triceps - 2 exercises",
+        "exercises": ["exercise_push_ups", "exercise_dips"]
+      },
+      "day_chest_focus_1_3": {
+        "id": "day_chest_focus_1_3",
+        "title": "Day 3",
+        "content": "Chest - 2 exercises",
+        "exercises": ["exercise_chest_flyes", "exercise_cable_crossovers"]
+      },
+      "day_chest_focus_2_1": {
+        "id": "day_chest_focus_2_1",
+        "title": "Day 1",
+        "content": "Chest, Triceps - 2 exercises",
+        "exercises": ["exercise_bench_press", "exercise_incline_db_press"]
+      },
+      "day_chest_focus_2_2": {
+        "id": "day_chest_focus_2_2",
+        "title": "Day 2",
+        "content": "Chest, Triceps - 2 exercises",
+        "exercises": ["exercise_push_ups", "exercise_dips"]
+      },
+      "day_chest_focus_2_3": {
+        "id": "day_chest_focus_2_3",
+        "title": "Day 3",
+        "content": "Chest - 2 exercises",
+        "exercises": ["exercise_chest_flyes", "exercise_cable_crossovers"]
+      },
+      "day_chest_focus_3_1": {
+        "id": "day_chest_focus_3_1",
+        "title": "Day 1",
+        "content": "Chest, Triceps - 2 exercises",
+        "exercises": ["exercise_bench_press", "exercise_incline_db_press"]
+      },
+      "day_chest_focus_3_2": {
+        "id": "day_chest_focus_3_2",
+        "title": "Day 2",
+        "content": "Chest, Triceps - 2 exercises",
+        "exercises": ["exercise_push_ups", "exercise_dips"]
+      },
+      "day_chest_focus_3_3": {
+        "id": "day_chest_focus_3_3",
+        "title": "Day 3",
+        "content": "Chest - 2 exercises",
+        "exercises": ["exercise_chest_flyes", "exercise_cable_crossovers"]
       },
       "day_leg_focus_1_1": {
         "id": "day_leg_focus_1_1",
+        "title": "Day 1",
+        "content": "Legs - 2 exercises",
         "exercises": ["exercise_squat", "exercise_leg_press"]
+      },
+      "day_leg_focus_1_2": {
+        "id": "day_leg_focus_1_2",
+        "title": "Day 2",
+        "content": "Legs - 2 exercises",
+        "exercises": ["exercise_lunges", "exercise_leg_extensions"]
+      },
+      "day_leg_focus_1_3": {
+        "id": "day_leg_focus_1_3",
+        "title": "Day 3",
+        "content": "Legs - 2 exercises",
+        "exercises": ["exercise_deadlifts", "exercise_leg_curls"]
+      },
+      "day_leg_focus_2_1": {
+        "id": "day_leg_focus_2_1",
+        "title": "Day 1",
+        "content": "Legs - 2 exercises",
+        "exercises": ["exercise_squat", "exercise_leg_press"]
+      },
+      "day_leg_focus_2_2": {
+        "id": "day_leg_focus_2_2",
+        "title": "Day 2",
+        "content": "Legs - 2 exercises",
+        "exercises": ["exercise_lunges", "exercise_leg_extensions"]
+      },
+      "day_leg_focus_2_3": {
+        "id": "day_leg_focus_2_3",
+        "title": "Day 3",
+        "content": "Legs - 2 exercises",
+        "exercises": ["exercise_deadlifts", "exercise_leg_curls"]
+      },
+      "day_leg_focus_3_1": {
+        "id": "day_leg_focus_3_1",
+        "title": "Day 1",
+        "content": "Legs - 2 exercises",
+        "exercises": ["exercise_squat", "exercise_leg_press"]
+      },
+      "day_leg_focus_3_2": {
+        "id": "day_leg_focus_3_2",
+        "title": "Day 2",
+        "content": "Legs - 2 exercises",
+        "exercises": ["exercise_lunges", "exercise_leg_extensions"]
+      },
+      "day_leg_focus_3_3": {
+        "id": "day_leg_focus_3_3",
+        "title": "Day 3",
+        "content": "Legs - 2 exercises",
+        "exercises": ["exercise_deadlifts", "exercise_leg_curls"]
       }
     },
     "exercises": {
@@ -47,6 +177,46 @@
         "rpe": "8",
         "sets": ["set_bench_press_1", "set_bench_press_2"]
       },
+      "exercise_incline_db_press": {
+        "id": "exercise_incline_db_press",
+        "title": "Incline Dumbbell Press",
+        "weight": "30",
+        "reps": "8",
+        "rpe": "7",
+        "sets": ["set_incline_db_press_1", "set_incline_db_press_2"]
+      },
+      "exercise_push_ups": {
+        "id": "exercise_push_ups",
+        "title": "Push Ups",
+        "weight": "bodyweight",
+        "reps": "15",
+        "rpe": "7",
+        "sets": []
+      },
+      "exercise_dips": {
+        "id": "exercise_dips",
+        "title": "Dips",
+        "weight": "bodyweight",
+        "reps": "10",
+        "rpe": "8",
+        "sets": []
+      },
+      "exercise_chest_flyes": {
+        "id": "exercise_chest_flyes",
+        "title": "Chest Flyes",
+        "weight": "25",
+        "reps": "12",
+        "rpe": "7",
+        "sets": []
+      },
+      "exercise_cable_crossovers": {
+        "id": "exercise_cable_crossovers",
+        "title": "Cable Crossovers",
+        "weight": "20",
+        "reps": "15",
+        "rpe": "7",
+        "sets": []
+      },
       "exercise_squat": {
         "id": "exercise_squat",
         "title": "Squat",
@@ -54,6 +224,46 @@
         "reps": "5",
         "rpe": "8",
         "sets": ["set_squat_1", "set_squat_2"]
+      },
+      "exercise_leg_press": {
+        "id": "exercise_leg_press",
+        "title": "Leg Press",
+        "weight": "150",
+        "reps": "10",
+        "rpe": "7",
+        "sets": ["set_leg_press_1", "set_leg_press_2"]
+      },
+      "exercise_lunges": {
+        "id": "exercise_lunges",
+        "title": "Lunges",
+        "weight": "bodyweight",
+        "reps": "12",
+        "rpe": "7",
+        "sets": []
+      },
+      "exercise_leg_extensions": {
+        "id": "exercise_leg_extensions",
+        "title": "Leg Extensions",
+        "weight": "60",
+        "reps": "15",
+        "rpe": "7",
+        "sets": []
+      },
+      "exercise_deadlifts": {
+        "id": "exercise_deadlifts",
+        "title": "Deadlifts",
+        "weight": "120",
+        "reps": "5",
+        "rpe": "8",
+        "sets": []
+      },
+      "exercise_leg_curls": {
+        "id": "exercise_leg_curls",
+        "title": "Leg Curls",
+        "weight": "50",
+        "reps": "12",
+        "rpe": "7",
+        "sets": []
       }
     },
     "sets": {
@@ -69,6 +279,18 @@
         "weight": 82.5,
         "rpe": 8
       },
+      "set_incline_db_press_1": {
+        "id": "set_incline_db_press_1",
+        "reps": 8,
+        "weight": 30,
+        "rpe": 7
+      },
+      "set_incline_db_press_2": {
+        "id": "set_incline_db_press_2",
+        "reps": 8,
+        "weight": 32.5,
+        "rpe": 7
+      },
       "set_squat_1": {
         "id": "set_squat_1",
         "reps": 5,
@@ -77,9 +299,21 @@
       },
       "set_squat_2": {
         "id": "set_squat_2",
-        "reps": 4,
-        "weight": 110,
-        "rpe": 9
+        "reps": 5,
+        "weight": 105,
+        "rpe": 8
+      },
+      "set_leg_press_1": {
+        "id": "set_leg_press_1",
+        "reps": 10,
+        "weight": 150,
+        "rpe": 7
+      },
+      "set_leg_press_2": {
+        "id": "set_leg_press_2",
+        "reps": 10,
+        "weight": 160,
+        "rpe": 7
       }
     }
   }
