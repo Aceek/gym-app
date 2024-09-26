@@ -1,6 +1,6 @@
 // ExerciseCard.js
 
-import React, {useState, useEffect, useCallback, useMemo} from 'react';
+import React, {useCallback} from 'react';
 import {
   View,
   Text,
@@ -13,50 +13,17 @@ import ThreeDotsModal from '../Modals/ThreeDotsModal';
 
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
 
-const ExerciseCard = React.memo(props => {
-  const {
-    id,
-    title,
-    initialContent,
-    dayId,
-    weekId,
-    mesocycleId,
-    onRemove,
-    onModify,
-  } = props;
-  const [weight, setWeight] = useState('');
-  const [reps, setReps] = useState('');
-  const [rpe, setRpe] = useState('');
+const ExerciseCard = ({
+  id,
+  title,
+  initialContent,
+  dayId,
+  weekId,
+  mesocycleId,
+  onRemove,
+  onModify,
+}) => {
   const navigation = useNavigation();
-
-  useEffect(() => {
-    if (typeof initialContent === 'string') {
-      const contentParts = initialContent.split(', ');
-      const newWeight =
-        contentParts
-          .find(part => part.startsWith('Weight:'))
-          ?.split(': ')[1]
-          .replace('kg', '') || '';
-      const newReps =
-        contentParts.find(part => part.startsWith('Reps:'))?.split(': ')[1] ||
-        '';
-      const newRpe =
-        contentParts.find(part => part.startsWith('RPE:'))?.split(': ')[1] ||
-        '';
-
-      setWeight(newWeight);
-      setReps(newReps);
-      setRpe(newRpe);
-    } else {
-      console.warn(
-        'ExerciseCard: initialContent is not a string:',
-        initialContent,
-      );
-      setWeight('');
-      setReps('');
-      setRpe('');
-    }
-  }, [initialContent]);
 
   const handlePress = useCallback(() => {
     navigation.navigate('ExerciseDetails', {
@@ -67,30 +34,20 @@ const ExerciseCard = React.memo(props => {
     });
   }, [navigation, mesocycleId, weekId, dayId, id]);
 
-  const handleRemove = useCallback(() => onRemove(id), [onRemove, id]);
-  const handleModify = useCallback(() => onModify(id), [onModify, id]);
-
-  const memoizedThreeDotsModal = useMemo(
-    () => (
-      <ThreeDotsModal
-        onRemove={handleRemove}
-        onModify={handleModify}
-        deleteText="Delete Card"
-      />
-    ),
-    [handleRemove, handleModify],
-  );
-
   return (
     <View style={styles.cardContainer}>
       <TouchableOpacity style={styles.card} onPress={handlePress}>
         <Text style={styles.cardTitle}>{title}</Text>
         <Text style={styles.cardContent}>{initialContent || 'No content'}</Text>
       </TouchableOpacity>
-      {memoizedThreeDotsModal}
+      <ThreeDotsModal
+        onRemove={() => onRemove(id)}
+        onModify={() => onModify(id)}
+        deleteText="Delete Exercise"
+      />
     </View>
   );
-});
+};
 
 const styles = StyleSheet.create({
   cardContainer: {

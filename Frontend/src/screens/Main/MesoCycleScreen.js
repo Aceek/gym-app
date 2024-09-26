@@ -1,4 +1,6 @@
-import React, {useState, useRef, useEffect, useCallback, useMemo} from 'react';
+// MesoCycleScreen.js
+
+import React, {useState, useEffect, useCallback, useMemo} from 'react';
 import {View, StyleSheet} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import TrelloBoardComponent from '../../components/Navigation/TrelloBoardComponent';
@@ -7,67 +9,52 @@ import DotNavigation from '../../components/UI/DotNavigation';
 import DayCardModal from '../../components/Modals/DayCardModal';
 import helper from '../../helpers/helperTemplate';
 
-const MesoCycleScreen = React.memo(() => {
+const MesoCycleScreen = () => {
   const navigation = useNavigation();
 
-  const [selectedMesocycleId, setSelectedMesocycleId] = useState(
-    'mesocycle_chest_focus',
-  );
-
+  const [selectedMesocycleId] = useState('mesocycle_chest_focus');
   const [weeks, setWeeks] = useState([]);
   const [days, setDays] = useState([]);
-
-  useEffect(() => {
-    // Récupérer les semaines du mésocycle sélectionné
-    const weeksData = helper.getWeeksForMesocycle(selectedMesocycleId);
-    setWeeks(weeksData);
-
-    // Récupérer les jours pour chaque semaine et ajouter la propriété weekId
-    const daysData = [];
-    weeksData.forEach(week => {
-      const weekDays = week.days.map(dayId => {
-        const day = helper.getDayById(dayId);
-        return {...day, weekId: week.id};
-      });
-      daysData.push(...weekDays);
-    });
-    setDays(daysData);
-  }, [selectedMesocycleId]);
-
   const [currentWeekIndex, setCurrentWeekIndex] = useState(0);
   const [dayModalVisible, setDayModalVisible] = useState(false);
   const [selectedDay, setSelectedDay] = useState(null);
 
-  const updateHeaderTitle = useCallback(
-    index => {
-      const currentWeek = weeks[index];
-      if (currentWeek) {
-        navigation.setOptions({
-          title: `Meso Cycle - ${currentWeek.title}`,
-        });
-      }
-    },
-    [weeks, navigation],
-  );
+  useEffect(() => {
+    const weeksData = helper.getWeeksForMesocycle(selectedMesocycleId);
+    setWeeks(weeksData);
+
+    const daysData = weeksData.flatMap(week =>
+      week.days.map(dayId => {
+        const day = helper.getDayById(dayId);
+        return {...day, weekId: week.id};
+      }),
+    );
+    setDays(daysData);
+  }, [selectedMesocycleId]);
 
   useEffect(() => {
-    updateHeaderTitle(currentWeekIndex);
-  }, [currentWeekIndex, updateHeaderTitle]);
+    const currentWeek = weeks[currentWeekIndex];
+    if (currentWeek) {
+      navigation.setOptions({
+        title: `Meso Cycle - ${currentWeek.title}`,
+      });
+    }
+  }, [currentWeekIndex, weeks, navigation]);
 
   const handleAddCard = useCallback(
     weekId => {
-      const newCard = {
+      const newDay = {
         id: `d${Date.now()}`,
-        weekId: weekId,
+        weekId,
         title: `Day ${days.filter(day => day.weekId === weekId).length + 1}`,
         content: 'New day description',
       };
-      setDays(prevDays => [...prevDays, newCard]);
+      setDays(prevDays => [...prevDays, newDay]);
     },
     [days],
   );
 
-  const handleRemoveCard = useCallback((weekId, cardId) => {
+  const handleRemoveCard = useCallback(cardId => {
     setDays(prevDays => prevDays.filter(day => day.id !== cardId));
   }, []);
 
@@ -109,22 +96,19 @@ const MesoCycleScreen = React.memo(() => {
     [weeks, days],
   );
 
-  const onViewableItemsChanged = useRef(({viewableItems}) => {
+  const onViewableItemsChanged = useCallback(({viewableItems}) => {
     if (viewableItems.length > 0) {
-      const newIndex = viewableItems[0].index;
-      setCurrentWeekIndex(newIndex);
-      updateHeaderTitle(newIndex);
+      setCurrentWeekIndex(viewableItems[0].index);
     }
-  }).current;
+  }, []);
 
   const renderDayCard = useCallback(
-    (item, weekId) => (
+    item => (
       <DayCard
         key={item.id}
         {...item}
-        weekId={weekId}
         mesocycleId={selectedMesocycleId}
-        onRemove={() => handleRemoveCard(weekId, item.id)}
+        onRemove={() => handleRemoveCard(item.id)}
         onModify={() => handleOpenDayModal(item.id)}
       />
     ),
@@ -137,9 +121,7 @@ const MesoCycleScreen = React.memo(() => {
         data={boardData}
         renderCard={renderDayCard}
         onViewableItemsChanged={onViewableItemsChanged}
-        viewabilityConfig={{itemVisiblePercentThreshold: 50}}
         onAddCard={handleAddCard}
-        onRemoveCard={handleRemoveCard}
       />
       <View style={styles.navigation}>
         <DotNavigation currentIndex={currentWeekIndex} total={weeks.length} />
@@ -150,21 +132,16 @@ const MesoCycleScreen = React.memo(() => {
         onSave={handleSaveDay}
         initialValues={
           selectedDay
-            ? {
-                title: selectedDay.title,
-                content: selectedDay.content,
-              }
+            ? {title: selectedDay.title, content: selectedDay.content}
             : {title: '', content: ''}
         }
       />
     </View>
   );
-});
+};
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
+  container: {flex: 1},
   navigation: {
     flexDirection: 'row',
     justifyContent: 'center',
