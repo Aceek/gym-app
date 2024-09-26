@@ -12,8 +12,8 @@ import PropTypes from 'prop-types';
 import BaseModal from './BaseModal';
 
 const DayCardModal = ({visible, onClose, onSave, initialValues}) => {
-  const [title, setTitle] = useState(initialValues.title || '');
-  const [content, setContent] = useState(initialValues.content || '');
+  const [title, setTitle] = useState('');
+  const [content, setContent] = useState('');
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
@@ -25,11 +25,11 @@ const DayCardModal = ({visible, onClose, onSave, initialValues}) => {
   const handleSave = () => {
     let currentErrors = {};
 
-    if (title.trim() === '') {
+    if (!title.trim()) {
       currentErrors.title = 'Le titre ne peut pas être vide.';
     }
 
-    if (content.trim() === '') {
+    if (!content.trim()) {
       currentErrors.content = 'Le contenu ne peut pas être vide.';
     }
 
@@ -42,7 +42,6 @@ const DayCardModal = ({visible, onClose, onSave, initialValues}) => {
       title: title.trim(),
       content: content.trim(),
     });
-    setErrors({});
     onClose();
   };
 
@@ -52,7 +51,6 @@ const DayCardModal = ({visible, onClose, onSave, initialValues}) => {
         <Text style={styles.modalTitle}>Modifier Jour</Text>
       </View>
 
-      {/* Titre Input */}
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Titre:</Text>
         <TextInput
@@ -69,7 +67,6 @@ const DayCardModal = ({visible, onClose, onSave, initialValues}) => {
         {errors.title && <Text style={styles.errorText}>{errors.title}</Text>}
       </View>
 
-      {/* Contenu Input */}
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Contenu:</Text>
         <TextInput
@@ -94,7 +91,6 @@ const DayCardModal = ({visible, onClose, onSave, initialValues}) => {
         )}
       </View>
 
-      {/* Buttons */}
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.button} onPress={onClose}>
           <Text style={styles.buttonText}>Annuler</Text>
@@ -120,22 +116,10 @@ DayCardModal.propTypes = {
 };
 
 const styles = StyleSheet.create({
-  header: {
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  modalTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-  },
-  inputContainer: {
-    marginBottom: 15,
-  },
-  label: {
-    fontSize: 16,
-    marginBottom: 5,
-    color: '#333',
-  },
+  header: {alignItems: 'center', marginBottom: 20},
+  modalTitle: {fontSize: 24, fontWeight: 'bold'},
+  inputContainer: {marginBottom: 15},
+  label: {fontSize: 16, marginBottom: 5, color: '#333'},
   input: {
     height: 40,
     borderColor: '#ccc',
@@ -147,16 +131,10 @@ const styles = StyleSheet.create({
   },
   textArea: {
     height: 100,
-    textAlignVertical: 'top', // Alignement du texte en haut pour les TextInput multilignes
+    textAlignVertical: 'top',
   },
-  inputError: {
-    borderColor: 'red',
-  },
-  errorText: {
-    color: 'red',
-    fontSize: 12,
-    marginTop: 5,
-  },
+  inputError: {borderColor: 'red'},
+  errorText: {color: 'red', fontSize: 12, marginTop: 5},
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -170,14 +148,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#2196F3',
     width: '45%',
   },
-  saveButton: {
-    backgroundColor: '#4CAF50',
-  },
-  buttonText: {
-    color: 'white',
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
+  saveButton: {backgroundColor: '#4CAF50'},
+  buttonText: {color: 'white', fontWeight: 'bold', textAlign: 'center'},
 });
 
 export default DayCardModal;

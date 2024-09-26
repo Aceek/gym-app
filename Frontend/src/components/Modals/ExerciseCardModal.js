@@ -1,3 +1,5 @@
+// ExerciseCardModal.js
+
 import React, {useState, useEffect} from 'react';
 import {
   View,
@@ -10,12 +12,10 @@ import PropTypes from 'prop-types';
 import BaseModal from './BaseModal';
 
 const ExerciseCardModal = ({visible, onClose, onSave, initialValues}) => {
-  const [title, setTitle] = useState(initialValues.title || '');
-  const [weight, setWeight] = useState(initialValues.weight.toString());
-  const [reps, setReps] = useState(initialValues.reps.toString());
-  const [rpe, setRpe] = useState(
-    initialValues.rpe ? initialValues.rpe.toString() : '',
-  );
+  const [title, setTitle] = useState('');
+  const [weight, setWeight] = useState('');
+  const [reps, setReps] = useState('');
+  const [rpe, setRpe] = useState('');
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
@@ -33,7 +33,7 @@ const ExerciseCardModal = ({visible, onClose, onSave, initialValues}) => {
 
     let currentErrors = {};
 
-    if (title.trim() === '') {
+    if (!title.trim()) {
       currentErrors.title = 'Le titre ne peut pas être vide.';
     }
 
@@ -60,7 +60,6 @@ const ExerciseCardModal = ({visible, onClose, onSave, initialValues}) => {
       reps: parsedReps,
       rpe: parsedRpe,
     });
-    setErrors({});
     onClose();
   };
 
@@ -70,7 +69,6 @@ const ExerciseCardModal = ({visible, onClose, onSave, initialValues}) => {
         <Text style={styles.modalTitle}>Modifier Exercice</Text>
       </View>
 
-      {/* Titre Input */}
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Titre:</Text>
         <TextInput
@@ -87,7 +85,6 @@ const ExerciseCardModal = ({visible, onClose, onSave, initialValues}) => {
         {errors.title && <Text style={styles.errorText}>{errors.title}</Text>}
       </View>
 
-      {/* Poids Input */}
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Poids (kg):</Text>
         <TextInput
@@ -105,7 +102,6 @@ const ExerciseCardModal = ({visible, onClose, onSave, initialValues}) => {
         {errors.weight && <Text style={styles.errorText}>{errors.weight}</Text>}
       </View>
 
-      {/* Répétitions Input */}
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Répétitions:</Text>
         <TextInput
@@ -123,7 +119,6 @@ const ExerciseCardModal = ({visible, onClose, onSave, initialValues}) => {
         {errors.reps && <Text style={styles.errorText}>{errors.reps}</Text>}
       </View>
 
-      {/* RPE Input */}
       <View style={styles.inputContainer}>
         <Text style={styles.label}>RPE:</Text>
         <TextInput
@@ -141,7 +136,6 @@ const ExerciseCardModal = ({visible, onClose, onSave, initialValues}) => {
         {errors.rpe && <Text style={styles.errorText}>{errors.rpe}</Text>}
       </View>
 
-      {/* Buttons */}
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.button} onPress={onClose}>
           <Text style={styles.buttonText}>Annuler</Text>
@@ -169,22 +163,10 @@ ExerciseCardModal.propTypes = {
 };
 
 const styles = StyleSheet.create({
-  header: {
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  modalTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-  },
-  inputContainer: {
-    marginBottom: 15,
-  },
-  label: {
-    fontSize: 16,
-    marginBottom: 5,
-    color: '#333',
-  },
+  header: {alignItems: 'center', marginBottom: 20},
+  modalTitle: {fontSize: 24, fontWeight: 'bold'},
+  inputContainer: {marginBottom: 15},
+  label: {fontSize: 16, marginBottom: 5, color: '#333'},
   input: {
     height: 40,
     borderColor: '#ccc',
@@ -194,14 +176,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     backgroundColor: '#fafafa',
   },
-  inputError: {
-    borderColor: 'red',
-  },
-  errorText: {
-    color: 'red',
-    fontSize: 12,
-    marginTop: 5,
-  },
+  inputError: {borderColor: 'red'},
+  errorText: {color: 'red', fontSize: 12, marginTop: 5},
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -215,14 +191,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#2196F3',
     width: '45%',
   },
-  saveButton: {
-    backgroundColor: '#4CAF50',
-  },
-  buttonText: {
-    color: 'white',
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
+  saveButton: {backgroundColor: '#4CAF50'},
+  buttonText: {color: 'white', fontWeight: 'bold', textAlign: 'center'},
 });
 
 export default ExerciseCardModal;

@@ -1,4 +1,6 @@
-import React, {useState, useCallback, useMemo} from 'react';
+// ThreeDotsModal.js
+
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -11,74 +13,22 @@ import PropTypes from 'prop-types';
 
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
 
-const ThreeDotsMenu = React.memo(({onPress}) => (
-  <TouchableOpacity onPress={onPress} style={styles.threeDotsMenu}>
-    <Text style={styles.threeDotsText}>⋮</Text>
-  </TouchableOpacity>
-));
-
-const ThreeDotsModal = React.memo(({onRemove, onModify, deleteText}) => {
+const ThreeDotsModal = ({onRemove, onModify, deleteText}) => {
   const [modalVisible, setModalVisible] = useState(false);
 
-  const handleOpenModal = useCallback(() => {
-    if (!modalVisible) {
-      setModalVisible(true);
-    }
-  }, [modalVisible]);
-
-  const handleCloseModal = useCallback(() => {
-    if (modalVisible) {
-      setModalVisible(false);
-    }
-  }, [modalVisible]);
-
-  const handleDelete = useCallback(() => {
-    if (onRemove) {
-      onRemove();
-    }
-    handleCloseModal();
-  }, [onRemove, handleCloseModal]);
-
-  const handleModify = useCallback(() => {
-    if (onModify) {
-      onModify();
-    }
-    handleCloseModal();
-  }, [onModify, handleCloseModal]);
-
-  const modifyOption = useMemo(() => {
-    if (onModify) {
-      return (
-        <TouchableOpacity style={styles.modalOption} onPress={handleModify}>
-          <Text style={[styles.modalOptionText, styles.modifyText]}>
-            Modifier
-          </Text>
-        </TouchableOpacity>
-      );
-    }
-    return null;
-  }, [onModify, handleModify]);
-
-  const deleteOption = useMemo(() => {
-    if (onRemove) {
-      return (
-        <TouchableOpacity style={styles.modalOption} onPress={handleDelete}>
-          <Text style={styles.modalOptionText}>
-            {deleteText || 'Supprimer'}
-          </Text>
-        </TouchableOpacity>
-      );
-    }
-    return null;
-  }, [onRemove, handleDelete, deleteText]);
+  const handleCloseModal = () => setModalVisible(false);
 
   return (
     <>
-      <ThreeDotsMenu onPress={handleOpenModal} />
+      <TouchableOpacity
+        onPress={() => setModalVisible(true)}
+        style={styles.threeDotsMenu}>
+        <Text style={styles.threeDotsText}>⋮</Text>
+      </TouchableOpacity>
 
       <Modal
         animationType="slide"
-        transparent={true}
+        transparent
         visible={modalVisible}
         onRequestClose={handleCloseModal}>
         <TouchableOpacity
@@ -87,8 +37,30 @@ const ThreeDotsModal = React.memo(({onRemove, onModify, deleteText}) => {
           onPress={handleCloseModal}>
           <View style={styles.modalContent} pointerEvents="box-none">
             <View style={styles.modalOptionsContainer}>
-              {modifyOption}
-              {deleteOption}
+              {onModify && (
+                <TouchableOpacity
+                  style={styles.modalOption}
+                  onPress={() => {
+                    onModify();
+                    handleCloseModal();
+                  }}>
+                  <Text style={[styles.modalOptionText, styles.modifyText]}>
+                    Modifier
+                  </Text>
+                </TouchableOpacity>
+              )}
+              {onRemove && (
+                <TouchableOpacity
+                  style={styles.modalOption}
+                  onPress={() => {
+                    onRemove();
+                    handleCloseModal();
+                  }}>
+                  <Text style={styles.modalOptionText}>
+                    {deleteText || 'Supprimer'}
+                  </Text>
+                </TouchableOpacity>
+              )}
               <TouchableOpacity
                 style={[styles.modalOption, styles.cancelOption]}
                 onPress={handleCloseModal}>
@@ -100,7 +72,7 @@ const ThreeDotsModal = React.memo(({onRemove, onModify, deleteText}) => {
       </Modal>
     </>
   );
-});
+};
 
 ThreeDotsModal.propTypes = {
   onRemove: PropTypes.func,
@@ -131,9 +103,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: SCREEN_WIDTH * 0.05,
     padding: SCREEN_WIDTH * 0.05,
   },
-  modalOptionsContainer: {
-    // Optionnel : Ajoutez un conteneur pour mieux gérer les options
-  },
+  modalOptionsContainer: {},
   modalOption: {
     paddingVertical: SCREEN_WIDTH * 0.04,
     borderBottomWidth: 1,
@@ -145,7 +115,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   modifyText: {
-    color: 'blue', // Couleur différente pour "Modifier"
+    color: 'blue',
   },
   cancelOption: {
     borderBottomWidth: 0,
@@ -154,6 +124,7 @@ const styles = StyleSheet.create({
   cancelOptionText: {
     color: 'blue',
     fontWeight: 'bold',
+    textAlign: 'center',
   },
 });
 

@@ -12,12 +12,10 @@ import PropTypes from 'prop-types';
 import BaseModal from './BaseModal';
 
 const SetCardModal = ({visible, onClose, onSave, initialValues}) => {
-  const [reps, setReps] = useState(initialValues.reps.toString());
-  const [weight, setWeight] = useState(initialValues.weight.toString());
-  const [rpe, setRpe] = useState(
-    initialValues.rpe ? initialValues.rpe.toString() : '',
-  );
-  const [type, setType] = useState(initialValues.type || 'regular');
+  const [reps, setReps] = useState('');
+  const [weight, setWeight] = useState('');
+  const [rpe, setRpe] = useState('');
+  const [type, setType] = useState('regular');
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
@@ -58,7 +56,6 @@ const SetCardModal = ({visible, onClose, onSave, initialValues}) => {
       rpe: parsedRpe,
       type,
     });
-    setErrors({});
     onClose();
   };
 
@@ -72,7 +69,6 @@ const SetCardModal = ({visible, onClose, onSave, initialValues}) => {
         <Text style={styles.modalTitle}>Modifier Set</Text>
       </View>
 
-      {/* Reps Input */}
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Répétitions:</Text>
         <TextInput
@@ -90,7 +86,6 @@ const SetCardModal = ({visible, onClose, onSave, initialValues}) => {
         {errors.reps && <Text style={styles.errorText}>{errors.reps}</Text>}
       </View>
 
-      {/* Weight Input */}
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Poids (kg):</Text>
         <TextInput
@@ -108,7 +103,6 @@ const SetCardModal = ({visible, onClose, onSave, initialValues}) => {
         {errors.weight && <Text style={styles.errorText}>{errors.weight}</Text>}
       </View>
 
-      {/* RPE Input */}
       <View style={styles.inputContainer}>
         <Text style={styles.label}>RPE:</Text>
         <TextInput
@@ -126,7 +120,6 @@ const SetCardModal = ({visible, onClose, onSave, initialValues}) => {
         {errors.rpe && <Text style={styles.errorText}>{errors.rpe}</Text>}
       </View>
 
-      {/* Set Type Selection */}
       <View style={styles.typeContainer}>
         <Text style={styles.label}>Type de Set:</Text>
         <View style={styles.typeButtons}>
@@ -162,7 +155,6 @@ const SetCardModal = ({visible, onClose, onSave, initialValues}) => {
         </View>
       </View>
 
-      {/* Buttons */}
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.button} onPress={onClose}>
           <Text style={styles.buttonText}>Annuler</Text>
@@ -190,22 +182,10 @@ SetCardModal.propTypes = {
 };
 
 const styles = StyleSheet.create({
-  header: {
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  modalTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-  },
-  inputContainer: {
-    marginBottom: 15,
-  },
-  label: {
-    fontSize: 16,
-    marginBottom: 5,
-    color: '#333',
-  },
+  header: {alignItems: 'center', marginBottom: 20},
+  modalTitle: {fontSize: 24, fontWeight: 'bold'},
+  inputContainer: {marginBottom: 15},
+  label: {fontSize: 16, marginBottom: 5, color: '#333'},
   input: {
     height: 40,
     borderColor: '#ccc',
@@ -215,21 +195,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     backgroundColor: '#fafafa',
   },
-  inputError: {
-    borderColor: 'red',
-  },
-  errorText: {
-    color: 'red',
-    fontSize: 12,
-    marginTop: 5,
-  },
-  typeContainer: {
-    marginBottom: 15,
-  },
-  typeButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
+  inputError: {borderColor: 'red'},
+  errorText: {color: 'red', fontSize: 12, marginTop: 5},
+  typeContainer: {marginBottom: 15},
+  typeButtons: {flexDirection: 'row', justifyContent: 'space-between'},
   typeButton: {
     flex: 1,
     alignItems: 'center',
@@ -244,14 +213,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#e0e0e0',
     borderColor: '#000',
   },
-  typeButtonText: {
-    fontSize: 16,
-    color: '#555',
-  },
-  typeButtonTextSelected: {
-    color: '#000',
-    fontWeight: 'bold',
-  },
+  typeButtonText: {fontSize: 16, color: '#555'},
+  typeButtonTextSelected: {color: '#000', fontWeight: 'bold'},
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -265,14 +228,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#2196F3',
     width: '45%',
   },
-  saveButton: {
-    backgroundColor: '#4CAF50',
-  },
-  buttonText: {
-    color: 'white',
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
+  saveButton: {backgroundColor: '#4CAF50'},
+  buttonText: {color: 'white', fontWeight: 'bold', textAlign: 'center'},
 });
 
 export default SetCardModal;

@@ -9,18 +9,14 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import PropTypes from 'prop-types';
-import BaseModal from './BaseModal'; // Assurez-vous que le chemin est correct
+import BaseModal from './BaseModal';
 
 const ExerciseNoteModal = ({visible, onClose, onSave, initialNote}) => {
-  const [note, setNote] = useState(initialNote);
+  const [note, setNote] = useState('');
 
   useEffect(() => {
     setNote(initialNote);
   }, [initialNote, visible]);
-
-  const handleSave = () => {
-    onSave(note);
-  };
 
   return (
     <BaseModal visible={visible} onClose={onClose}>
@@ -28,26 +24,24 @@ const ExerciseNoteModal = ({visible, onClose, onSave, initialNote}) => {
         <Text style={styles.modalTitle}>Ajouter une note</Text>
       </View>
 
-      {/* Note Input */}
       <View style={styles.inputContainer}>
         <TextInput
           style={[styles.textArea, styles.input]}
           onChangeText={setNote}
           value={note}
           placeholder="Entrez votre note ici..."
-          multiline={true}
+          multiline
           numberOfLines={4}
         />
       </View>
 
-      {/* Boutons */}
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.button} onPress={onClose}>
           <Text style={styles.buttonText}>Annuler</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.button, styles.saveButton]}
-          onPress={handleSave}>
+          onPress={() => onSave(note)}>
           <Text style={styles.buttonText}>Enregistrer</Text>
         </TouchableOpacity>
       </View>
@@ -63,17 +57,10 @@ ExerciseNoteModal.propTypes = {
 };
 
 const styles = StyleSheet.create({
-  header: {
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  modalTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-  },
-  inputContainer: {
-    marginBottom: 15,
-  },
+  header: {alignItems: 'center', marginBottom: 20},
+  modalTitle: {fontSize: 24, fontWeight: 'bold'},
+  inputContainer: {marginBottom: 15},
+  input: {},
   textArea: {
     height: 150,
     borderColor: 'gray',
@@ -97,14 +84,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#2196F3',
     width: '45%',
   },
-  saveButton: {
-    backgroundColor: '#4CAF50',
-  },
-  buttonText: {
-    color: 'white',
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
+  saveButton: {backgroundColor: '#4CAF50'},
+  buttonText: {color: 'white', fontWeight: 'bold', textAlign: 'center'},
 });
 
 export default ExerciseNoteModal;
