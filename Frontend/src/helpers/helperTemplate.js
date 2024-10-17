@@ -1,102 +1,95 @@
 // helperTemplate.js
 
-const path = require('path');
-
-// Charger les données depuis template.json
-const data = require('./template.json').data;
+import {data, loadData} from './helperTemplateUpdate';
 
 // Fonction pour obtenir tous les mésocycles
-function getMesocycles() {
+export async function getMesocycles() {
+  await loadData();
   return Object.values(data.mesocycles);
 }
 
 // Fonction pour obtenir un mésocycle par ID
-function getMesocycleById(mesocycleId) {
+export async function getMesocycleById(mesocycleId) {
+  await loadData();
   return data.mesocycles[mesocycleId];
 }
 
 // Fonction pour obtenir les semaines d'un mésocycle
-function getWeeksForMesocycle(mesocycleId) {
-  const mesocycle = getMesocycleById(mesocycleId);
+export async function getWeeksForMesocycle(mesocycleId) {
+  await loadData();
+  const mesocycle = await getMesocycleById(mesocycleId);
   if (!mesocycle) return [];
-  return mesocycle.weeks.map(weekId => getWeekById(weekId));
+  return mesocycle.weeks.map(weekId => data.weeks[weekId]);
 }
 
 // Fonction pour obtenir toutes les semaines
-function getWeeks() {
+export async function getWeeks() {
+  await loadData();
   return Object.values(data.weeks);
 }
 
 // Fonction pour obtenir une semaine par ID
-function getWeekById(weekId) {
+export async function getWeekById(weekId) {
+  await loadData();
   return data.weeks[weekId];
 }
 
 // Fonction pour obtenir les jours d'une semaine
-function getDaysForWeek(weekId) {
-  const week = getWeekById(weekId);
+export async function getDaysForWeek(weekId) {
+  await loadData();
+  const week = await getWeekById(weekId);
   if (!week) return [];
-  return week.days.map(dayId => getDayById(dayId));
+  return week.days.map(dayId => data.days[dayId]);
 }
 
 // Fonction pour obtenir tous les jours
-function getDays() {
+export async function getDays() {
+  await loadData();
   return Object.values(data.days);
 }
 
 // Fonction pour obtenir un jour par ID
-function getDayById(dayId) {
+export async function getDayById(dayId) {
+  await loadData();
   return data.days[dayId];
 }
 
 // Fonction pour obtenir les exercices d'un jour
-function getExercisesForDay(dayId) {
-  const day = getDayById(dayId);
+export async function getExercisesForDay(dayId) {
+  await loadData();
+  const day = await getDayById(dayId);
   if (!day) return [];
-  return day.exercises.map(exerciseId => getExerciseById(exerciseId));
+  return day.exercises.map(exerciseId => data.exercises[exerciseId]);
 }
 
 // Fonction pour obtenir tous les exercices
-function getExercises() {
+export async function getExercises() {
+  await loadData();
   return Object.values(data.exercises);
 }
 
 // Fonction pour obtenir un exercice par ID
-function getExerciseById(exerciseId) {
+export async function getExerciseById(exerciseId) {
+  await loadData();
   return data.exercises[exerciseId];
 }
 
 // Fonction pour obtenir les sets d'un exercice
-function getSetsForExercise(exerciseId) {
-  const exercise = getExerciseById(exerciseId);
+export async function getSetsForExercise(exerciseId) {
+  await loadData();
+  const exercise = await getExerciseById(exerciseId);
   if (!exercise || !exercise.sets) return [];
-  return exercise.sets.map(setId => getSetById(setId));
+  return exercise.sets.map(setId => data.sets[setId]);
 }
 
 // Fonction pour obtenir tous les sets
-function getSets() {
+export async function getSets() {
+  await loadData();
   return Object.values(data.sets);
 }
 
 // Fonction pour obtenir un set par ID
-function getSetById(setId) {
+export async function getSetById(setId) {
+  await loadData();
   return data.sets[setId];
 }
-
-// Exporter les fonctions pour utilisation dans d'autres modules
-module.exports = {
-  getMesocycles,
-  getMesocycleById,
-  getWeeksForMesocycle,
-  getWeeks,
-  getWeekById,
-  getDaysForWeek,
-  getDays,
-  getDayById,
-  getExercisesForDay,
-  getExercises,
-  getExerciseById,
-  getSetsForExercise,
-  getSets,
-  getSetById,
-};

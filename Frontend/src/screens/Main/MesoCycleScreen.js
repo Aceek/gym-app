@@ -7,7 +7,8 @@ import TrelloBoardComponent from '../../components/Navigation/TrelloBoardCompone
 import DayCard from '../../components/Cards/DayCard';
 import DotNavigation from '../../components/UI/DotNavigation';
 import DayCardModal from '../../components/Modals/DayCardModal';
-import helper from '../../helpers/helperTemplate';
+import * as helper from '../../helpers/helperTemplate';
+import * as helperUpdate from '../../helpers/helperTemplateUpdate';
 
 const MesoCycleScreen = () => {
   const navigation = useNavigation();
@@ -20,16 +21,26 @@ const MesoCycleScreen = () => {
   const [selectedDay, setSelectedDay] = useState(null);
 
   useEffect(() => {
-    const weeksData = helper.getWeeksForMesocycle(selectedMesocycleId);
-    setWeeks(weeksData);
+    loadData();
+  }, [selectedMesocycleId, loadData]);
 
-    const daysData = weeksData.flatMap(week =>
-      week.days.map(dayId => {
-        const day = helper.getDayById(dayId);
-        return {...day, weekId: week.id};
-      }),
-    );
-    setDays(daysData);
+  const loadData = useCallback(async () => {
+    try {
+      const weeksData = await helper.getWeeksForMesocycle(selectedMesocycleId);
+      setWeeks(weeksData);
+
+      const daysDataPromises = weeksData.flatMap(week =>
+        week.days.map(async dayId => {
+          const day = await helper.getDayById(dayId);
+          return {...day, weekId: week.id};
+        }),
+      );
+
+      const daysData = await Promise.all(daysDataPromises);
+      setDays(daysData);
+    } catch (error) {
+      console.error('Erreur lors du chargement des données :', error);
+    }
   }, [selectedMesocycleId]);
 
   useEffect(() => {
@@ -42,21 +53,41 @@ const MesoCycleScreen = () => {
   }, [currentWeekIndex, weeks, navigation]);
 
   const handleAddCard = useCallback(
-    weekId => {
-      const newDay = {
-        id: `d${Date.now()}`,
-        weekId,
-        title: `Day ${days.filter(day => day.weekId === weekId).length + 1}`,
-        content: 'New day description',
-      };
-      setDays(prevDays => [...prevDays, newDay]);
+    async weekId => {
+      try {
+        const dayId = `day_${Date.now()}`;
+        const newDay = {
+          id: dayId,
+          title: `Day ${days.filter(day => day.weekId === weekId).length + 1}`,
+          content: 'New day description',
+          exercises: [],
+        };
+        // Ajouter le nouveau jour
+        await helperUpdate.addDay(dayId, newDay);
+        // Associer le jour à la semaine
+        await helperUpdate.addDayToWeek(weekId, dayId);
+        // Recharger les données
+        await loadData();
+      } catch (error) {
+        console.error("Erreur lors de l'ajout du jour :", error);
+      }
     },
-    [days],
+    [days, loadData],
   );
 
-  const handleRemoveCard = useCallback(cardId => {
-    setDays(prevDays => prevDays.filter(day => day.id !== cardId));
-  }, []);
+  const handleRemoveCard = useCallback(
+    async cardId => {
+      try {
+        // Supprimer le jour
+        await helperUpdate.removeDay(cardId);
+        // Recharger les données
+        await loadData();
+      } catch (error) {
+        console.error('Erreur lors de la suppression du jour :', error);
+      }
+    },
+    [loadData],
+  );
 
   const handleOpenDayModal = useCallback(
     dayId => {
@@ -75,26 +106,32 @@ const MesoCycleScreen = () => {
   }, []);
 
   const handleSaveDay = useCallback(
-    updatedDay => {
-      setDays(prevDays =>
-        prevDays.map(day =>
-          day.id === selectedDay.id ? {...day, ...updatedDay} : day,
-        ),
-      );
-      handleCloseDayModal();
+    async updatedDay => {
+      try {
+        const dayId = selectedDay.id;
+        const dayData = {
+          ...(await helper.getDayById(dayId)),
+          ...updatedDay,
+        };
+        // Mettre à jour le jour
+        await helperUpdate.updateDay(dayId, dayData);
+        // Recharger les données
+        await loadData();
+        handleCloseDayModal();
+      } catch (error) {
+        console.error('Erreur lors de la mise à jour du jour :', error);
+      }
     },
-    [selectedDay, handleCloseDayModal],
+    [selectedDay, loadData, handleCloseDayModal],
   );
 
-  const boardData = useMemo(
-    () =>
-      weeks.map(week => ({
-        id: week.id,
-        title: week.title,
-        data: days.filter(day => day.weekId === week.id),
-      })),
-    [weeks, days],
-  );
+  const boardData = useMemo(() => {
+    return weeks.map(week => ({
+      id: week.id,
+      title: week.title,
+      data: days.filter(day => day.weekId === week.id),
+    }));
+  }, [weeks, days]);
 
   const onViewableItemsChanged = useCallback(({viewableItems}) => {
     if (viewableItems.length > 0) {
